@@ -1,0 +1,50 @@
+services:
+  qa-platform-api:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    container_name: qa-platform-api-prod
+    restart: on-failure
+    ports:
+      - "5050:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      - qa-platform-db
+    networks:
+      - qa-platform-network-prod
+
+  qa-platform-db:
+    image: postgres:latest
+    container_name: qa-platform-db-prod
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: qa-platform-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - qa-platform-volume-prod:/var/lib/postgresql/data
+    networks:
+      - qa-platform-network-prod
+
+  qa-platform-db-admin:
+    image: dpage/pgadmin4
+    container_name: qa-platform-db-admin-prod
+    restart: on-failure
+    environment:
+      PGADMIN_DEFAULT_EMAIL: dev@dev.com
+      PGADMIN_DEFAULT_PASSWORD: devpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - qa-platform-db
+    networks:
+      - qa-platform-network-prod
+
+volumes:
+  qa-platform-volume-prod:
+
+networks:
+  qa-platform-network-prod:
+    driver: bridge

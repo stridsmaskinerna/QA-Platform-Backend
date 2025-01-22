@@ -1,0 +1,50 @@
+services:
+  qa-platform-api:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    container_name: qa-platform-api-test
+    restart: on-failure
+    ports:
+      - "5050:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
+    depends_on:
+      - qa-platform-db
+    networks:
+      - qa-platform-network-test
+
+  qa-platform-db:
+    image: postgres:latest
+    container_name: qa-platform-db-test
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: qa-platform-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - qa-platform-volume-test:/var/lib/postgresql/data
+    networks:
+      - qa-platform-network-test
+
+  qa-platform-db-admin:
+    image: dpage/pgadmin4
+    container_name: qa-platform-db-admin-test
+    restart: on-failure
+    environment:
+      PGADMIN_DEFAULT_EMAIL: dev@dev.com
+      PGADMIN_DEFAULT_PASSWORD: devpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - qa-platform-db
+    networks:
+      - qa-platform-network-test
+
+volumes:
+  qa-platform-volume-test:
+
+networks:
+  qa-platform-network-test:
+    driver: bridge
