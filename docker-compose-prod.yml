@@ -3,7 +3,6 @@ services:
     build:
       context: "."
       dockerfile: Dockerfile
-    container_name: qa-platform-api-prod
     restart: on-failure
     ports:
       - "5050:8080"
@@ -16,7 +15,6 @@ services:
 
   qa-platform-db:
     image: postgres:latest
-    container_name: qa-platform-db-prod
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpassword
@@ -30,7 +28,6 @@ services:
 
   qa-platform-db-admin:
     image: dpage/pgadmin4
-    container_name: qa-platform-db-admin-prod
     restart: on-failure
     environment:
       PGADMIN_DEFAULT_EMAIL: dev@dev.com
