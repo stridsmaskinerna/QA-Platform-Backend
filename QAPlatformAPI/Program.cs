@@ -28,7 +28,7 @@ public class Program
     private static async Task ConfigureWebApplicationPipeline(WebApplication app)
     {
         await app.UseDataSeedAsyncExtension();
-        
+
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();

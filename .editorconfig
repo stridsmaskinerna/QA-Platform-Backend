@@ -1,0 +1,25 @@
+root = true
+
+[*]
+indent_style = space            # Use spaces instead of tabs
+indent_size = 4                 # Set indentation size
+end_of_line = lf                # Use LF for cross-platform projects
+charset = utf-8                 # Use UTF-8 encoding
+insert_final_newline = true     # Add a newline at the end of each file
+trim_trailing_whitespace = true # Remove trailing whitespace
+
+[*.cs]
+dotnet_sort_system_directives_first = true              # Sort `using System;` directives at the top
+csharp_space_before_colon_in_inheritance_clause = true  # Add space before `:` in inheritance
+csharp_preserve_single_line_blocks = true               # Keep single-line blocks (e.g., `{ }`) as is
+csharp_style_var_for_built_in_types = false             # Use explicit types instead of `var`
+csharp_style_var_when_type_is_apparent = true           # Use `var` when the type is obvious
+csharp_style_prefer_braces = true                       # Always use braces for blocks
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+[*.{yml, yaml}]
+indent_style = space
+indent_size = 2
