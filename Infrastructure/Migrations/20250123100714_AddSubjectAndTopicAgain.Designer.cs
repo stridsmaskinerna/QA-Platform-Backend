@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(QAPlatformContext))]
-    partial class QAPlatformContextModelSnapshot : ModelSnapshot
+    [Migration("20250123100714_AddSubjectAndTopicAgain")]
+    partial class AddSubjectAndTopicAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,114 +24,6 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsHidden")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid?>("QuestionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Answers");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Comment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("AnswerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnswerId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Question", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsHidden")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsProtected")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsResolved")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("TopicId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TopicId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Questions");
-                });
 
             modelBuilder.Entity("Infrastructure.Entities.Subject", b =>
                 {
@@ -168,7 +63,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Topics");
+                    b.ToTable("AnotherNewEntities");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.User", b =>
@@ -370,43 +265,10 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
-                {
-                    b.HasOne("Infrastructure.Entities.Question", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("QuestionId");
-
-                    b.HasOne("Infrastructure.Entities.User", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Comment", b =>
-                {
-                    b.HasOne("Infrastructure.Entities.Answer", null)
-                        .WithMany("Comments")
-                        .HasForeignKey("AnswerId");
-
-                    b.HasOne("Infrastructure.Entities.User", null)
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Question", b =>
-                {
-                    b.HasOne("Infrastructure.Entities.Topic", null)
-                        .WithMany("Questions")
-                        .HasForeignKey("TopicId");
-
-                    b.HasOne("Infrastructure.Entities.User", null)
-                        .WithMany("Questions")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("Infrastructure.Entities.Topic", b =>
                 {
                     b.HasOne("Infrastructure.Entities.Subject", null)
-                        .WithMany("Topics")
+                        .WithMany("Topic")
                         .HasForeignKey("SubjectId");
                 });
 
@@ -461,33 +323,9 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Question", b =>
-                {
-                    b.Navigation("Answers");
-                });
-
             modelBuilder.Entity("Infrastructure.Entities.Subject", b =>
                 {
-                    b.Navigation("Topics");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Topic", b =>
-                {
-                    b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.User", b =>
-                {
-                    b.Navigation("Answers");
-
-                    b.Navigation("Comments");
-
-                    b.Navigation("Questions");
+                    b.Navigation("Topic");
                 });
 #pragma warning restore 612, 618
         }
