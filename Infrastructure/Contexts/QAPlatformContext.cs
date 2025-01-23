@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
+using Infrastructure.Configurations;
 
 namespace Infrastructure.Contexts;
 
@@ -23,4 +23,10 @@ public class QAPlatformContext : IdentityDbContext<User, IdentityRole, string>
     public QAPlatformContext(DbContextOptions<QAPlatformContext> options)
         : base(options)
     { }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfiguration(new SubjectTeacherConfiguration());
+    }
 }

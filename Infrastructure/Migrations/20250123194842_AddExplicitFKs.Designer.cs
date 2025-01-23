@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(QAPlatformContext))]
-    partial class QAPlatformContextModelSnapshot : ModelSnapshot
+    [Migration("20250123194842_AddExplicitFKs")]
+    partial class AddExplicitFKs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Answers", (string)null);
+                    b.ToTable("Answers");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.Comment", b =>
@@ -82,7 +85,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.Question", b =>
@@ -127,7 +130,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.Subject", b =>
@@ -145,22 +148,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects", (string)null);
-                });
-
-            modelBuilder.Entity("Infrastructure.Entities.Tag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tag", (string)null);
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.Topic", b =>
@@ -183,7 +171,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Topics", (string)null);
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("Infrastructure.Entities.User", b =>
@@ -385,36 +373,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("QuestionTag", b =>
-                {
-                    b.Property<Guid>("QuestionsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TagsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("QuestionsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("QuestionTag", (string)null);
-                });
-
-            modelBuilder.Entity("SubjectTeacher", b =>
-                {
-                    b.Property<Guid>("SubjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("SubjectId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SubjectTeacher", (string)null);
-                });
-
             modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
                 {
                     b.HasOne("Infrastructure.Entities.Question", null)
@@ -507,36 +465,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("QuestionTag", b =>
-                {
-                    b.HasOne("Infrastructure.Entities.Question", null)
-                        .WithMany()
-                        .HasForeignKey("QuestionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Infrastructure.Entities.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SubjectTeacher", b =>
-                {
-                    b.HasOne("Infrastructure.Entities.Subject", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Infrastructure.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")

@@ -4,6 +4,10 @@ public class Answer
 {
     public Guid Id { get; set; }
 
+    public Guid QuestionId { get; set; }
+
+    public string? UserId { get; set; }
+
     public string Value { get; set; } = String.Empty;
 
     public int Rating { get; set; }

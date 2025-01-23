@@ -4,6 +4,10 @@ public class Question
 {
     public Guid Id { get; set; }
 
+    public Guid TopicId { get; set; }
+
+    public string? UserId { get; set; }
+
     public string Title { get; set; } = String.Empty;
 
     public string Description { get; set; } = String.Empty;
@@ -21,4 +25,6 @@ public class Question
     // Navigation
 
     public IEnumerable<Answer> Answers { get; set; } = [];
+
+    public IEnumerable<Tag> Tags { get; set; } = [];
 }

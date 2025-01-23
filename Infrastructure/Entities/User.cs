@@ -13,4 +13,6 @@ public class User : IdentityUser
     public IEnumerable<Answer> Answers { get; set; } = [];
 
     public IEnumerable<Comment> Comments { get; set; } = [];
+
+    public IEnumerable<Subject> Subjects { get; set; } = [];
 }
