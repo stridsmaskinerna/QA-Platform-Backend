@@ -1,7 +1,6 @@
 services:
   qa-platform-db:
     image: postgres:latest
-    container_name: qa-platform-db-dev
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpassword
@@ -15,7 +14,6 @@ services:
 
   qa-platform-db-admin:
     image: dpage/pgadmin4
-    container_name: qa-platform-db-admin-dev
     restart: on-failure
     environment:
       PGADMIN_DEFAULT_EMAIL: dev@dev.com
