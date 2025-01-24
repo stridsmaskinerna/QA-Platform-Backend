@@ -34,7 +34,7 @@ After login, you need to register the database server by completing the followin
     - Password: `devpassword`
 - Click `Save`
 
-After `Save`, the database can be found under `Serves`int the left board.
+After `Save`, the database can be found under `Serves`in the left board.
  
 
 ## Formatting
