@@ -2,7 +2,7 @@ root = true
 
 [*]
 indent_style = space            # Use spaces instead of tabs
-indent_size = 4                 # Set indentation size
+indent_size = 4                # Set indentation size
 end_of_line = lf                # Use LF for cross-platform projects
 charset = utf-8                 # Use UTF-8 encoding
 insert_final_newline = true     # Add a newline at the end of each file
@@ -17,9 +17,7 @@ csharp_style_var_when_type_is_apparent = true           # Use `var` when the typ
 csharp_style_prefer_braces = true                       # Always use braces for blocks
 
 [*.json]
-indent_style = space
 indent_size = 2
 
 [*.{yml, yaml}]
-indent_style = space
 indent_size = 2
