@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Entities;
+﻿namespace Domain.Entities;
 
 public class Topic
 {

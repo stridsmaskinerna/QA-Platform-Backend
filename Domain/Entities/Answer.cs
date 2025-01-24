@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Entities;
+﻿namespace Domain.Entities;
 
 public class Answer
 {
@@ -12,7 +12,7 @@ public class Answer
 
     public int Rating { get; set; }
 
-    public string FilePath { get; set; } = String.Empty;
+    public string? FilePath { get; set; }
 
     public DateTime Created { get; set; }
 

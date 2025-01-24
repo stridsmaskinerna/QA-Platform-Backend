@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Entities;
+﻿namespace Domain.Entities;
 
 public class Question
 {
@@ -12,7 +12,7 @@ public class Question
 
     public string Description { get; set; } = String.Empty;
 
-    public string FilePath { get; set; } = String.Empty;
+    public string? FilePath { get; set; }
 
     public DateTime Created { get; set; }
 
