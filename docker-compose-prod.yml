@@ -19,8 +19,6 @@ services:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpassword
       POSTGRES_DB: qa-platform-db
-    ports:
-      - "5432:5432"
     volumes:
       - qa-platform-volume-prod:/var/lib/postgresql/data
     networks:
