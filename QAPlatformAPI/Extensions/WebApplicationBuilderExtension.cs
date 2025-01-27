@@ -1,4 +1,6 @@
-﻿using Infrastructure.Contexts;
+using System.Text.Json;
+using Application.Services;
+using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace QAPlatformAPI.Extensions;
@@ -27,6 +29,41 @@ public static class WebApplicationBuilderExtension
             {
                 options.EnableSensitiveDataLogging();
             }
+        });
+    }
+
+    public static void AddApplicationServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IServiceManager, ServiceManager>();
+        builder.Services.AddAsLazy<IBaseService, BaseService>();
+    }
+
+    private static void AddAsLazy<IServiceType, ServiceType>(
+        this IServiceCollection collection,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped
+    )
+        where ServiceType : class, IServiceType
+        where IServiceType : class
+    {
+        collection.Add(new ServiceDescriptor(
+            typeof(IServiceType),
+            typeof(ServiceType),
+            lifetime
+        ));
+
+        collection.Add(new ServiceDescriptor(
+            typeof(Lazy<IServiceType>),
+            p => new Lazy<IServiceType>(() => p.GetRequiredService<IServiceType>()),
+            lifetime
+        ));
+    }
+
+    public static void AddJSONSerializerOptions(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton(new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
         });
     }
 }

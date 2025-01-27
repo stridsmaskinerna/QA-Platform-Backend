@@ -1,4 +1,4 @@
-﻿using Infrastructure.Contexts;
+using Infrastructure.Contexts;
 
 namespace Infrastructure.Seeds;
 

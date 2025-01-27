@@ -1,4 +1,4 @@
-﻿using Infrastructure.Contexts;
+using Infrastructure.Contexts;
 using Infrastructure.Seeds;
 
 namespace QAPlatformAPI;

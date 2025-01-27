@@ -1,4 +1,6 @@
+using Presentation;
 using QAPlatformAPI.Extensions;
+using QAPlatformAPI.Middlewares;
 
 namespace QAPlatformAPI;
 
@@ -14,9 +16,16 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers(configure =>
+        {
+            configure.ReturnHttpNotAcceptable = true;
+        }).AddApplicationPart(typeof(AssemblyReference).Assembly);
 
         builder.AddDBExtension();
+
+        builder.AddJSONSerializerOptions();
+
+        builder.AddApplicationServices();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
@@ -27,6 +36,8 @@ public class Program
 
     private static async Task ConfigureWebApplicationPipeline(WebApplication app)
     {
+        app.UseMiddleware<ExceptionMiddleware>();
+
         await app.UseDataSeedAsyncExtension();
 
         if (app.Environment.IsDevelopment())
