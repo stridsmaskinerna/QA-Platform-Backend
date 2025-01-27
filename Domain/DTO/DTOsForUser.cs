@@ -19,4 +19,5 @@ namespace Domain.DTO
         public bool IsBlocked;
 
     }
+
 }

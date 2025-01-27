@@ -10,13 +10,13 @@ namespace Domain.DTO
     public record AnswerDTO
     {
         public Guid Id;
+        public string UserId;
         public Guid QuestionId;
         public string UserName;
         public string Value;
         public int Rating;
         public string? FilePath;
         public DateTime Created;
-        public bool IsHidden;
         public IEnumerable<CommentDTO> Comments;
     }
 }
