@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities;
 
@@ -8,11 +8,11 @@ public class User : IdentityUser
 
     //Navigation
 
-    public IEnumerable<Question> Questions { get; set; } = [];
+    public ICollection<Question> Questions { get; set; } = [];
 
-    public IEnumerable<Answer> Answers { get; set; } = [];
+    public ICollection<Answer> Answers { get; set; } = [];
 
-    public IEnumerable<Comment> Comments { get; set; } = [];
+    public ICollection<Comment> Comments { get; set; } = [];
 
-    public IEnumerable<Subject> Subjects { get; set; } = [];
+    public ICollection<Subject> Subjects { get; set; } = [];
 }

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+namespace Domain.Entities;
 
 public class Question
 {
@@ -24,7 +24,7 @@ public class Question
 
     // Navigation
 
-    public IEnumerable<Answer> Answers { get; set; } = [];
+    public ICollection<Answer> Answers { get; set; } = [];
 
-    public IEnumerable<Tag> Tags { get; set; } = [];
+    public ICollection<Tag> Tags { get; set; } = [];
 }

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+namespace Domain.Entities;
 
 public class Topic
 {
@@ -11,6 +11,6 @@ public class Topic
     public bool IsActive{ get; set; }
 
     // Navigation
-    public IEnumerable<Question> Questions { get; set; } = [];
+    public ICollection<Question> Questions { get; set; } = [];
 
 }
