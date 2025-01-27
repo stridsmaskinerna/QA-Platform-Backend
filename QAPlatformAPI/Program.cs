@@ -1,3 +1,4 @@
+using Infrastructure.Contexts;
 using QAPlatformAPI.Extensions;
 
 namespace QAPlatformAPI;
@@ -21,6 +22,7 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddAutoMapper(typeof(QAPlatformContext));
 
         return builder.Build();
     }
