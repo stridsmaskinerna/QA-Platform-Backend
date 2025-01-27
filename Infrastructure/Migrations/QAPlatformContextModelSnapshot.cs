@@ -22,7 +22,7 @@ namespace Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
+            modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Answers", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Comment", b =>
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,7 +84,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Comments", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Question", b =>
+            modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -128,7 +128,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Questions", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Subject", b =>
+            modelBuilder.Entity("Domain.Entities.Subject", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -146,7 +146,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Subjects", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Tag", b =>
+            modelBuilder.Entity("Domain.Entities.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -161,7 +161,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Tag", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Topic", b =>
+            modelBuilder.Entity("Domain.Entities.Topic", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -184,7 +184,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Topics", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.User", b =>
+            modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -413,48 +413,48 @@ namespace Infrastructure.Migrations
                     b.ToTable("SubjectTeacher", (string)null);
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
+            modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.Question", null)
+                    b.HasOne("Domain.Entities.Question", null)
                         .WithMany("Answers")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany("Answers")
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Comment", b =>
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.Answer", null)
+                    b.HasOne("Domain.Entities.Answer", null)
                         .WithMany("Comments")
                         .HasForeignKey("AnswerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany("Comments")
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Question", b =>
+            modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.Topic", null)
+                    b.HasOne("Domain.Entities.Topic", null)
                         .WithMany("Questions")
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany("Questions")
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Topic", b =>
+            modelBuilder.Entity("Domain.Entities.Topic", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.Subject", null)
+                    b.HasOne("Domain.Entities.Subject", null)
                         .WithMany("Topics")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -472,7 +472,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -481,7 +481,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -496,7 +496,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -505,7 +505,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -514,13 +514,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("QuestionTag", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.Question", null)
+                    b.HasOne("Domain.Entities.Question", null)
                         .WithMany()
                         .HasForeignKey("QuestionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Entities.Tag", null)
+                    b.HasOne("Domain.Entities.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -529,40 +529,40 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("SubjectTeacher", b =>
                 {
-                    b.HasOne("Infrastructure.Entities.Subject", null)
+                    b.HasOne("Domain.Entities.Subject", null)
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Answer", b =>
+            modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
                     b.Navigation("Comments");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Question", b =>
+            modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
                     b.Navigation("Answers");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Subject", b =>
+            modelBuilder.Entity("Domain.Entities.Subject", b =>
                 {
                     b.Navigation("Topics");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.Topic", b =>
+            modelBuilder.Entity("Domain.Entities.Topic", b =>
                 {
                     b.Navigation("Questions");
                 });
 
-            modelBuilder.Entity("Infrastructure.Entities.User", b =>
+            modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("Answers");
 
