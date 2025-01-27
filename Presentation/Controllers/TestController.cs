@@ -14,21 +14,21 @@ public class TestController : ControllerBase
     };
 
     private readonly ILogger<TestController> _logger;
-    private readonly IBaseService _baseService;
+    private readonly IServiceManager _sm;
 
     public TestController(
         ILogger<TestController> logger,
-        IBaseService baseService
+        IServiceManager sm
     )
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger)); ;
-        _baseService = baseService ?? throw new ArgumentNullException(nameof(baseService)); ;
+        _sm = sm ?? throw new ArgumentNullException(nameof(sm)); ;
     }
 
     [HttpGet("error")]
     public IEnumerable<WeatherForecast> GetError()
     {
-        _baseService.Unauthorized();
+        _sm.BaseService.Conflict();
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
