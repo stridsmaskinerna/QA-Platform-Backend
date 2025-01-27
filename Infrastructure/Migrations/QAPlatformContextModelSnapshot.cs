@@ -56,7 +56,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Answers");
+                    b.ToTable("Answers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
@@ -81,7 +81,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
@@ -125,7 +125,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Subject", b =>
@@ -143,7 +143,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Tag", b =>
@@ -158,7 +158,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tag", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Topic", b =>
@@ -181,7 +181,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Topics");
+                    b.ToTable("Topics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -395,7 +395,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("QuestionTag");
+                    b.ToTable("QuestionTag", (string)null);
                 });
 
             modelBuilder.Entity("SubjectTeacher", b =>
@@ -410,7 +410,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SubjectTeacher");
+                    b.ToTable("SubjectTeacher", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Answer", b =>

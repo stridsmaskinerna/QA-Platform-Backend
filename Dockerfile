@@ -10,7 +10,10 @@ WORKDIR /src
 
 # Copy all project files
 COPY ["QAPlatformAPI/QAPlatformAPI.csproj", "QAPlatformAPI/"]
+COPY ["Application/Application.csproj", "Application/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
+COPY ["Presentation/Presentation.csproj", "Presentation/"]
 
 # Restore dependencies
 RUN dotnet restore "./QAPlatformAPI/QAPlatformAPI.csproj"
