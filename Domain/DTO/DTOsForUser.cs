@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.DTO
 {
@@ -9,12 +9,13 @@ namespace Domain.DTO
     }
 
 
-    public class UserWithEmailDTO : UserDTO{
+    public class UserWithEmailDTO : UserDTO
+    {
         public string Email;
 
     }
 
-    public class UserDetailsDTO : UserWithEmailDTO 
+    public class UserDetailsDTO : UserWithEmailDTO
     {
         public bool IsBlocked;
 
