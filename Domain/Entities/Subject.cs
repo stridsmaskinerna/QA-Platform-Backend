@@ -9,7 +9,7 @@ public class Subject
     public string? SubjectCode { get; set; }
 
     // Navigation
-    public IEnumerable<Topic> Topics { get; set; } = [];
+    public ICollection<Topic> Topics { get; set; } = [];
 
-    public IEnumerable<User> Teachers { get; set; } = [];
+    public ICollection<User> Teachers { get; set; } = [];
 }

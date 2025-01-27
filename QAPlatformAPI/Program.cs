@@ -23,9 +23,7 @@ public class Program
 
         builder.AddDBExtension();
 
-        builder.AddJSONSerializerOptions();
-
-        builder.AddApplicationServices();
+        builder.AddIdentityCoreExtension();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();

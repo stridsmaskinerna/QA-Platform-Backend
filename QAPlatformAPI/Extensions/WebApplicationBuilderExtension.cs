@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Application.Services;
+using Domain.Entities;
 using Infrastructure.Contexts;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace QAPlatformAPI.Extensions;
@@ -65,5 +67,23 @@ public static class WebApplicationBuilderExtension
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         });
+    }
+
+    public static void AddIdentityCoreExtension(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddDataProtection();
+
+        builder.Services.AddIdentityCore<User>(opt =>
+        {
+            opt.Password.RequireDigit = false;
+            opt.Password.RequireLowercase = false;
+            opt.Password.RequireUppercase = false;
+            opt.Password.RequireNonAlphanumeric = false;
+            opt.Password.RequiredLength = 8;
+
+        })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<QAPlatformContext>()
+            .AddDefaultTokenProviders();
     }
 }

@@ -8,5 +8,5 @@ public class Tag
 
     // Navigation
 
-    public IEnumerable<Question> Questions { get; set; } = [];
+    public ICollection<Question> Questions { get; set; } = [];
 }
