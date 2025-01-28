@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Domain.DTO;
 using Domain.Entities;
 
@@ -22,7 +22,8 @@ namespace Domain
             
             CreateMap<Answer, AnswerDTO>();
 
-
         }
+
     }
+
 }
