@@ -1,11 +1,11 @@
-﻿using Domain.Entities;
-using Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities;
+using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -25,12 +25,12 @@ namespace Infrastructure.Repositories
             return await _dbContext.Answers.FindAsync(id);
         }
 
-        public async Task<List<Answer>> GetAnswersByQuestionIdAsync(Guid questionId)
+        public async Task<IEnumerable<Answer>> GetAnswersByQuestionIdAsync(Guid questionId)
         {
             return await _dbContext.Answers.Where(a => a.QuestionId == questionId).ToListAsync();
         }
         //changed guid to string
-        public async Task<List<Answer>> GetAnswersByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<Answer>> GetAnswersByUserIdAsync(Guid userId)
         {
             return await _dbContext.Answers.Where(a => a.UserId == userId.ToString()).ToListAsync();
         }

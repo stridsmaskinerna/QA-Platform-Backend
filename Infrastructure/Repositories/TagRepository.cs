@@ -1,11 +1,11 @@
-﻿using Domain.Entities;
-using Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities;
+using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -28,7 +28,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.Tags.FirstOrDefaultAsync(t => t.Value == value);
         }
 
-        public async Task<List<Tag>> GetAllAsync()
+        public async Task<IEnumerable<Tag>> GetAllAsync()
         {
             return await _dbContext.Tags.ToListAsync();
         }

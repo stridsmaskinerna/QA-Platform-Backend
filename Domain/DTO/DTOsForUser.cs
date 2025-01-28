@@ -1,24 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.DTO
+namespace Domain.DTO;
+
+public class UserDTO
 {
-    public class UserDTO
-    {
-        public string Id = String.Empty;
-        public string UserName = String.Empty;
-    }
+    public string Id { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+}
 
 
-    public class UserWithEmailDTO : UserDTO
-    {
-        public string Email;
+public class UserWithEmailDTO : UserDTO
+{
+    public string Email { get; set; } = string.Empty;
 
-    }
+}
 
-    public class UserDetailsDTO : UserWithEmailDTO
-    {
-        public bool IsBlocked;
-
-    }
+public class UserDetailsDTO : UserWithEmailDTO
+{
+    public bool IsBlocked { get; set; }
 
 }

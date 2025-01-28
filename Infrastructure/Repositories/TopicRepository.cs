@@ -1,12 +1,12 @@
-﻿using Domain.Contracts;
-using Domain.Entities;
-using Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Contracts;
+using Domain.Entities;
+using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -31,12 +31,12 @@ namespace Infrastructure.Repositories
             return await _dbContext.Topics.FirstOrDefaultAsync(t => t.Name == name);
         }
 
-        public async Task<List<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId)
+        public async Task<IEnumerable<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId)
         {
             return await _dbContext.Topics.Where(t => t.SubjectId == subjectId).ToListAsync();
         }
 
-        public async Task<List<Topic>> GetAllAsync()
+        public async Task<IEnumerable<Topic>> GetAllAsync()
         {
             return await _dbContext.Topics.ToListAsync();
         }
