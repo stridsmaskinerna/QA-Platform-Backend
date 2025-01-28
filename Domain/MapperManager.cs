@@ -23,7 +23,5 @@ namespace Domain
             CreateMap<Answer, AnswerDTO>();
 
         }
-
     }
-
 }
