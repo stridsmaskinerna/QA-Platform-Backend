@@ -145,6 +145,7 @@ public static class SeedQAPlatformDB
         var topics = new List<Topic>();
         var topicsNames = new[]
         {
+            "Introduction",
             "Assignment 1",
             "Assignment 2",
             "Assignment 3",
