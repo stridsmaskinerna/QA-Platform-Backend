@@ -19,6 +19,8 @@ public class Program
 
         builder.AddDBExtension();
 
+        builder.AddIdentityCoreExtension();
+
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -30,7 +32,7 @@ public class Program
     private static async Task ConfigureWebApplicationPipeline(WebApplication app)
     {
         await app.UseDataSeedAsyncExtension();
-        
+
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
