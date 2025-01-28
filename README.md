@@ -1,5 +1,13 @@
 # QA-Platform-Backend
 
+## Design
+
+- [Database ER diagram](https://lucid.app/lucidchart/ae37e314-f5bd-427d-92c3-6db17f0c7d96/edit?viewport_loc=39%2C-134%2C2908%2C1554%2C0_0&invitationId=inv_407d2aa7-e46e-4486-bd13-9dc5f04f6818)
+
+- [Sequence diagrams](https://lucid.app/lucidchart/40271668-76b3-4095-9ac9-0968643d98d7/edit?invitationId=inv_1247fee7-1320-4446-be3a-d6849eb6419e&page=0_0#)
+
+- [Package diagram](https://lucid.app/lucidchart/81d55cd4-06ae-4ec0-867b-00a1f21cb27e/edit?invitationId=inv_24927175-c561-46cd-b5c6-94fcadcecb3d&page=0_0#)
+
 ## Development requirements
 
 - Dotnet version 8
