@@ -1,11 +1,11 @@
+using Application.Services;
+using AutoMapper;
+using Domain;
+using Domain.DTO;
+using Domain.Entities;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using Infrastructure.Repositories;
-using Domain.DTO;
-using Domain;
-using Domain.Entities;
-using Application.Services;
 
 
 namespace Presentation.Controllers
@@ -28,7 +28,7 @@ namespace Presentation.Controllers
         {
             var publicQuestion = await _sm.QuestionService.GetAllAsync();
             var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
-            return Ok(courseDTOList) ;
+            return Ok(courseDTOList);
 
         }
     }

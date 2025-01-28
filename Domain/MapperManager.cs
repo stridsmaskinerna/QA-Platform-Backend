@@ -20,7 +20,7 @@ namespace Domain
             CreateMap<Subject, SubjectDTO>().ReverseMap(); //used for Subject creation too
 
             CreateMap<Comment, CommentDTO>().ReverseMap(); //used to create the commento too
-            
+
             CreateMap<Answer, AnswerDTO>();
 
         }
