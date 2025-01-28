@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Presentation.Controllers;
 
+// TODO delete class
 [ApiController]
 [Route("api/test")]
 public class TestController : ControllerBase
