@@ -18,6 +18,8 @@ public class QAPlatformContext : IdentityDbContext<User, IdentityRole, string>
 
     public DbSet<Answer> Answers => Set<Answer>();
 
+    public DbSet<Tag> Tags => Set<Tag>();
+
     public QAPlatformContext() { }
 
     public QAPlatformContext(DbContextOptions<QAPlatformContext> options)
