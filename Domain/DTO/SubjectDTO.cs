@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTO
+namespace Domain.DTO;
+
+public class SubjectDTO
 {
-    public record SubjectDTO
-    {
-        public Guid Id;
-        public string Name;
-        public string? SubjectCode;
-        public IEnumerable<UserWithEmailDTO> Theachers;
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? SubjectCode { get; set; }
+    public IEnumerable<UserWithEmailDTO> Theachers { get; set; } = [];
 }

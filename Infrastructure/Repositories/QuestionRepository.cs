@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,7 +17,7 @@ namespace Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
-        public async Task<List<Question>> GetAllAsync()
+        public async Task<IEnumerable<Question>> GetAllAsync()
         {
             return await _dbContext.Questions.ToListAsync();
         }

@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,8 @@ namespace Domain.Contracts
     {
         Task<Topic?> GetByIdAsync(Guid id);
         Task<Topic?> GetByNameAsync(string name);
-        Task<List<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId);
-        Task<List<Topic>> GetAllAsync();
+        Task<IEnumerable<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId);
+        Task<IEnumerable<Topic>> GetAllAsync();
         Task<Topic> AddAsync(Topic topic);
         Task UpdateAsync(Topic topic);
         Task DeleteAsync(Guid id);

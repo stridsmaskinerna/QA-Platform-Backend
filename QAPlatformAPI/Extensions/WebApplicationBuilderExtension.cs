@@ -38,6 +38,7 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
+        builder.Services.AddAsLazy<IQuestionService, QuestionService>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(

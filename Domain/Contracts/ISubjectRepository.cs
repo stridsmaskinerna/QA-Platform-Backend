@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Infrastructure.Repositories
 {
     public interface ISubjectRepository
     {
-        Task<List<Subject>> GetAllAsync();
+        Task<IEnumerable<Subject>> GetAllAsync();
         Task<Subject?> GetByIdAsync(Guid id);
         Task<Subject?> GetByNameAsync(string name);
         Task<Subject?> GetByCodeAsync(string code);

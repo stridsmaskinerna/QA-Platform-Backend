@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Infrastructure.Repositories
     {
         Task<Tag?> GetByIdAsync(Guid id);
         Task<Tag?> GetByValueAsync(string value);
-        Task<List<Tag>> GetAllAsync();
+        Task<IEnumerable<Tag>> GetAllAsync();
         Task<Tag> AddAsync(Tag tag);
         Task UpdateAsync(Tag tag);
         Task DeleteAsync(Guid id);

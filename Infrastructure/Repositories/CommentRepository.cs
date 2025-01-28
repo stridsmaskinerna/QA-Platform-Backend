@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -23,12 +23,12 @@ namespace Infrastructure.Repositories
             return await _dbContext.Comments.FindAsync(id);
         }
 
-        public async Task<List<Comment>> GetCommentsByAnswerIdAsync(Guid answerId)
+        public async Task<IEnumerable<Comment>> GetCommentsByAnswerIdAsync(Guid answerId)
         {
             return await _dbContext.Comments.Where(c => c.AnswerId == answerId).ToListAsync();
         }
 
-        public async Task<List<Comment>> GetCommentsByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<Comment>> GetCommentsByUserIdAsync(Guid userId)
         {
             return await _dbContext.Comments.Where(c => c.UserId == userId.ToString()).ToListAsync();
         }
