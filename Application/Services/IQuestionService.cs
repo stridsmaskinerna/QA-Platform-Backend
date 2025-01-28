@@ -10,7 +10,7 @@ namespace Application.Services;
 public interface IQuestionService
 {
     Task<Question?> GetByIdAsync(Guid id);
-    Task<List<Question>> GetAllAsync();
+    Task<IEnumerable<Question>> GetAllAsync();
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);
     Task DeleteAsync(Guid id);

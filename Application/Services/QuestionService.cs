@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Entities;
-using Infrastructure.Contexts;
 using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -18,6 +11,7 @@ public class QuestionService : IQuestionService
     {
         _repository = rp;
     }
+
     public async Task<IEnumerable<Question>> GetAllAsync()
     {
         return await _repository.GetAllAsync();
@@ -28,12 +22,8 @@ public class QuestionService : IQuestionService
         return await _repository.GetByIdAsync(id);
     }
 
-
-
-
     public async Task<Question> AddAsync(Question question)
     {
-
         return await _repository.AddAsync(question);
     }
 
@@ -45,11 +35,6 @@ public class QuestionService : IQuestionService
     public async Task DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
-    }
-
-    Task<List<Question>> IQuestionService.GetAllAsync()
-    {
-        throw new NotImplementedException();
     }
 }
 
