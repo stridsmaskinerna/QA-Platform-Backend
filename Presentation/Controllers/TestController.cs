@@ -1,26 +1,34 @@
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace QAPlatformAPI.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+[Route("api/test")]
+public class TestController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<TestController> _logger;
+    private readonly IServiceManager _sm;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public TestController(
+        ILogger<TestController> logger,
+        IServiceManager sm
+    )
     {
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger)); ;
+        _sm = sm ?? throw new ArgumentNullException(nameof(sm)); ;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    [HttpGet("error")]
+    public IEnumerable<WeatherForecast> GetError()
     {
+        _sm.BaseService.Conflict();
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

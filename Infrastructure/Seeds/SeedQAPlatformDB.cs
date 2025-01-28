@@ -12,7 +12,8 @@ public static class SeedQAPlatformDB
         QAPlatformContext context,
         UserManager<User> userManager,
         RoleManager<IdentityRole> roleManager
-    ) {
+    )
+    {
         var subjects = CreateSubjects();
         await context.AddRangeAsync(subjects);
 
@@ -89,7 +90,8 @@ public static class SeedQAPlatformDB
 
     private static async Task CreateUserRoles(
         RoleManager<IdentityRole> roleManager
-    ) {
+    )
+    {
         string[] roles = [Roles.TEACHER, Roles.USER, Roles.ADMIN];
         foreach (var roleName in roles)
         {
@@ -106,7 +108,8 @@ public static class SeedQAPlatformDB
         UserManager<User> userManager,
         int nrOfAdmins = 1,
         string password = "password"
-    ) {
+    )
+    {
         var faker = new Faker<User>("en").Rules((f, user) =>
         {
             user.Email = f.Person.Email;
@@ -137,10 +140,12 @@ public static class SeedQAPlatformDB
 
     private static List<Topic> CreateTopics(
         List<Subject> subjects
-    ) {
+    )
+    {
         var topics = new List<Topic>();
         var topicsNames = new[]
         {
+            "Introduction",
             "Assignment 1",
             "Assignment 2",
             "Assignment 3",
@@ -185,7 +190,7 @@ public static class SeedQAPlatformDB
             "Internships"
         };
 
-        foreach(var tagName in tagValues)
+        foreach (var tagName in tagValues)
         {
             var tag = new Tag()
             {
@@ -202,7 +207,8 @@ public static class SeedQAPlatformDB
         List<Topic> topics,
         List<Tag> tags,
         List<User> users
-    ) {
+    )
+    {
         var questions = new List<Question>();
 
         foreach (var topic in topics)
@@ -233,7 +239,8 @@ public static class SeedQAPlatformDB
         int maxQuantity,
         List<Question> questions,
         List<User> users
-    ) {
+    )
+    {
         var answers = new List<Answer>();
 
         foreach (var question in questions)
@@ -261,7 +268,8 @@ public static class SeedQAPlatformDB
         int maxQuantity,
         List<Answer> answers,
         List<User> users
-    ) {
+    )
+    {
         var comments = new List<Comment>();
 
         foreach (var answer in answers)
@@ -288,7 +296,8 @@ public static class SeedQAPlatformDB
         return random.Next(0, 2) == 0;
     }
 
-    private static int RandomInt(int min, int max) {
+    private static int RandomInt(int min, int max)
+    {
         Random random = new Random();
         int number = random.Next(min, max);
         return number;

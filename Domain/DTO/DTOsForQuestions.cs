@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +20,7 @@ namespace Domain.DTO
 
         public UserDTO Author;
 
-        public IEnumerable< string>? Tags;
+        public IEnumerable<string>? Tags;
 
         public string Topic;
 
@@ -29,10 +29,11 @@ namespace Domain.DTO
         public int AnswerCount;
     }
 
-    public class QuestionDetailedDTO : QuestionDTO { 
-    
+    public class QuestionDetailedDTO : QuestionDTO
+    {
+
         public IEnumerable<AnswerDTO>? Answers;
-    
+
     }
-    
+
 }
