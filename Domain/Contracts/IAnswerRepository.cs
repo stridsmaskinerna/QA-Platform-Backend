@@ -15,6 +15,6 @@ namespace Infrastructure.Repositories
         Task<Answer> AddAsync(Answer answer);
         Task UpdateAsync(Answer answer);
         Task DeleteAsync(Guid id);
-        Task<int> GetAnswerCountByQuestionIdAsync(Guid questionId); 
+        Task<int> GetAnswerCountByQuestionIdAsync(Guid questionId);
     }
 }

@@ -17,6 +17,6 @@ namespace Infrastructure.Repositories
         Task UpdateAsync(Subject subject);
         Task DeleteAsync(Guid id);
 
-       // Task<List<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId);
+        // Task<List<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId);
     }
 }
