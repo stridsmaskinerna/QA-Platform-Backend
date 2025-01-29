@@ -48,14 +48,15 @@ public class AuthenticationController : ControllerBase
 
 
         string rolesString = userRoles.Count > 0 ? string.Join(",", userRoles) : "";
+        rolesString = rolesString.Trim() + ",";
 
 
         List<Claim> infoInToken =
         [
-            new Claim("Username", user.UserName!),
-            new Claim("Role", rolesString),
-            new Claim("Email", user.Email!.ToString()),
-            new Claim("Id", user.Id!.ToString()),
+            new Claim("username", user.UserName!),
+            new Claim("roles", rolesString),
+            new Claim("email", user.Email!.ToString()),
+            new Claim("userId", user.Id!.ToString()),
         ];
 
         var jwtSecurityToken = new JwtSecurityToken(
