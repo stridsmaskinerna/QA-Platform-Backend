@@ -90,7 +90,7 @@ public static class WebApplicationBuilderExtension
 
     public static void AddCORSConfiguration(this WebApplicationBuilder builder)
     {
-        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
         builder.Services.AddCors(config =>
             config.AddPolicy("AllowFrontend",
