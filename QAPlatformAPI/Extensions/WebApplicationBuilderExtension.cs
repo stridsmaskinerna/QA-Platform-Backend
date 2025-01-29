@@ -87,4 +87,16 @@ public static class WebApplicationBuilderExtension
             .AddEntityFrameworkStores<QAPlatformContext>()
             .AddDefaultTokenProviders();
     }
+
+    public static void AddCORSConfiguration(this WebApplicationBuilder builder)
+    {
+        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+        builder.Services.AddCors(config =>
+            config.AddPolicy("AllowFrontend",
+                p => p.WithOrigins(allowedOrigins)
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()  // ✅ Allows `Authorization` header
+            ));
+    }
 }

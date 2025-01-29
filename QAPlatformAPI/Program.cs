@@ -24,6 +24,8 @@ public class Program
             configure.ReturnHttpNotAcceptable = true;
         }).AddApplicationPart(typeof(AssemblyReference).Assembly);
 
+        builder.AddCORSConfiguration();
+
         builder.AddDBExtension();
 
         builder.AddIdentityCoreExtension();
@@ -52,6 +54,8 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseCors("AllowFrontend");
 
         app.UseAuthorization();
 
