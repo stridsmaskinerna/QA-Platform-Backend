@@ -1,5 +1,6 @@
 using Application.Services;
 using Domain.DTO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -29,6 +30,8 @@ public class QuestionController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<QuestionDetailedDTO>>> GetQuestionDetail(
         [FromRoute] Guid id
     )
@@ -37,6 +40,8 @@ public class QuestionController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> CreateQuestion(
         [FromBody] QuestionForCreationDTO body
     )
@@ -45,14 +50,29 @@ public class QuestionController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteQuestion(
         [FromRoute] Guid id
     )
     {
+        var xx = 11;
+        if (xx == 11)
+        {
+            Unauthorized();
+        }
+        else if (xx < 11)
+        {
+            NotFound();
+        }
         throw new NotImplementedException();
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> PutQuestion(
         [FromRoute] Guid id,
         [FromBody] QuestionForPutDTO body
@@ -63,6 +83,9 @@ public class QuestionController : ControllerBase
 
 
     [HttpPut("{id}/rating")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> VoteQuestion(
         [FromRoute] Guid id,
         [FromQuery] bool vote
