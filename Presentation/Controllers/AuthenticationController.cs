@@ -1,9 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Application.Services;
+using Domain.DTO;
 using Domain.Entities;
-using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +14,7 @@ namespace Presentation.Controllers;
 
 [Route("api/authentication/")]
 [ApiController]
+[Produces("application/json")]
 public class AuthenticationController : ControllerBase
 {
     private readonly IConfiguration _configuration;
@@ -34,7 +34,7 @@ public class AuthenticationController : ControllerBase
 
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Authenticate(AuthenticationRequestBody authenticationRequestBody)
+    public async Task<ActionResult<TokenDTO>> Authenticate(AuthenticationRequestBody authenticationRequestBody)
     {
         User? user = await ValidateUserCredential(authenticationRequestBody.Email, authenticationRequestBody.Password);
         if (user == null) return Unauthorized();
@@ -68,9 +68,13 @@ public class AuthenticationController : ControllerBase
 
         var tokenToReturn = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
+        TokenDTO token = new TokenDTO
+        {
+            accessToken = tokenToReturn,
+            refreshToken = ""
+        };
 
-
-        return Ok(tokenToReturn);
+        return Ok(token);
     }
 
     private async Task<User?> ValidateUserCredential(string? email, string? password)
