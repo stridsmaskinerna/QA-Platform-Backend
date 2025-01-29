@@ -22,6 +22,7 @@ public class QuestionController : ControllerBase
         [FromQuery] int? limit
     )
     {
+        // Use searching to search for question title, tags, subject name, topic name, etc 
         var publicQuestion = await _sm.QuestionService.GetAllAsync();
         var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
         return Ok(courseDTOList);
