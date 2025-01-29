@@ -13,7 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Controllers;
 
-[Route("api/authentication/login")]
+[Route("api/authentication/")]
 [ApiController]
 public class AuthenticationController : ControllerBase
 {
@@ -33,7 +33,7 @@ public class AuthenticationController : ControllerBase
 
 
 
-    [HttpPost("authenticate")]
+    [HttpPost("login")]
     public async Task<ActionResult<string>> Authenticate(AuthenticationRequestBody authenticationRequestBody)
     {
         User? user = await ValidateUserCredential(authenticationRequestBody.Email, authenticationRequestBody.Password);
