@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Domain.DTO;
 
 public class UserDTO
