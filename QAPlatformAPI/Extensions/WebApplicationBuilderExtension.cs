@@ -4,6 +4,7 @@ using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Replication;
 
 namespace QAPlatformAPI.Extensions;
 
@@ -86,5 +87,17 @@ public static class WebApplicationBuilderExtension
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<QAPlatformContext>()
             .AddDefaultTokenProviders();
+    }
+
+    public static void AddCORSConfiguration(this WebApplicationBuilder builder)
+    {
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+        builder.Services.AddCors(config =>
+            config.AddPolicy("AllowFrontend",
+                p => p.WithOrigins(allowedOrigins)
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()  // ✅ Allows `Authorization` header
+            ));
     }
 }

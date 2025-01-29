@@ -24,6 +24,8 @@ public class Program
             configure.ReturnHttpNotAcceptable = true;
         }).AddApplicationPart(typeof(AssemblyReference).Assembly);
 
+        builder.AddCORSConfiguration();
+
         builder.AddDBExtension();
 
         builder.AddIdentityCoreExtension();
@@ -52,6 +54,9 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+        //Unsure if this goes better in the if statement above? In production, will we
+        //still need a CORS policy?
+        app.UseCors("AllowFrontend");
 
         app.UseAuthorization();
 
