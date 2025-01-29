@@ -4,7 +4,6 @@ using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.Replication;
 
 namespace QAPlatformAPI.Extensions;
 
