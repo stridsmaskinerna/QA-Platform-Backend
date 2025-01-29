@@ -32,6 +32,9 @@ public static class WebApplicationBuilderExtension
                 options.EnableSensitiveDataLogging();
             }
         });
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+           .AddEntityFrameworkStores<QAPlatformContext>()
+           .AddDefaultTokenProviders();
     }
 
     public static void AddApplicationServices(this WebApplicationBuilder builder)
