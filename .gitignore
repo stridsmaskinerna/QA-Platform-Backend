@@ -364,6 +364,3 @@ FodyWeavers.xsd
 
 # App settings
 appsettings.Production.json
-
-# Generated Swagger
-Doc
