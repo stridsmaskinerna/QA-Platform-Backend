@@ -40,7 +40,7 @@ public class AuthenticationController : ControllerBase
 
         return Ok(token);
     }
-    
+
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TokenDTO>> RegisterUser(RegistrationDTO registrationDTO)
@@ -64,6 +64,7 @@ public class AuthenticationController : ControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
         }
+    }
 
     [Authorize(Roles = Roles.USER)]
     [HttpGet("debug-claims")]
