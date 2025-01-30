@@ -7,31 +7,26 @@ public class BaseService : IBaseService
 {
     [DoesNotReturn]
     public void BadRequest(
-        string detail = "",
-        string title = "Bad Request"
-    ) => throw new BadRequestException(detail, title);
+        string detail = ""
+    ) => throw new BadRequestException(detail);
 
     [DoesNotReturn]
     public void Conflict(
-        string detail = "",
-        string title = "Conflict"
-    ) => throw new ConflictException(detail, title);
+        string detail = ""
+    ) => throw new ConflictException(detail);
 
     [DoesNotReturn]
     public void Forbidden(
-        string detail = "",
-        string title = "Forbidden"
-    ) => throw new ForbiddenException(detail, title);
+        string detail = ""
+    ) => throw new ForbiddenException(detail);
 
     [DoesNotReturn]
     public void NotFound(
-        string detail = "",
-        string title = "Not Found"
-    ) => throw new NotFoundException(detail, title);
+        string detail = ""
+    ) => throw new NotFoundException(detail);
 
     [DoesNotReturn]
     public void Unauthorized(
-        string detail = "",
-        string title = "Unauthorized"
-    ) => throw new UnauthorizedException(detail, title);
+        string detail = ""
+    ) => throw new UnauthorizedException(detail);
 }

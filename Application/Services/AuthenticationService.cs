@@ -25,7 +25,11 @@ public class AuthenticationService : BaseService, IAuthenticationService
     )
     {
         User? user = await ValidateUserCredential(authenticationDTO.Email, authenticationDTO.Password);
-        if (user == null) Unauthorized();
+        if (user == null)
+        {
+            // Throw Unauthorized Exception handled by ExceptionMiddleware.
+            Unauthorized();
+        };
 
         string? sKey = (_configuration?["secretKey"]) ?? throw new ArgumentNullException("something went wrong");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sKey));
