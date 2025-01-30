@@ -14,7 +14,7 @@ public static class WebApplicationPipelineExtension
         var serviceProvider = scope.ServiceProvider;
         var context = serviceProvider.GetRequiredService<QAPlatformContext>();
         await context.Database.MigrateAsync();
-        if (await context.Subjects.AnyAsync())
+        if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
         {
             return;
         }
