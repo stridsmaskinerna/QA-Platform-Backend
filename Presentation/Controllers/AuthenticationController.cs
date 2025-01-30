@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Services;
+using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -35,5 +36,29 @@ public class AuthenticationController : ControllerBase
         var token = await _sm.AuthenticationService.Authenticate(authenticationDTO);
 
         return Ok(token);
+    }
+    [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<TokenDTO>> RegisterUser(RegistrationDTO registrationDTO)
+    {
+        try
+        {
+            var token = await _sm.AuthenticationService.RegisterUser(registrationDTO);
+
+            return Ok(token);
+        }
+        catch (ArgumentException ex)
+        {
+            if (ex.Message.Contains("User already exists"))
+            {
+                return Conflict(new { Message = ex.Message });
+            }
+
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
+        }
     }
 }
