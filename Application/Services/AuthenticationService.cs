@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Domain.DTO.Request;
+using Domain.Constants;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -38,19 +39,18 @@ public class AuthenticationService : BaseService, IAuthenticationService
 
         var userRoles = await _userManager.GetRolesAsync(user);
 
-
-
-        string rolesString = userRoles.Count > 0 ? string.Join(",", userRoles) : "";
-        rolesString = rolesString.Trim() + ",";
-
-
         List<Claim> infoInToken =
         [
-            new Claim("username", user.UserName!),
-            new Claim("roles", rolesString),
-            new Claim("email", user.Email!.ToString()),
-            new Claim("userId", user.Id!.ToString()),
+            new Claim(DomainClaims.USER_NAME, user.UserName!),
+            new Claim(DomainClaims.EMAIL, user.Email!.ToString()),
+            new Claim(DomainClaims.USER_ID, user.Id!.ToString()),
         ];
+
+        // ✅ Store each role as a separate claim
+        foreach (var role in userRoles)
+        {
+            infoInToken.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var jwtSecurityToken = new JwtSecurityToken(
             _configuration["JwtSettings:Issuer"],

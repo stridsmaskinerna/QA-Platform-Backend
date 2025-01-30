@@ -3,8 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using Application.Services;
 using Domain.DTO.Request;
+using Domain.Constants;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +30,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<TokenDTO>> Authenticate(
         AuthenticationDTO authenticationDTO
@@ -37,6 +40,7 @@ public class AuthenticationController : ControllerBase
 
         return Ok(token);
     }
+    
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TokenDTO>> RegisterUser(RegistrationDTO registrationDTO)
@@ -60,5 +64,12 @@ public class AuthenticationController : ControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
         }
+
+    [Authorize(Roles = Roles.USER)]
+    [HttpGet("debug-claims")]
+    public IActionResult DebugRoles()
+    {
+        var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        return Ok(claims);
     }
 }

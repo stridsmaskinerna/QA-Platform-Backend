@@ -1,9 +1,15 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Application.Services;
+using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace QAPlatformAPI.Extensions;
 
@@ -37,10 +43,12 @@ public static class WebApplicationBuilderExtension
 
     public static void AddApplicationServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
         builder.Services.AddAsLazy<IQuestionService, QuestionService>();
         builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddAsLazy<ITokenService, TokenService>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(
@@ -75,6 +83,29 @@ public static class WebApplicationBuilderExtension
     public static void AddIdentityCoreExtension(this WebApplicationBuilder builder)
     {
         builder.Services.AddDataProtection();
+
+        builder.Services
+            .AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(opt =>
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration?["secretKey"]
+                        ?? throw new InvalidOperationException("secretKey string not found."))
+                    ),
+                }
+            );
 
         builder.Services.AddIdentityCore<User>(opt =>
         {

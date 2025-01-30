@@ -1,5 +1,8 @@
 using Application.Services;
+using Domain.Constants;
+using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,18 +15,20 @@ public class QuestionController : ControllerBase
 {
     private readonly IServiceManager _sm;
 
-    public QuestionController(IServiceManager sM)
+    public QuestionController(IServiceManager sm)
     {
-        _sm = sM;
+        _sm = sm;
     }
 
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestionsList(
         [FromQuery] string? searchString,
         [FromQuery] int? limit
     )
     {
-        // Use searching to search for question title, tags, subject name, topic name, etc 
+        // TODO Npgsql.EntityFrameworkCore.PostgreSQL assembly EF.Functions.ILike
+        // TODO! Use searching to search for question, question title, tags, subject name, subject code, topic name, etc 
         var publicQuestion = await _sm.QuestionService.GetAllAsync();
         var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
         return Ok(courseDTOList);
