@@ -57,6 +57,7 @@ public class Program
 
         app.UseCors("AllowFrontend");
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
