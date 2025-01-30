@@ -8,6 +8,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 
 namespace Application.Services;
 
@@ -31,7 +32,8 @@ public class AuthenticationService : BaseService, IAuthenticationService
         {
             // Throw Unauthorized Exception handled by ExceptionMiddleware.
             Unauthorized();
-        };
+        }
+        ;
 
         string? sKey = (_configuration?["secretKey"]) ?? throw new ArgumentNullException("something went wrong");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sKey));
@@ -68,15 +70,20 @@ public class AuthenticationService : BaseService, IAuthenticationService
             refreshToken = ""
         };
     }
-    public async Task<TokenDTO> RegisterUser(RegistrationDTO registrationDTO)
+    public async Task RegisterUser(RegistrationDTO registrationDTO)
     {
 
-        var existingUser = await _userManager.FindByEmailAsync(registrationDTO.Email);
-        if (existingUser != null)
+        var userWithEmail = await _userManager.FindByEmailAsync(registrationDTO.Email);
+        if (userWithEmail != null)
         {
-            throw new ArgumentException("A user with the same email already exists.");
+            Conflict("Email taken");
         }
 
+        var userWithUsername = await _userManager.FindByNameAsync(registrationDTO.UserName);
+        if (userWithUsername != null)
+        {
+            Conflict("Username taken");
+        }
 
         var user = new User
         {
@@ -89,44 +96,14 @@ public class AuthenticationService : BaseService, IAuthenticationService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
-        }
-
-        if (registrationDTO.Roles != null && registrationDTO.Roles.Any())
-        {
-            await _userManager.AddToRolesAsync(user, registrationDTO.Roles);
+            BadRequest(string.Join("; ", result.Errors.Select(e => e.Description)));
         }
 
         string? sKey = _configuration["secretKey"] ?? throw new ArgumentNullException("Secret key is missing.");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sKey));
         var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var userRoles = await _userManager.GetRolesAsync(user);
-        string rolesString = userRoles.Count > 0 ? string.Join(",", userRoles) : "";
-
-        List<Claim> infoInToken = new()
-        {
-            new Claim("username", user.UserName!),
-            new Claim("roles", rolesString),
-            new Claim("email", user.Email!.ToString()),
-            new Claim("userId", user.Id!.ToString()),
-        };
-
-        var jwtSecurityToken = new JwtSecurityToken(
-            _configuration["JwtSettings:Issuer"],
-            _configuration["JwtSettings:Audience"],
-            infoInToken,
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:Expires"])),
-            credential);
-
-        var tokenToReturn = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
-        return new TokenDTO
-        {
-            accessToken = tokenToReturn,
-            refreshToken = ""
-        };
+        await _userManager.AddToRoleAsync(user, Roles.USER);
     }
     private async Task<User?> ValidateUserCredential(string? email, string? password)
     {

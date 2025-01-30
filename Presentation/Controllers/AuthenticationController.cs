@@ -42,28 +42,28 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TokenDTO>> RegisterUser(RegistrationDTO registrationDTO)
     {
-        try
-        {
-            var token = await _sm.AuthenticationService.RegisterUser(registrationDTO);
+        await _sm.AuthenticationService.RegisterUser(registrationDTO);
 
-            return Ok(token);
-        }
-        catch (ArgumentException ex)
-        {
-            if (ex.Message.Contains("User already exists"))
-            {
-                return Conflict(new { Message = ex.Message });
-            }
+        return Ok();
 
-            return BadRequest(new { Message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-        }
+        // catch (ArgumentException ex)
+        // {
+        //     if (ex.Message.Contains("User already exists"))
+        //     {
+        //         return Conflict(new { Message = ex.Message });
+        //     }
+
+        //     return BadRequest(new { Message = ex.Message });
+        // }
+        // catch (Exception ex)
+        // {
+        //     return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
+        // }
     }
 
     [Authorize(Roles = Roles.USER)]
