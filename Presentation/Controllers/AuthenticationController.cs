@@ -29,10 +29,10 @@ public class AuthenticationController : ControllerBase
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<TokenDTO>> Authenticate(
-        AuthenticationDTO authenticationRequestBody
+        AuthenticationDTO authenticationDTO
     )
     {
-        var token = await _sm.AuthenticationService.Authenticate(authenticationRequestBody);
+        var token = await _sm.AuthenticationService.Authenticate(authenticationDTO);
 
         return Ok(token);
     }

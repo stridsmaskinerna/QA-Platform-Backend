@@ -1,11 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using Domain.DTO.Response;
 
 namespace Application.Services;
 
@@ -21,10 +21,10 @@ public class AuthenticationService : BaseService, IAuthenticationService
     }
 
     public async Task<TokenDTO> Authenticate(
-        AuthenticationDTO authenticationRequestBody
+        AuthenticationDTO authenticationDTO
     )
     {
-        User? user = await ValidateUserCredential(authenticationRequestBody.Email, authenticationRequestBody.Password);
+        User? user = await ValidateUserCredential(authenticationDTO.Email, authenticationDTO.Password);
         if (user == null) Unauthorized();
 
         string? sKey = (_configuration?["secretKey"]) ?? throw new ArgumentNullException("something went wrong");
