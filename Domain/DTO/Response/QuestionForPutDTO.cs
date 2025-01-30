@@ -1,4 +1,4 @@
-namespace Domain.DTO;
+namespace Domain.DTO.Response;
 
 public class QuestionForPutDTO : QuestionForCreationDTO
 {

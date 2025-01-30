@@ -20,8 +20,6 @@ public static class WebApplicationBuilderExtension
 
             options.UseNpgsql(connectionString);
 
-            Console.WriteLine($"Connection String: {connectionString}");
-
             if (builder.Environment.IsDevelopment())
             {
                 Console.WriteLine($"Connection String: {connectionString}");
@@ -42,6 +40,7 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
         builder.Services.AddAsLazy<IQuestionService, QuestionService>();
+        builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(

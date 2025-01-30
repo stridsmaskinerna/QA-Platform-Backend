@@ -1,5 +1,5 @@
 using Application.Services;
-using Domain.DTO;
+using Domain.DTO.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
