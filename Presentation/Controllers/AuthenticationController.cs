@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Domain.DTO;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Controllers;
 
-[Route("api/authentication/")]
 [ApiController]
+[Route("api/authentication/")]
 [Produces("application/json")]
 public class AuthenticationController : ControllerBase
 {
@@ -34,6 +35,7 @@ public class AuthenticationController : ControllerBase
 
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status409Conflict)] // TODO If only one login is ok
     public async Task<ActionResult<TokenDTO>> Authenticate(AuthenticationRequestBody authenticationRequestBody)
     {
         User? user = await ValidateUserCredential(authenticationRequestBody.Email, authenticationRequestBody.Password);

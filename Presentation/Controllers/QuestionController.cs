@@ -57,15 +57,6 @@ public class QuestionController : ControllerBase
         [FromRoute] Guid id
     )
     {
-        var xx = 11;
-        if (xx == 11)
-        {
-            Unauthorized();
-        }
-        else if (xx < 11)
-        {
-            NotFound();
-        }
         throw new NotImplementedException();
     }
 

@@ -110,13 +110,6 @@ public static class SeedQAPlatformDB
         string password = "password"
     )
     {
-        //var faker = new Faker<User>("en").Rules((f, user) =>
-        //{
-        //    user.UserName = f.Person.UserName;
-        //    user.Email = .RuleFor(u => u.Email, (f, u) => $"{u.FirstName}.{u.LastName}@ltu.se".ToLower());
-        //    user.IsBlocked = false;
-        //});
-
         var faker = new Faker<User>()
             .RuleFor(u => u.UserName, f => f.Person.UserName)
             .RuleFor(u => u.Email, (f, u) => $"{u.UserName}@ltu.se".ToLower());
