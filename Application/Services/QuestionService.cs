@@ -3,7 +3,7 @@ using Infrastructure.Repositories;
 
 namespace Application.Services;
 
-public class QuestionService : IQuestionService
+public class QuestionService : BaseService, IQuestionService
 {
     private readonly IQuestionRepository _repository;
 

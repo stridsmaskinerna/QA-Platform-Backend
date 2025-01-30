@@ -81,7 +81,7 @@ public static class SeedQAPlatformDB
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
             s.Name = $"General";
-            s.SubjectCode = $"{f.Random.Int(100, 999)}-{f.Random.Int(100, 999)}-{f.Random.Int(100, 999)}";
+            s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
 
@@ -110,12 +110,9 @@ public static class SeedQAPlatformDB
         string password = "password"
     )
     {
-        var faker = new Faker<User>("en").Rules((f, user) =>
-        {
-            user.Email = f.Person.Email;
-            user.UserName = f.Person.UserName;
-            user.IsBlocked = false;
-        });
+        var faker = new Faker<User>()
+            .RuleFor(u => u.UserName, f => f.Person.UserName)
+            .RuleFor(u => u.Email, (f, u) => $"{u.UserName}@ltu.se".ToLower());
 
         var users = faker.Generate(nrOfUsers);
 

@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Domain.DTO;
+namespace Domain.DTO.Response;
 
 public class UserDTO
 {

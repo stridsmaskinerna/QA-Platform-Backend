@@ -48,10 +48,9 @@ public class Program
     {
         app.UseMiddleware<ExceptionMiddleware>();
 
-        await app.UseDataSeedAsyncExtension();
-
         if (app.Environment.IsDevelopment())
         {
+            await app.UseDataSeedAsyncExtension();
             app.UseSwagger();
             app.UseSwaggerUI();
         }

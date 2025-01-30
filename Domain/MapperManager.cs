@@ -1,6 +1,5 @@
 using AutoMapper;
-
-using Domain.DTO;
+using Domain.DTO.Response;
 using Domain.Entities;
 
 namespace Domain
