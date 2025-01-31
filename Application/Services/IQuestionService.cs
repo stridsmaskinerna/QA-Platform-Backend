@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Entities;
 
 namespace Application.Services;
@@ -10,7 +5,8 @@ namespace Application.Services;
 public interface IQuestionService
 {
     Task<Question?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Question>> GetAllAsync();
+    Task<IEnumerable<Question>> GetAllAsync(int? limit, string? searchString);
+    Task<IEnumerable<Question>> GetAllPublicAsync(int? limit, string? searchString);
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);
     Task DeleteAsync(Guid id);

@@ -22,14 +22,24 @@ public class QuestionController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestionsList(
-        [FromQuery] string? searchString,
-        [FromQuery] int? limit
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
+        [FromQuery] int? limit,
+        [FromQuery] string? searchString
     )
     {
-        // TODO Npgsql.EntityFrameworkCore.PostgreSQL assembly EF.Functions.ILike
-        // TODO! Use searching to search for question, question title, tags, subject name, subject code, topic name, etc 
-        var publicQuestion = await _sm.QuestionService.GetAllAsync();
+        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString);
+        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
+        return Ok(courseDTOList);
+    }
+
+    [HttpGet("public")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestionsList(
+        [FromQuery] int? limit,
+        [FromQuery] string? searchString
+    )
+    {
+        var publicQuestion = await _sm.QuestionService.GetAllPublicAsync(limit, searchString);
         var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
         return Ok(courseDTOList);
     }

@@ -1,15 +1,15 @@
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using Application.Services;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace QAPlatformAPI.Extensions;
 
