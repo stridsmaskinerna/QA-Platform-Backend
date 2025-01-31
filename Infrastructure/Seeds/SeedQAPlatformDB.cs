@@ -36,8 +36,13 @@ public static class SeedQAPlatformDB
         var comments = CreateComments(5, answers, users);
         await context.AddRangeAsync(comments);
 
+        var answerVotes = CreateAnswerVotes(users, answers);
+        await context.AddRangeAsync(answerVotes);
+
         await context.SaveChangesAsync();
     }
+
+
 
     private static List<Subject> CreateSubjects()
     {
@@ -158,6 +163,7 @@ public static class SeedQAPlatformDB
             {
                 var topic = new Topic()
                 {
+                    Subject = subject,
                     SubjectId = subject.Id,
                     Name = name,
                     IsActive = true
@@ -250,7 +256,6 @@ public static class SeedQAPlatformDB
                     a.QuestionId = question.Id;
                     a.UserId = users[RandomInt(0, users.Count)].Id;
                     a.Value = $"{f.Lorem.Sentence(20, 100)}";
-                    a.Rating = 0;
                     a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddDays(1), question.Created.AddDays(100)), DateTimeKind.Utc);
                     a.IsHidden = RandomBool();
                 });
@@ -287,6 +292,40 @@ public static class SeedQAPlatformDB
         return comments;
     }
 
+    private static List<AnswerVotes> CreateAnswerVotes(List<User> users, List<Answer> answers)
+    {
+        var answerVotes = new List<AnswerVotes>();
+
+        foreach (var user in users)
+        {
+
+            //Simulate not all users have voted for every answer
+            if (RandomInt(0, 11) > 8)
+            {
+                continue;
+            }
+
+
+            foreach (var answer in answers)
+            {
+
+                //Simulate not all users have voted for every answer
+                if (RandomInt(0, 11) > 8)
+                {
+                    answerVotes.Add(new AnswerVotes() { Vote = MostlyTrueBool(), User = user, UserId = user.Id, Answer = answer, AnswerId = answer.Id });
+                }
+
+
+            }
+
+
+        }
+        return answerVotes;
+
+    }
+
+
+
     private static bool RandomBool()
     {
         Random random = new Random();
@@ -299,4 +338,11 @@ public static class SeedQAPlatformDB
         int number = random.Next(min, max);
         return number;
     }
+
+    private static bool MostlyTrueBool()
+    {
+        Random random = new Random();
+        return random.Next(0, 11) > 2;
+    }
+
 }

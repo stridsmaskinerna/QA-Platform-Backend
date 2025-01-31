@@ -20,6 +20,8 @@ public class QAPlatformContext : IdentityDbContext<User, IdentityRole, string>
 
     public DbSet<Tag> Tags => Set<Tag>();
 
+    public DbSet<AnswerVotes> AnswerVotes => Set<AnswerVotes>();
+
     public QAPlatformContext() { }
 
     public QAPlatformContext(DbContextOptions<QAPlatformContext> options)
@@ -30,5 +32,6 @@ public class QAPlatformContext : IdentityDbContext<User, IdentityRole, string>
     {
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new SubjectTeacherConfiguration());
+        builder.ApplyConfiguration(new AnswerVotesConfiguration());
     }
 }

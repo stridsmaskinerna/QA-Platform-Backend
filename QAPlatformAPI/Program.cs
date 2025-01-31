@@ -50,7 +50,7 @@ public class Program
 
         if (app.Environment.IsDevelopment())
         {
-            // await app.UseDataSeedAsyncExtension();
+            await app.UseDataSeedAsyncExtension();
             app.UseSwagger();
             app.UseSwaggerUI();
         }
