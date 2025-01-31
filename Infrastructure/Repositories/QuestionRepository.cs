@@ -43,7 +43,10 @@ public class QuestionRepository : IQuestionRepository
 
         query = ApplySearchFilter(query, searchString);
 
-        query = query.Include(q => q.Tags).Include(q => q.Topic).ThenInclude(t => t.Subject.Name);
+        query = query.Include(q => q.Tags);
+        query = query.Include(q => q.Topic).ThenInclude(t => t.Subject.Name);
+        query = query.Include(q => q.Answers.Count);
+        query = query.Include(q => q.User.UserName);
 
         if (limit.HasValue)
         {

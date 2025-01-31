@@ -29,4 +29,6 @@ public class Question
     public ICollection<Tag> Tags { get; set; } = [];
 
     public required Topic Topic { get; set; }
+
+    public required User User { get; set; }
 }
