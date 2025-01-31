@@ -8,6 +8,5 @@ public interface IQuestionRepository
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);
     Task DeleteAsync(Guid id);
-    Task<IEnumerable<Question>> GetAllAsync(int? limit, string? searchString);
-    Task<IEnumerable<Question>> GetAllPublicAsync(int? limit, string? searchString);
+    Task<IEnumerable<Question>> GetAllAsync(int? limit, string? searchString, bool onlyPublic);
 }

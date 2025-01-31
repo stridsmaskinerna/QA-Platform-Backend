@@ -14,18 +14,11 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task<IEnumerable<Question>> GetAllAsync(
         int? limit,
-        string? searchString
+        string? searchString,
+        bool onlyPublic = true
     )
     {
-        return await _repository.GetAllAsync(limit, searchString);
-    }
-
-    public async Task<IEnumerable<Question>> GetAllPublicAsync(
-        int? limit,
-        string? searchString
-    )
-    {
-        return await _repository.GetAllPublicAsync(limit, searchString);
+        return await _repository.GetAllAsync(limit, searchString, onlyPublic);
     }
 
     public async Task<Question?> GetByIdAsync(Guid id)

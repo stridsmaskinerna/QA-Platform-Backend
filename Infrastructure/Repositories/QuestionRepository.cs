@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -15,46 +16,56 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<IEnumerable<Question>> GetAllAsync(
         int? limit,
-        string? searchString
+        string? searchString,
+        bool onlyPublic = true
     )
     {
+
         var query = _dbContext.Questions.AsQueryable();
 
+        if (onlyPublic)
+        {
+            query = query.Where(q => !q.IsProtected);
+        }
+
         query = ApplySearchFilter(query, searchString);
 
         query = query.Include(q => q.Tags);
+        query = query.Include(q => q.Topic).ThenInclude(t => t.Subject);
+        query = query.Include(q => q.Answers);
+        query = query.Include(q => q.User);
+        query = query.OrderBy(q => q.Created);
 
         if (limit.HasValue)
         {
             query = query.Take(limit.Value);
         }
 
-        return await query.ToListAsync();
+        return await query.OrderBy(q => q.Created).ToListAsync();
+
+
+
+        // var query = _dbContext.Questions.AsQueryable();
+
+        // query = ApplySearchFilter(query, searchString);
+
+        // query = query.Include(q => q.Tags);
+
+        // if (limit.HasValue)
+        // {
+        //     query = query.Take(limit.Value);
+        // }
+
+        // return await query.ToListAsync();
     }
 
-    public async Task<IEnumerable<Question>> GetAllPublicAsync(
-        int? limit,
-        string? searchString
-    )
-    {
-        var query = _dbContext.Questions
-            .Where(q => !q.IsProtected)
-            .AsQueryable();
+    // public async Task<IEnumerable<Question>> GetAllPublicAsync(
+    //     int? limit,
+    //     string? searchString
+    // )
+    // {
 
-        query = ApplySearchFilter(query, searchString);
-
-        query = query.Include(q => q.Tags);
-        query = query.Include(q => q.Topic).ThenInclude(t => t.Subject.Name);
-        query = query.Include(q => q.Answers.Count);
-        query = query.Include(q => q.User.UserName);
-
-        if (limit.HasValue)
-        {
-            query = query.Take(limit.Value);
-        }
-
-        return await query.ToListAsync();
-    }
+    // }
 
 
     private IQueryable<Question> ApplySearchFilter(

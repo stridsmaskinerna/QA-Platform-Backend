@@ -77,7 +77,7 @@ public static class SeedQAPlatformDB
                 var subject = new Faker<Subject>().Rules((f, s) =>
                 {
                     s.Name = $"{level} {category}";
-                    s.SubjectCode = $"{f.Random.Int(100, 999)}-{f.Random.Int(100, 999)}-{f.Random.Int(100, 999)}";
+                    s.SubjectCode = $"{f.Random.String(2).ToUpper()}-{f.Random.Int(100, 999)}";
                 });
                 subjects.Add(subject);
             }
@@ -219,6 +219,13 @@ public static class SeedQAPlatformDB
             var derivedQuantities = RandomInt(0, maxQuantity);
             for (int i = 0; i < derivedQuantities; i++)
             {
+                var rndTags = new HashSet<Tag>();
+                for (int j = 0; j < 5; j++)
+                {
+                    rndTags.Add(tags[RandomInt(0, tags.Count)]);
+                }
+
+
                 var question = new Faker<Question>("en").Rules((f, q) =>
                 {
                     q.TopicId = topic.Id;
@@ -229,7 +236,7 @@ public static class SeedQAPlatformDB
                     q.IsResolved = RandomBool();
                     q.IsProtected = RandomBool();
                     q.IsHidden = RandomBool();
-                    q.Tags = tags.GetRange(0, RandomInt(1, tags.Count));
+                    q.Tags = rndTags;
                 });
                 questions.Add(question);
             }

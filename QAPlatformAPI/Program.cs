@@ -1,7 +1,5 @@
-using Domain;
-using Infrastructure.Contexts;
+using Application.Services;
 using Infrastructure.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Presentation;
 using QAPlatformAPI.Extensions;
 using QAPlatformAPI.Middlewares;

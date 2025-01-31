@@ -29,7 +29,7 @@ public class QuestionController : ControllerBase
         [FromQuery] string? searchString
     )
     {
-        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString);
+        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString, onlyPublic: false);
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
         return Ok(questionDTOList);
     }
@@ -41,54 +41,8 @@ public class QuestionController : ControllerBase
         [FromQuery] string? searchString
     )
     {
-        var publicQuestions = await _sm.QuestionService.GetAllPublicAsync(limit, searchString);
+        var publicQuestions = await _sm.QuestionService.GetAllAsync(limit, searchString);
         var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
-
-        // List<QuestionDTO> questionDTOList = new();
-
-        // foreach (Question q in publicQuestion)
-        // {
-
-        //     var extraObj = await _sm.Context.Questions
-        //         .Select(q => new
-        //         {
-        //             Question = q,
-        //             TopicName = _sm.Context.Topics
-        //                     .Where(t => t.Id == q.TopicId)
-        //                     .Select(t => t.Name)
-        //                     .FirstOrDefault(),
-        //             SubjectName = _sm.Context.Subjects
-        //                     .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
-        //                     .Select(s => s.Name)
-        //                     .FirstOrDefault(),
-        //             SubjectCode = _sm.Context.Subjects
-        //                     .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
-        //                     .Select(s => s.SubjectCode)
-        //                     .FirstOrDefault(),
-        //             SubjectId = _sm.Context.Subjects
-        //                     .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
-        //                     .Select(s => s.Id)
-        //                     .FirstOrDefault(),
-        //             UserName = _sm.Context.Users
-        //                     .Where(u => u.Id == q.UserId)
-        //                     .Select(u => u.UserName)
-        //                     .FirstOrDefault(),
-        //             T = q.Tags.Select(t => t.Value).ToList()
-        //         })
-        //         .FirstAsync();
-
-        //     QuestionDTO dto = _sm.Mapper.Map<QuestionDTO>(q);
-        //     dto.TopicName = extraObj.TopicName!;
-        //     dto.SubjectName = extraObj.SubjectName!;
-        //     dto.SubjectCode = extraObj.SubjectCode;
-        //     dto.SubjectId = $"{extraObj.SubjectId!}";
-        //     dto.UserName = extraObj.UserName!;
-        //     dto.Tags = extraObj.T;
-
-
-        //     questionDTOList.Add(dto);
-
-        // }
 
         return Ok(publicQuestionDTOList);
 
