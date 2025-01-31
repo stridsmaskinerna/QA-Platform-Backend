@@ -6,6 +6,7 @@ public class QuestionDTO
     public required string TopicName { get; set; }
     public required string SubjectName { get; set; }
     public string? SubjectCode { get; set; }
+    public string? SubjectId { get; set; }
     public required string UserName { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }

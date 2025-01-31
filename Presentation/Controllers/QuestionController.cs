@@ -2,9 +2,11 @@ using Application.Services;
 using Domain.Constants;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Controllers;
 
@@ -30,8 +32,56 @@ public class QuestionController : ControllerBase
         // TODO Npgsql.EntityFrameworkCore.PostgreSQL assembly EF.Functions.ILike
         // TODO! Use searching to search for question, question title, tags, subject name, subject code, topic name, etc 
         var publicQuestion = await _sm.QuestionService.GetAllAsync();
-        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
-        return Ok(courseDTOList);
+
+        List<QuestionDTO> questionDTOList = new();
+
+        foreach (Question q in publicQuestion)
+        {
+
+            var extraObj = await _sm.Context.Questions
+                .Select(q => new
+                {
+                    Question = q,
+                    TopicName = _sm.Context.Topics
+                            .Where(t => t.Id == q.TopicId)
+                            .Select(t => t.Name)
+                            .FirstOrDefault(),
+                    SubjectName = _sm.Context.Subjects
+                            .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
+                            .Select(s => s.Name)
+                            .FirstOrDefault(),
+                    SubjectCode = _sm.Context.Subjects
+                            .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
+                            .Select(s => s.SubjectCode)
+                            .FirstOrDefault(),
+                    SubjectId = _sm.Context.Subjects
+                            .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
+                            .Select(s => s.Id)
+                            .FirstOrDefault(),
+                    UserName = _sm.Context.Users
+                            .Where(u => u.Id == q.UserId)
+                            .Select(u => u.UserName)
+                            .FirstOrDefault(),
+                    T = q.Tags.Select(t => t.Value).ToList()
+                })
+                .FirstAsync();
+
+            QuestionDTO dto = _sm.Mapper.Map<QuestionDTO>(q);
+            dto.TopicName = extraObj.TopicName!;
+            dto.SubjectName = extraObj.SubjectName!;
+            dto.SubjectCode = extraObj.SubjectCode;
+            dto.SubjectId = $"{extraObj.SubjectId!}";
+            dto.UserName = extraObj.UserName!;
+            dto.Tags = extraObj.T;
+
+
+            questionDTOList.Add(dto);
+
+        }
+
+
+
+        return Ok(questionDTOList);
     }
 
     [HttpGet("{id}")]

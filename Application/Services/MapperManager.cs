@@ -1,13 +1,17 @@
 using AutoMapper;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain
 {
     public class MapperManager : Profile
     {
+        
         public MapperManager()
         {
+            QAPlatformContext _context = new QAPlatformContext();
 
             CreateMap<User, UserDTO>();
             CreateMap<User, UserWithEmailDTO>();
@@ -15,6 +19,16 @@ namespace Domain
 
             CreateMap<Question, QuestionDTO>();
             CreateMap<Question, QuestionDetailedDTO>();
+
+
+
+            CreateMap<Question, QuestionDTO>()
+                .ForMember(dest => dest.TopicName, opt => opt.Ignore()) 
+                .ForMember(dest => dest.SubjectName, opt => opt.Ignore()) 
+                .ForMember(dest => dest.SubjectCode, opt => opt.Ignore())
+                .ForMember(dest => dest.SubjectId, opt => opt.Ignore())
+                .ForMember(dest => dest.AnswerCount, opt => opt.MapFrom(src => src.Answers.Count))
+                .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.Select(t => t.Value).ToList()));
 
             CreateMap<Subject, SubjectDTO>().ReverseMap(); //used for Subject creation too
 

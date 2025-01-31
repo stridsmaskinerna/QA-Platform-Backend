@@ -1,4 +1,5 @@
 using AutoMapper;
+using Infrastructure.Contexts;
 
 namespace Application.Services;
 
@@ -9,4 +10,6 @@ public interface IServiceManager
     IAuthenticationService AuthenticationService { get; }
     ITokenService TokenService { get; }
     IMapper Mapper { get; }
+    QAPlatformContext Context { get; }
+
 }
