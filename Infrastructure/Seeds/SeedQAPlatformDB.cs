@@ -70,6 +70,12 @@ public static class SeedQAPlatformDB
             "Essentials of"
         };
 
+        string[] prefixes =
+[
+    "CS", "MA", "EN", "LA", "IT", "FR", "DE", "SP", "RU", "JP",
+    "BR", "CH", "IN", "US", "UK"
+];
+
         foreach (var category in categories)
         {
             foreach (var level in levels)
@@ -77,7 +83,7 @@ public static class SeedQAPlatformDB
                 var subject = new Faker<Subject>().Rules((f, s) =>
                 {
                     s.Name = $"{level} {category}";
-                    s.SubjectCode = $"{f.Random.String(2).ToUpper()}-{f.Random.Int(100, 999)}";
+                    s.SubjectCode = $"{prefixes[RandomInt(0, prefixes.Length)]}{f.Random.Int(100, 999)}";
                 });
                 subjects.Add(subject);
             }
