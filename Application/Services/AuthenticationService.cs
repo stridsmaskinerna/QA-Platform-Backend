@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Domain.DTO.Request;
 using Domain.Constants;
+using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
