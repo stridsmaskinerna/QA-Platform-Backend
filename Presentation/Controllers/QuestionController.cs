@@ -27,8 +27,8 @@ public class QuestionController : ControllerBase
         [FromQuery] string? searchString
     )
     {
-        var publicQuestion = await _sm.QuestionService.GetAllAsync(limit, searchString);
-        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
+        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString);
+        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
         return Ok(courseDTOList);
     }
 
