@@ -12,9 +12,20 @@ public class QuestionService : BaseService, IQuestionService
         _repository = rp;
     }
 
-    public async Task<IEnumerable<Question>> GetAllAsync()
+    public async Task<IEnumerable<Question>> GetAllAsync(
+        int? limit,
+        string? searchString
+    )
     {
-        return await _repository.GetAllAsync();
+        return await _repository.GetAllAsync(limit, searchString);
+    }
+
+    public async Task<IEnumerable<Question>> GetAllPublicAsync(
+        int? limit,
+        string? searchString
+    )
+    {
+        return await _repository.GetAllPublicAsync(limit, searchString);
     }
 
     public async Task<Question?> GetByIdAsync(Guid id)
