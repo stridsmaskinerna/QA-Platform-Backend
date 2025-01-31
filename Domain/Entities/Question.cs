@@ -27,4 +27,6 @@ public class Question
     public ICollection<Answer> Answers { get; set; } = [];
 
     public ICollection<Tag> Tags { get; set; } = [];
+
+    public required Topic Topic { get; set; }
 }

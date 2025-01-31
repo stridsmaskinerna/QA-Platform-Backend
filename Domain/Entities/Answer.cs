@@ -6,11 +6,9 @@ public class Answer
 
     public Guid QuestionId { get; set; }
 
-    public string? UserId { get; set; }
+    public required string UserId { get; set; }
 
     public string Value { get; set; } = String.Empty;
-
-    public int Rating { get; set; }
 
     public string? FilePath { get; set; }
 
@@ -21,4 +19,10 @@ public class Answer
     // Navigation
 
     public ICollection<Comment> Comments { get; set; } = [];
+
+    public required Question Question { get; set; }
+
+    public required User User { get; set; }
+
+    public ICollection<AnswerVotes> AnswerVotes { get; set; } = [];
 }

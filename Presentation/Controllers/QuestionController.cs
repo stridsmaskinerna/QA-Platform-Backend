@@ -2,9 +2,11 @@ using Application.Services;
 using Domain.Constants;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Controllers;
 
@@ -22,26 +24,74 @@ public class QuestionController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions(
         [FromQuery] int? limit,
         [FromQuery] string? searchString
     )
     {
         var questions = await _sm.QuestionService.GetAllAsync(limit, searchString);
-        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
-        return Ok(courseDTOList);
+        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
+        return Ok(questionDTOList);
     }
 
     [HttpGet("public")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestionsList(
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
         [FromQuery] int? limit,
         [FromQuery] string? searchString
     )
     {
-        var publicQuestion = await _sm.QuestionService.GetAllPublicAsync(limit, searchString);
-        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
-        return Ok(courseDTOList);
+        var publicQuestions = await _sm.QuestionService.GetAllPublicAsync(limit, searchString);
+        var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
+
+        // List<QuestionDTO> questionDTOList = new();
+
+        // foreach (Question q in publicQuestion)
+        // {
+
+        //     var extraObj = await _sm.Context.Questions
+        //         .Select(q => new
+        //         {
+        //             Question = q,
+        //             TopicName = _sm.Context.Topics
+        //                     .Where(t => t.Id == q.TopicId)
+        //                     .Select(t => t.Name)
+        //                     .FirstOrDefault(),
+        //             SubjectName = _sm.Context.Subjects
+        //                     .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
+        //                     .Select(s => s.Name)
+        //                     .FirstOrDefault(),
+        //             SubjectCode = _sm.Context.Subjects
+        //                     .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
+        //                     .Select(s => s.SubjectCode)
+        //                     .FirstOrDefault(),
+        //             SubjectId = _sm.Context.Subjects
+        //                     .Where(s => s.Topics.Any(t => t.Id == q.TopicId))
+        //                     .Select(s => s.Id)
+        //                     .FirstOrDefault(),
+        //             UserName = _sm.Context.Users
+        //                     .Where(u => u.Id == q.UserId)
+        //                     .Select(u => u.UserName)
+        //                     .FirstOrDefault(),
+        //             T = q.Tags.Select(t => t.Value).ToList()
+        //         })
+        //         .FirstAsync();
+
+        //     QuestionDTO dto = _sm.Mapper.Map<QuestionDTO>(q);
+        //     dto.TopicName = extraObj.TopicName!;
+        //     dto.SubjectName = extraObj.SubjectName!;
+        //     dto.SubjectCode = extraObj.SubjectCode;
+        //     dto.SubjectId = $"{extraObj.SubjectId!}";
+        //     dto.UserName = extraObj.UserName!;
+        //     dto.Tags = extraObj.T;
+
+
+        //     questionDTOList.Add(dto);
+
+        // }
+
+        return Ok(publicQuestionDTOList);
+
     }
 
     [HttpGet("{id}")]
