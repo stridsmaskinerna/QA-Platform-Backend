@@ -1,6 +1,7 @@
-using System.IO.Compression;
+using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
@@ -13,96 +14,6 @@ public class QuestionRepository : IQuestionRepository
     {
         _dbContext = dbContext;
     }
-
-    public async Task<IEnumerable<Question>> GetAllAsync(
-        int? limit,
-        string? searchString,
-        Guid? subjecId,
-        Guid? topicId,
-        string? resolvedFilter,
-        bool onlyPublic = true
-    )
-    {
-
-        var query = _dbContext.Questions.AsQueryable();
-
-        if (onlyPublic)
-        {
-            query = query.Where(q => !q.IsProtected);
-        }
-
-        query = query.Include(q => q.Topic).ThenInclude(t => t.Subject);
-        query = ApplySearchFilter(query, searchString, subjecId, topicId, resolvedFilter);
-
-        query = query.Include(q => q.Tags);
-        query = query.Include(q => q.Answers);
-        query = query.Include(q => q.User);
-        query = query.OrderBy(q => q.Created);
-
-        if (limit.HasValue)
-        {
-            query = query.Take(limit.Value);
-        }
-
-        return await query.OrderBy(q => q.Created).ToListAsync();
-    }
-
-
-    private IQueryable<Question> ApplySearchFilter(
-        IQueryable<Question> queryable,
-        string? searchString,
-        Guid? subjectId,
-        Guid? topicId,
-        string? resolvedFilter
-    )
-    {
-        if (resolvedFilter is not null)
-        {
-            if (resolvedFilter == "onlyResolved")
-            {
-                queryable = queryable.Where(q => q.IsResolved);
-            }
-            else if (resolvedFilter == "onlyUnresolved")
-            {
-                queryable = queryable.Where(q => !q.IsResolved);
-            }
-        }
-
-        if (subjectId is not null)
-        {
-            queryable = queryable.Where(q => q.Topic.Subject.Id == subjectId);
-
-            if (topicId is not null)
-            {
-                queryable = queryable.Where(q => q.Topic.Id == topicId);
-            }
-        }
-
-        if (string.IsNullOrWhiteSpace(searchString))
-        {
-            return queryable;
-        }
-
-        var query = $"%{searchString}%";
-
-        return queryable.Where(q =>
-            EF.Functions.ILike(q.Title, query) ||
-
-            q.Tags.Any(tag => EF.Functions.ILike(tag.Value, query)) ||
-
-            _dbContext.Topics
-                .Where(t => t.Id == q.TopicId)
-                .Any(t => EF.Functions.ILike(t.Name, query)) ||
-
-            _dbContext.Subjects
-                .Where(s => _dbContext.Topics
-                    .Where(t => t.Id == q.TopicId && t.SubjectId == s.Id)
-                    .Any())
-                .Any(s => EF.Functions.ILike(s.Name, query) ||
-                    (s.SubjectCode != null && EF.Functions.ILike(s.SubjectCode, query)))
-        );
-    }
-
 
     public async Task<Question?> GetByIdAsync(Guid id)
     {
@@ -132,4 +43,128 @@ public class QuestionRepository : IQuestionRepository
         }
     }
 
+    public async Task<IEnumerable<Question>> GetAllAsync(
+        PaginationDTO paginationDTO,
+        QuestionSearchDTO searchDTO
+    )
+    {
+        var query = _dbContext.Questions.AsQueryable();
+
+        query = query.Include(q => q.Topic)
+            .ThenInclude(t => t.Subject)
+            .Include(q => q.Tags)
+            .Include(q => q.Answers)
+            .Include(q => q.User)
+            .OrderBy(q => q.Created);
+
+        query = query
+            .Pipe(q => ApplyPublicFilter(q, searchDTO))
+            .Pipe(q => ApplyResolvedFilter(q, searchDTO))
+            .Pipe(q => ApplySubjectAndTopiFilter(q, searchDTO))
+            .Pipe(q => ApplySearchFilter(q, searchDTO))
+            .Pipe(q => ApplySorting(q))
+            .Pipe(q => ApplyPagination(q, paginationDTO));
+
+        return await query.ToListAsync();
+    }
+
+
+    private IQueryable<Question> ApplyPublicFilter(
+        IQueryable<Question> queryable,
+        QuestionSearchDTO searchDTO
+    )
+    {
+        if (searchDTO.OnlyPublic)
+        {
+            queryable = queryable.Where(q => !q.IsProtected);
+        }
+
+        return queryable;
+    }
+
+
+    private IQueryable<Question> ApplyResolvedFilter(
+        IQueryable<Question> queryable,
+        QuestionSearchDTO searchDTO
+    )
+    {
+        if (searchDTO.IsResolved == null)
+        {
+            return queryable;
+        }
+
+        return searchDTO.IsResolved == true
+            ? queryable.Where(q => q.IsResolved)
+            : queryable.Where(q => !q.IsResolved);
+    }
+
+    private IQueryable<Question> ApplySubjectAndTopiFilter(
+        IQueryable<Question> queryable,
+        QuestionSearchDTO searchDTO
+    )
+    {
+        if (searchDTO.SubjectName is not null)
+        {
+            queryable = queryable.Where(q => q.Topic.Subject.Name == searchDTO.SubjectName);
+        }
+
+        if (searchDTO.SubjectCode is not null)
+        {
+            queryable = queryable.Where(q => q.Topic.Subject.SubjectCode == searchDTO.SubjectCode);
+        }
+
+        if (searchDTO.TopicName is not null)
+        {
+            queryable = queryable.Where(q => q.Topic.Name == searchDTO.TopicName);
+        }
+
+        return queryable;
+    }
+
+    private IQueryable<Question> ApplySearchFilter(
+        IQueryable<Question> queryable,
+        QuestionSearchDTO searchDTO
+    )
+    {
+        if (string.IsNullOrWhiteSpace(searchDTO.SearchString))
+        {
+            return queryable;
+        }
+
+        var query = $"%{searchDTO.SearchString}%";
+
+        return queryable.Where(q =>
+            EF.Functions.ILike(q.Title, query) ||
+
+            q.Tags.Any(tag => EF.Functions.ILike(tag.Value, query)) ||
+
+            _dbContext.Topics
+                .Where(t => t.Id == q.TopicId)
+                .Any(t => EF.Functions.ILike(t.Name, query)) ||
+
+            _dbContext.Subjects
+                .Where(s => _dbContext.Topics
+                    .Where(t => t.Id == q.TopicId && t.SubjectId == s.Id)
+                    .Any())
+                .Any(s => EF.Functions.ILike(s.Name, query) ||
+                    (s.SubjectCode != null && EF.Functions.ILike(s.SubjectCode, query)))
+        );
+    }
+
+    private IQueryable<Question> ApplySorting(
+        IQueryable<Question> queryable
+    )
+    {
+        return queryable.OrderBy(q => q.Created);
+    }
+
+    private IQueryable<Question> ApplyPagination(
+        IQueryable<Question> queryable,
+        PaginationDTO paginationDTO
+    )
+    {
+        return queryable
+            .Skip(paginationDTO.Limit * (paginationDTO.PageNr - 1))
+            .Take(paginationDTO.Limit);
+    }
 }

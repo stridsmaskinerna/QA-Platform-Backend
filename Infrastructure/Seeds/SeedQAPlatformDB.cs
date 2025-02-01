@@ -72,8 +72,21 @@ public static class SeedQAPlatformDB
 
         string[] prefixes =
 [
-    "CS", "MA", "EN", "LA", "IT", "FR", "DE", "SP", "RU", "JP",
-    "BR", "CH", "IN", "US", "UK"
+    "CS",
+    "MA",
+    "EN",
+    "LA",
+    "IT",
+    "FR",
+    "DE",
+    "SP",
+    "RU",
+    "JP",
+    "BR",
+    "CH",
+    "IN",
+    "US",
+    "UK"
 ];
 
         foreach (var category in categories)

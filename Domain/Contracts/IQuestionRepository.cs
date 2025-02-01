@@ -1,3 +1,4 @@
+using Domain.DTO.Query;
 using Domain.Entities;
 
 namespace Infrastructure.Repositories;
@@ -8,5 +9,8 @@ public interface IQuestionRepository
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);
     Task DeleteAsync(Guid id);
-    Task<IEnumerable<Question>> GetAllAsync(int? limit, string? searchString, Guid? subjectId, Guid? topicId, string? resolvedFilter, bool onlyPublic = true);
+    Task<IEnumerable<Question>> GetAllAsync(
+        PaginationDTO paginationDTO,
+        QuestionSearchDTO searchDTO
+    );
 }

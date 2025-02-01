@@ -1,3 +1,4 @@
+using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Repositories;
 
@@ -13,15 +14,11 @@ public class QuestionService : BaseService, IQuestionService
     }
 
     public async Task<IEnumerable<Question>> GetAllAsync(
-        int? limit,
-        string? searchString,
-        Guid? subjectId,
-        Guid? topicId,
-        string? resolvedFilter,
-        bool onlyPublic = true
+        PaginationDTO paginationDTO,
+        QuestionSearchDTO searchDTO
     )
     {
-        return await _repository.GetAllAsync(limit, searchString, subjectId, topicId, resolvedFilter, onlyPublic);
+        return await _repository.GetAllAsync(paginationDTO, searchDTO);
     }
 
     public async Task<Question?> GetByIdAsync(Guid id)

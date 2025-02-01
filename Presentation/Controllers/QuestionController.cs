@@ -1,5 +1,6 @@
 using Application.Services;
 using Domain.Constants;
+using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
@@ -25,15 +26,11 @@ public class QuestionController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions(
-        [FromQuery] int? limit,
-        [FromQuery] string? searchString,
-        [FromQuery] Guid? subjectId,
-        [FromQuery] Guid? topicId,
-        [FromQuery] string? resolvedFilter
-
+        [FromQuery] PaginationDTO paginationDTO,
+        [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString, subjectId, topicId, resolvedFilter, onlyPublic: false);
+        var questions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO);
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
         return Ok(questionDTOList);
     }
@@ -41,18 +38,14 @@ public class QuestionController : ControllerBase
     [HttpGet("public")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
-        [FromQuery] int? limit,
-        [FromQuery] string? searchString,
-        [FromQuery] Guid? subjecId,
-        [FromQuery] Guid? topicId,
-        [FromQuery] string? resolveFilter
+        [FromQuery] PaginationDTO paginationDTO,
+        [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var publicQuestions = await _sm.QuestionService.GetAllAsync(limit, searchString, subjecId, topicId, resolveFilter);
+        var publicQuestions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO);
         var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
 
         return Ok(publicQuestionDTOList);
-
     }
 
     [HttpGet("{id}")]
