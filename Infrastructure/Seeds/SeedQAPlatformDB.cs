@@ -225,6 +225,7 @@ public static class SeedQAPlatformDB
             var derivedQuantities = RandomInt(0, maxQuantity);
             for (int i = 0; i < derivedQuantities; i++)
             {
+                //To make questions not have that many tags
                 var rndTags = new HashSet<Tag>();
                 for (int j = 0; j < 5; j++)
                 {
@@ -232,16 +233,17 @@ public static class SeedQAPlatformDB
                 }
 
 
+                var idx = RandomInt(0, Dummydata.StudentQuestions.Length);
                 var question = new Faker<Question>("en").Rules((f, q) =>
                 {
                     q.TopicId = topic.Id;
                     q.UserId = users[RandomInt(0, users.Count)].Id;
-                    q.Title = $"{f.Lorem.Sentence(5, 20)}?";
-                    q.Description = f.Lorem.Sentence(20, 200);
+                    q.Title = Dummydata.StudentQuestions[idx].Title;
+                    q.Description = Dummydata.StudentQuestions[idx].Description;
                     q.Created = DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow, new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)), DateTimeKind.Utc);
                     q.IsResolved = RandomBool();
                     q.IsProtected = RandomBool();
-                    q.IsHidden = RandomBool();
+                    q.IsHidden = RandomInt(0, 11) > 8;
                     q.Tags = rndTags;
                 });
                 questions.Add(question);
@@ -270,7 +272,7 @@ public static class SeedQAPlatformDB
                     a.UserId = users[RandomInt(0, users.Count)].Id;
                     a.Value = $"{f.Lorem.Sentence(20, 100)}";
                     a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddDays(1), question.Created.AddDays(100)), DateTimeKind.Utc);
-                    a.IsHidden = RandomBool();
+                    a.IsHidden = RandomInt(0, 11) > 8;
                 });
                 answers.Add(answer);
             }
@@ -358,4 +360,9 @@ public static class SeedQAPlatformDB
         return random.Next(0, 11) > 2;
     }
 
+
+
+
 }
+
+

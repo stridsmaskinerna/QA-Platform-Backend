@@ -42,30 +42,7 @@ public class QuestionRepository : IQuestionRepository
         }
 
         return await query.OrderBy(q => q.Created).ToListAsync();
-
-
-
-        // var query = _dbContext.Questions.AsQueryable();
-
-        // query = ApplySearchFilter(query, searchString);
-
-        // query = query.Include(q => q.Tags);
-
-        // if (limit.HasValue)
-        // {
-        //     query = query.Take(limit.Value);
-        // }
-
-        // return await query.ToListAsync();
     }
-
-    // public async Task<IEnumerable<Question>> GetAllPublicAsync(
-    //     int? limit,
-    //     string? searchString
-    // )
-    // {
-
-    // }
 
 
     private IQueryable<Question> ApplySearchFilter(
