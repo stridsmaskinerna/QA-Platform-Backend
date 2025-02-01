@@ -26,7 +26,7 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var questions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO);
+        var questions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO, onlyPublic: false);
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
         return Ok(questionDTOList);
     }

@@ -11,6 +11,7 @@ public interface IQuestionRepository
     Task DeleteAsync(Guid id);
     Task<IEnumerable<Question>> GetAllAsync(
         PaginationDTO paginationDTO,
-        QuestionSearchDTO searchDTO
+        QuestionSearchDTO searchDTO,
+        bool onlyPublic = true
     );
 }
