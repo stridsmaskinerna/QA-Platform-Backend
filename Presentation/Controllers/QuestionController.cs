@@ -26,10 +26,14 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions(
         [FromQuery] int? limit,
-        [FromQuery] string? searchString
+        [FromQuery] string? searchString,
+        [FromQuery] Guid? subjectId,
+        [FromQuery] Guid? topicId,
+        [FromQuery] string? resolvedFilter
+
     )
     {
-        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString, onlyPublic: false);
+        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString, subjectId, topicId, resolvedFilter, onlyPublic: false);
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
         return Ok(questionDTOList);
     }
@@ -38,10 +42,13 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
         [FromQuery] int? limit,
-        [FromQuery] string? searchString
+        [FromQuery] string? searchString,
+        [FromQuery] Guid? subjecId,
+        [FromQuery] Guid? topicId,
+        [FromQuery] string? resolveFilter
     )
     {
-        var publicQuestions = await _sm.QuestionService.GetAllAsync(limit, searchString);
+        var publicQuestions = await _sm.QuestionService.GetAllAsync(limit, searchString, subjecId, topicId, resolveFilter);
         var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
 
         return Ok(publicQuestionDTOList);

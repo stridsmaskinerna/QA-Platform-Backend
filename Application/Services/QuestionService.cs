@@ -15,10 +15,13 @@ public class QuestionService : BaseService, IQuestionService
     public async Task<IEnumerable<Question>> GetAllAsync(
         int? limit,
         string? searchString,
+        Guid? subjectId,
+        Guid? topicId,
+        string? resolvedFilter,
         bool onlyPublic = true
     )
     {
-        return await _repository.GetAllAsync(limit, searchString, onlyPublic);
+        return await _repository.GetAllAsync(limit, searchString, subjectId, topicId, resolvedFilter, onlyPublic);
     }
 
     public async Task<Question?> GetByIdAsync(Guid id)

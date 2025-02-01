@@ -17,6 +17,9 @@ public class QuestionRepository : IQuestionRepository
     public async Task<IEnumerable<Question>> GetAllAsync(
         int? limit,
         string? searchString,
+        Guid? subjecId,
+        Guid? topicId,
+        string? resolvedFilter,
         bool onlyPublic = true
     )
     {
@@ -28,10 +31,10 @@ public class QuestionRepository : IQuestionRepository
             query = query.Where(q => !q.IsProtected);
         }
 
-        query = ApplySearchFilter(query, searchString);
+        query = query.Include(q => q.Topic).ThenInclude(t => t.Subject);
+        query = ApplySearchFilter(query, searchString, subjecId, topicId, resolvedFilter);
 
         query = query.Include(q => q.Tags);
-        query = query.Include(q => q.Topic).ThenInclude(t => t.Subject);
         query = query.Include(q => q.Answers);
         query = query.Include(q => q.User);
         query = query.OrderBy(q => q.Created);
@@ -47,9 +50,34 @@ public class QuestionRepository : IQuestionRepository
 
     private IQueryable<Question> ApplySearchFilter(
         IQueryable<Question> queryable,
-        string? searchString
+        string? searchString,
+        Guid? subjectId,
+        Guid? topicId,
+        string? resolvedFilter
     )
     {
+        if (resolvedFilter is not null)
+        {
+            if (resolvedFilter == "onlyResolved")
+            {
+                queryable = queryable.Where(q => q.IsResolved);
+            }
+            else if (resolvedFilter == "onlyUnresolved")
+            {
+                queryable = queryable.Where(q => !q.IsResolved);
+            }
+        }
+
+        if (subjectId is not null)
+        {
+            queryable = queryable.Where(q => q.Topic.Subject.Id == subjectId);
+
+            if (topicId is not null)
+            {
+                queryable = queryable.Where(q => q.Topic.Id == topicId);
+            }
+        }
+
         if (string.IsNullOrWhiteSpace(searchString))
         {
             return queryable;

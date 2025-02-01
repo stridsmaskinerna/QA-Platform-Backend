@@ -4,6 +4,7 @@ public class QuestionDTO
 {
     public Guid Id { get; set; }
     public required string TopicName { get; set; }
+    public required Guid TopicId { get; set; }
     public required string SubjectName { get; set; }
     public string? SubjectCode { get; set; }
     public Guid SubjectId { get; set; }
