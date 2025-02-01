@@ -19,16 +19,6 @@ public class AnswerService : BaseService, IAnswerService
         _sm = sm;
     }
 
-    public async Task<Answer?> GetByIdAsync(Guid id)
-    {
-        var answer = await _answerRepository.GetByIdAsync(id);
-        if (answer == null)
-        {
-            NotFound();
-        }
-        return answer;
-    }
-
     public async Task<AnswerDTO> AddAsync(AnswerForCreationDTO answerDTO)
     {
         var answer = _sm.Mapper.Map<Answer>(answerDTO);
