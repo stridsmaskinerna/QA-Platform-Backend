@@ -1,13 +1,9 @@
 using Application.Services;
-using Domain.Constants;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
-using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Controllers;
 
