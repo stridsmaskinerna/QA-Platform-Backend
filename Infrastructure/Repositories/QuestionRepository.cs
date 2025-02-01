@@ -103,9 +103,9 @@ public class QuestionRepository : IQuestionRepository
         QuestionSearchDTO searchDTO
     )
     {
-        if (searchDTO.SubjectName is not null)
+        if (searchDTO.SubjectId is not null)
         {
-            queryable = queryable.Where(q => q.Topic.Subject.Name == searchDTO.SubjectName);
+            queryable = queryable.Where(q => q.Topic.Subject.Id == searchDTO.SubjectId);
         }
 
         if (searchDTO.SubjectCode is not null)
@@ -113,9 +113,9 @@ public class QuestionRepository : IQuestionRepository
             queryable = queryable.Where(q => q.Topic.Subject.SubjectCode == searchDTO.SubjectCode);
         }
 
-        if (searchDTO.TopicName is not null)
+        if (searchDTO.TopicId is not null)
         {
-            queryable = queryable.Where(q => q.Topic.Name == searchDTO.TopicName);
+            queryable = queryable.Where(q => q.Topic.Id == searchDTO.TopicId);
         }
 
         return queryable;
