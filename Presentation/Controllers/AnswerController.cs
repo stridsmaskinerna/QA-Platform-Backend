@@ -1,6 +1,7 @@
 using Application.Services;
 using Domain.Constants;
 using Domain.DTO.Request;
+using Domain.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,29 +21,20 @@ public class AnswerController : ControllerBase
         _sm = sm;
     }
 
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAnswerById(int id)
-    {
-        throw new NotImplementedException();
-    }
-
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateAnswer(
+    public async Task<ActionResult<AnswerDTO>> CreateAnswer(
         [FromBody] AnswerForCreationDTO body
     )
     {
         var created = await _sm.AnswerService.AddAsync(body);
 
-        return CreatedAtAction(
-            nameof(GetAnswerById),
-            new { id = created.Id },
-            created
-        );
+        return new ObjectResult(created)
+        {
+            StatusCode = StatusCodes.Status201Created
+        };
     }
 
     [HttpPut("{id}")]
