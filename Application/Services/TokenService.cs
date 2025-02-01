@@ -1,10 +1,11 @@
 using System.Security.Claims;
 using Domain.Constants;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Services;
 
-public class TokenService : ITokenService
+public class TokenService : BaseService, ITokenService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -13,18 +14,39 @@ public class TokenService : ITokenService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private ClaimsPrincipal? GetUser()
+    public string GetUserName()
     {
-        return _httpContextAccessor.HttpContext?.User;
+        var userName = GetUser().FindFirst(DomainClaims.USER_NAME)?.Value;
+
+        if (userName == null)
+        {
+            Unauthorized();
+        }
+
+        return userName;
     }
 
-    public string? GetUserName()
+    public string GetUserId()
     {
-        return GetUser()?.FindFirst(DomainClaims.USER_NAME)?.Value;
+        var userId = GetUser().FindFirst(DomainClaims.USER_ID)?.Value;
+
+        if (userId == null)
+        {
+            Unauthorized();
+        }
+
+        return userId;
     }
 
-    public string? GetUserId()
+    private ClaimsPrincipal GetUser()
     {
-        return GetUser()?.FindFirst(DomainClaims.USER_ID)?.Value;
+        var user = _httpContextAccessor.HttpContext?.User;
+
+        if (user == null)
+        {
+            Unauthorized();
+        }
+
+        return user;
     }
 }

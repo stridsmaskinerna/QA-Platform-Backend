@@ -5,6 +5,7 @@ namespace Application.Services;
 public class ServiceManager(
     Lazy<IBaseService> baseService,
     Lazy<IQuestionService> questionService,
+    Lazy<IAnswerService> answerService,
     Lazy<IAuthenticationService> authenticationService,
     Lazy<ITokenService> tokenService,
     IMapper mapper
@@ -15,6 +16,7 @@ public class ServiceManager(
     public IAuthenticationService AuthenticationService => authenticationService.Value;
     public ITokenService TokenService => tokenService.Value;
     public IMapper Mapper => mapper;
+    public IAnswerService AnswerService => answerService.Value;
 }
 
 

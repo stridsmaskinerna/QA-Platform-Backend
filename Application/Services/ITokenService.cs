@@ -1,5 +1,5 @@
 public interface ITokenService
 {
-    string? GetUserName();
-    string? GetUserId();
+    string GetUserName();
+    string GetUserId();
 }

@@ -1,8 +1,7 @@
-using System.Runtime.InteropServices;
 using AutoMapper;
+using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
-
 
 namespace Application.Services;
 public class MapperManager : Profile
@@ -18,8 +17,6 @@ public class MapperManager : Profile
         // CreateMap<Question, QuestionDTO>();
         CreateMap<Question, QuestionDetailedDTO>();
 
-
-
         CreateMap<Question, QuestionDTO>()
         .ForMember(dest => dest.TopicName, opt => opt.MapFrom(src => src.Topic.Name))
         .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Topic.Subject.Name))
@@ -31,10 +28,19 @@ public class MapperManager : Profile
 
         CreateMap<Subject, SubjectDTO>().ReverseMap(); //used for Subject creation too
 
-        CreateMap<Comment, CommentDTO>().ReverseMap(); //used to create the commento too
+        CreateMap<Comment, CommentDTO>().ReverseMap(); //used to create the comment too
 
         CreateMap<Answer, AnswerDTO>();
 
+        CreateMap<AnswerForCreationDTO, Answer>()
+        .ForMember(dest => dest.UserId, opt => opt.MapFrom<UserIdResolver>())
+        .AfterMap((src, dest) =>
+        {
+            dest.IsHidden = true;
+            dest.Created = DateTime.UtcNow;
+        });
+
+        CreateMap<AnswerForPutDTO, Answer>();
     }
 }
 

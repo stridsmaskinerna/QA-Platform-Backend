@@ -1,6 +1,8 @@
+using System.Data.Common;
 using System.Text.Json;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace QAPlatformAPI.Middlewares;
 
@@ -19,6 +21,16 @@ public class ExceptionMiddleware(
         catch (ApiException ex)
         {
             await HandleExceptionAsync(context, ex);
+        }
+        catch (DbException)
+        {
+            var apiException = new ApiException();
+            await HandleExceptionAsync(context, apiException);
+        }
+        catch (Exception)
+        {
+            var apiException = new ApiException();
+            await HandleExceptionAsync(context, apiException);
         }
     }
 
