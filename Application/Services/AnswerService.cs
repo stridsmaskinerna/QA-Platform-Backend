@@ -28,8 +28,9 @@ public class AnswerService : BaseService, IAnswerService
         }
 
         var createdAnswer = await _answerRepository.AddAsync(answer);
-
-        return _sm.Mapper.Map<AnswerDTO>(createdAnswer);
+        var createdAnswerDTO = _sm.Mapper.Map<AnswerDTO>(createdAnswer);
+        createdAnswerDTO.UserName = _sm.TokenService.GetUserName();
+        return createdAnswerDTO;
     }
 
     public async Task UpdateAsync(
@@ -44,7 +45,6 @@ public class AnswerService : BaseService, IAnswerService
         }
 
         var updated = _sm.Mapper.Map(answerDTO, answer);
-
         await _answerRepository.UpdateAsync(updated);
     }
 

@@ -32,8 +32,7 @@ public class MapperManager : Profile
 
         CreateMap<Comment, CommentDTO>().ReverseMap(); //used to create the comment too
 
-        CreateMap<Answer, AnswerDTO>()
-            .ForMember(d => d.UserName, o => o.MapFrom<UserNameResolver>());
+        CreateMap<Answer, AnswerDTO>();
 
         CreateMap<AnswerForCreationDTO, Answer>()
             .ForMember(d => d.UserId, o => o.MapFrom<UserIdResolver>())
