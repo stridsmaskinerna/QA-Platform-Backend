@@ -3,7 +3,9 @@ using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 
-namespace Application.Services;
+namespace Application.Profiles;
+
+// TODO Crate a Profile class for every resource, e.g., AnswerProfile
 public class MapperManager : Profile
 {
     public MapperManager()
@@ -33,12 +35,12 @@ public class MapperManager : Profile
         CreateMap<Answer, AnswerDTO>();
 
         CreateMap<AnswerForCreationDTO, Answer>()
-        .ForMember(dest => dest.UserId, opt => opt.MapFrom<UserIdResolver>())
-        .AfterMap((src, dest) =>
-        {
-            dest.IsHidden = true;
-            dest.Created = DateTime.UtcNow;
-        });
+            .ForMember(d => d.UserId, o => o.MapFrom<UserIdResolver>())
+            .AfterMap((s, d) =>
+            {
+                d.IsHidden = true;
+                d.Created = DateTime.UtcNow;
+            });
 
         CreateMap<AnswerForPutDTO, Answer>();
     }

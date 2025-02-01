@@ -1,8 +1,7 @@
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using Application.Profiles;
 using Application.Services;
-using Domain.Constants;
 using Domain.Contracts;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -10,7 +9,6 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace QAPlatformAPI.Extensions;

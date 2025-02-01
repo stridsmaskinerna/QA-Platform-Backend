@@ -1,7 +1,6 @@
 using Application.Services;
 using Domain.Constants;
 using Domain.DTO.Request;
-using Domain.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
