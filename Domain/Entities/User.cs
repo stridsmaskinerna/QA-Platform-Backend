@@ -15,4 +15,6 @@ public class User : IdentityUser
     public ICollection<Comment> Comments { get; set; } = [];
 
     public ICollection<Subject> Subjects { get; set; } = [];
+
+    public ICollection<AnswerVotes> AnswerVotes { get; set; } = [];
 }

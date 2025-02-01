@@ -6,7 +6,11 @@ public class Comment
 
     public Guid AnswerId { get; set; }
 
-    public string? UserId { get; set; }
+    public required string UserId { get; set; }
 
     public string Value { get; set; } = String.Empty;
+
+    public required User User { get; set; }
+
+    public required Answer Answer { get; set; }
 }

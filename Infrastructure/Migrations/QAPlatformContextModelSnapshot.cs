@@ -22,6 +22,24 @@ namespace Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AnswerVotes", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("AnswerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Vote")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("UserId", "AnswerId");
+
+                    b.HasIndex("AnswerId");
+
+                    b.ToTable("AnswerVotes");
+                });
+
             modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -40,10 +58,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Value")
@@ -69,6 +85,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Value")
@@ -413,52 +430,89 @@ namespace Infrastructure.Migrations
                     b.ToTable("SubjectTeacher");
                 });
 
+            modelBuilder.Entity("AnswerVotes", b =>
+                {
+                    b.HasOne("Domain.Entities.Answer", "Answer")
+                        .WithMany("AnswerVotes")
+                        .HasForeignKey("AnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("AnswerVotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
-                    b.HasOne("Domain.Entities.Question", null)
+                    b.HasOne("Domain.Entities.Question", "Question")
                         .WithMany("Answers")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Answers")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
-                    b.HasOne("Domain.Entities.Answer", null)
+                    b.HasOne("Domain.Entities.Answer", "Answer")
                         .WithMany("Comments")
                         .HasForeignKey("AnswerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Comments")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Question", b =>
                 {
-                    b.HasOne("Domain.Entities.Topic", null)
+                    b.HasOne("Domain.Entities.Topic", "Topic")
                         .WithMany("Questions")
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Questions")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Topic");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Topic", b =>
                 {
-                    b.HasOne("Domain.Entities.Subject", null)
+                    b.HasOne("Domain.Entities.Subject", "Subject")
                         .WithMany("Topics")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -544,6 +598,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Answer", b =>
                 {
+                    b.Navigation("AnswerVotes");
+
                     b.Navigation("Comments");
                 });
 
@@ -564,6 +620,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
+                    b.Navigation("AnswerVotes");
+
                     b.Navigation("Answers");
 
                     b.Navigation("Comments");

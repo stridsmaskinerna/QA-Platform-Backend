@@ -13,4 +13,6 @@ public class Topic
     // Navigation
     public ICollection<Question> Questions { get; set; } = [];
 
+    public required Subject Subject { get; set; }
+
 }

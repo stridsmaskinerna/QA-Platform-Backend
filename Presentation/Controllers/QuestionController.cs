@@ -1,8 +1,7 @@
 using Application.Services;
-using Domain.Constants;
+using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,26 +21,27 @@ public class QuestionController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
-        [FromQuery] int? limit,
-        [FromQuery] string? searchString
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions(
+        [FromQuery] PaginationDTO paginationDTO,
+        [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var questions = await _sm.QuestionService.GetAllAsync(limit, searchString);
-        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
-        return Ok(courseDTOList);
+        var questions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO);
+        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
+        return Ok(questionDTOList);
     }
 
     [HttpGet("public")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestionsList(
-        [FromQuery] int? limit,
-        [FromQuery] string? searchString
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
+        [FromQuery] PaginationDTO paginationDTO,
+        [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var publicQuestion = await _sm.QuestionService.GetAllPublicAsync(limit, searchString);
-        var courseDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestion);
-        return Ok(courseDTOList);
+        var publicQuestions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO);
+        var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
+
+        return Ok(publicQuestionDTOList);
     }
 
     [HttpGet("{id}")]
