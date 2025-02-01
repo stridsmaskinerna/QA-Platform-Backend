@@ -45,7 +45,8 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<IEnumerable<Question>> GetAllAsync(
         PaginationDTO paginationDTO,
-        QuestionSearchDTO searchDTO
+        QuestionSearchDTO searchDTO,
+        bool onlyPublic
     )
     {
         var query = _dbContext.Questions.AsQueryable();
@@ -58,7 +59,7 @@ public class QuestionRepository : IQuestionRepository
             .OrderBy(q => q.Created);
 
         query = query
-            .Pipe(q => ApplyPublicFilter(q, searchDTO))
+            .Pipe(q => ApplyPublicFilter(q, onlyPublic))
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
             .Pipe(q => ApplySubjectAndTopiFilter(q, searchDTO))
             .Pipe(q => ApplySearchFilter(q, searchDTO))
@@ -71,10 +72,10 @@ public class QuestionRepository : IQuestionRepository
 
     private IQueryable<Question> ApplyPublicFilter(
         IQueryable<Question> queryable,
-        QuestionSearchDTO searchDTO
+        bool onlyPublic
     )
     {
-        if (searchDTO.OnlyPublic)
+        if (onlyPublic)
         {
             queryable = queryable.Where(q => !q.IsProtected);
         }
@@ -106,11 +107,6 @@ public class QuestionRepository : IQuestionRepository
         if (searchDTO.SubjectId is not null)
         {
             queryable = queryable.Where(q => q.Topic.Subject.Id == searchDTO.SubjectId);
-        }
-
-        if (searchDTO.SubjectCode is not null)
-        {
-            queryable = queryable.Where(q => q.Topic.Subject.SubjectCode == searchDTO.SubjectCode);
         }
 
         if (searchDTO.TopicId is not null)
