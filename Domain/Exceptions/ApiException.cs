@@ -1,6 +1,6 @@
 namespace Domain.Exceptions;
 
-public class ApiException(
+public abstract class ApiException(
     string message = "An unexpected error occurred.",
     string title = "Internal Server Error",
     int statusCode = 500

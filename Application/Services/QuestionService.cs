@@ -13,13 +13,15 @@ public class QuestionService : BaseService, IQuestionService
         _repository = rp;
     }
 
-    public async Task<IEnumerable<Question>> GetAllAsync(
+    public async
+    Task<(IEnumerable<Question> Questions, int TotalItemCount)>
+    GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic = true
     )
     {
-        return await _repository.GetAllAsync(paginationDTO, searchDTO, onlyPublic);
+        return await _repository.GetItemsAsync(paginationDTO, searchDTO, onlyPublic);
     }
 
     public async Task<Question?> GetByIdAsync(Guid id)

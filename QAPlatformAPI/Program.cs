@@ -2,6 +2,7 @@ using Application.Services;
 using Infrastructure.Repositories;
 using Presentation;
 using QAPlatformAPI.Extensions;
+using QAPlatformAPI.Filters;
 using QAPlatformAPI.Middlewares;
 
 namespace QAPlatformAPI;
@@ -35,7 +36,10 @@ public class Program
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(opt =>
+        {
+            opt.OperationFilter<CustomHeadersOperationFilter>();
+        });
 
         return builder.Build();
     }

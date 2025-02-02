@@ -6,7 +6,7 @@ namespace Application.Services;
 public interface IQuestionService
 {
     Task<Question?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Question>> GetAllAsync(
+    Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO, bool onlyPublic = true);
     Task<Question> AddAsync(Question question);

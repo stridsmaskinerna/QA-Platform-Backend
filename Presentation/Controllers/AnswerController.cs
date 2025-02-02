@@ -31,10 +31,7 @@ public class AnswerController : ControllerBase
     {
         var created = await _sm.AnswerService.AddAsync(body);
 
-        return new ObjectResult(created)
-        {
-            StatusCode = StatusCodes.Status201Created
-        };
+        return Created(string.Empty, created);
     }
 
     [HttpPut("{id}")]

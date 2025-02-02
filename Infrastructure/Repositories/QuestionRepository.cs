@@ -43,12 +43,16 @@ public class QuestionRepository : IQuestionRepository
         }
     }
 
-    public async Task<IEnumerable<Question>> GetAllAsync(
+    public async
+    Task<(IEnumerable<Question> Questions, int TotalItemCount)>
+    GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic
     )
     {
+        var totalItemCount = await _dbContext.Questions.CountAsync();
+
         var query = _dbContext.Questions.AsQueryable();
 
         query = query.Include(q => q.Topic)
@@ -66,7 +70,10 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(q => ApplySorting(q))
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
-        return await query.ToListAsync();
+        return (
+            Questions: await query.ToListAsync(),
+            TotalItemCount: totalItemCount
+        );
     }
 
 

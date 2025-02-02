@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Application.Profiles;
 using Application.Services;
+using Domain.Constants;
 using Domain.Contracts;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -140,7 +141,10 @@ public static class WebApplicationBuilderExtension
             config.AddPolicy("AllowFrontend",
                 p => p.WithOrigins(allowedOrigins)
                       .AllowAnyMethod()
-                      .AllowAnyHeader()  // ✅ Allows `Authorization` header
+                      .AllowAnyHeader() // ✅ Allows `Authorization` header
+                      .WithExposedHeaders([
+                          CustomHeaders.Pagination
+                      ])
             ));
     }
 }
