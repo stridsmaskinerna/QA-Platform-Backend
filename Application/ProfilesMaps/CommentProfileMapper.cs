@@ -7,7 +7,8 @@ namespace Application.ProfilesMaps;
 
 public class CommentProfileMapper : Profile
 {
-    public CommentProfileMapper() {
+    public CommentProfileMapper()
+    {
         CreateMap<Comment, CommentDTO>().ReverseMap();
     }
 }

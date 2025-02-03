@@ -1,3 +1,5 @@
+using System.Data;
+using System.Data.Common;
 using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -17,14 +19,24 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<Question?> GetByIdAsync(Guid id)
     {
-        return await _dbContext.Questions.FindAsync(id);
+        var question = await _dbContext.Questions
+            .Where(q => q.Id == id)
+            .AsNoTracking()
+            .Include(q => q.Topic)
+            .ThenInclude(t => t.Subject)
+            .Include(q => q.Tags)
+            .Include(q => q.User)
+            .Include(q => q.Answers)
+            .FirstOrDefaultAsync();
+
+        return question;
     }
 
     public async Task<Question> AddAsync(Question question)
     {
         _dbContext.Questions.Add(question);
         await _dbContext.SaveChangesAsync();
-        return question;
+        return await GetByIdAsync(question.Id) ?? throw new DataException();
     }
 
     public async Task UpdateAsync(Question question)
@@ -43,6 +55,11 @@ public class QuestionRepository : IQuestionRepository
         }
     }
 
+    public async Task CompleteAsync(Question updated)
+    {
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async
     Task<(IEnumerable<Question> Questions, int TotalItemCount)>
     GetItemsAsync(
@@ -55,7 +72,8 @@ public class QuestionRepository : IQuestionRepository
 
         var query = _dbContext.Questions.AsQueryable();
 
-        query = query.Include(q => q.Topic)
+        query = query
+            .Include(q => q.Topic)
             .ThenInclude(t => t.Subject)
             .Include(q => q.Tags)
             .Include(q => q.Answers)
