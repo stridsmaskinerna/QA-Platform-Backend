@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Application.Profiles;
+using Application.ProfilesMaps;
 using Application.Services;
 using Domain.Constants;
 using Domain.Contracts;
@@ -46,7 +46,11 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddHttpContextAccessor();
 
-        builder.Services.AddAutoMapper(typeof(MapperManager));
+        builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<AnswerProfileMapper>();
+                                                cfg.AddProfile<CommentProfileMapper>();
+                                                cfg.AddProfile<SubjectProfileMapper>();
+                                                cfg.AddProfile<UserProfileMapper>();
+                                                cfg.AddProfile<QuestionProfileMapper>(); });
 
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
