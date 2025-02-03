@@ -10,4 +10,5 @@ public interface IServiceManager
     IAuthenticationService AuthenticationService { get; }
     ITokenService TokenService { get; }
     IMapper Mapper { get; }
+    ITagService TagService { get; }
 }

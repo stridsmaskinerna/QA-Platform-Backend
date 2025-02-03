@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Domain.DTO.Response;
 
-public class TokenDTO
+public class TagStandardDTO
 {
-    public string accessToken { get; set; } = string.Empty;
-    public string? refreshToken { get; set; } = "";
+    public Guid Id { get; set; }
+    public string Value { get; set; } = string.Empty;
 }

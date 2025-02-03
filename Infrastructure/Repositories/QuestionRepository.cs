@@ -1,3 +1,4 @@
+using Domain.Contracts;
 using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -170,4 +171,5 @@ public class QuestionRepository : IQuestionRepository
             .Skip(paginationDTO.Limit * (paginationDTO.PageNr - 1))
             .Take(paginationDTO.Limit);
     }
+
 }
