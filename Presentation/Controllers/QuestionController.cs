@@ -55,8 +55,21 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var publicQuestions = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
+        var (publicQuestions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
         var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
+
+
+        var paginationMeta = new PaginationMetaDTO()
+        {
+            PageNr = paginationDTO.PageNr,
+            Limit = paginationDTO.Limit,
+            TotalItemCount = totalItemCount,
+        };
+
+        Response.Headers.Append(
+            CustomHeaders.Pagination,
+            JsonSerializer.Serialize(paginationMeta)
+        );
 
         return Ok(publicQuestionDTOList);
     }
