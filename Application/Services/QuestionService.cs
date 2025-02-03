@@ -1,14 +1,8 @@
-using System.Text;
-using System.Text.RegularExpressions;
-using Bogus.Bson;
-using Domain.Contracts;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services;
 
@@ -97,10 +91,6 @@ public class QuestionService : BaseService, IQuestionService
         var normalizedNewTagValues = questionDTO.Tags
             .Select(_sm.UtilityService.NormalizeText)
             .ToList();
-
-        //var existingTagValues = question.Tags
-        //    .Select(tag => tag.Value)
-        //    .ToList();
 
         var tagsToRemove = question.Tags
             .Where(t => !normalizedNewTagValues.Contains(t.Value))
