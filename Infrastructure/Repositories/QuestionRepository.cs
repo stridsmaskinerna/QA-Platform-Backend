@@ -1,5 +1,4 @@
 using System.Data;
-using System.Data.Common;
 using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -19,17 +18,14 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<Question?> GetByIdAsync(Guid id)
     {
-        var question = await _dbContext.Questions
+        return await _dbContext.Questions
             .Where(q => q.Id == id)
-            .AsNoTracking()
             .Include(q => q.Topic)
             .ThenInclude(t => t.Subject)
             .Include(q => q.Tags)
             .Include(q => q.User)
             .Include(q => q.Answers)
             .FirstOrDefaultAsync();
-
-        return question;
     }
 
     public async Task<Question> AddAsync(Question question)
@@ -55,7 +51,7 @@ public class QuestionRepository : IQuestionRepository
         }
     }
 
-    public async Task CompleteAsync(Question updated)
+    public async Task CompleteAsync()
     {
         await _dbContext.SaveChangesAsync();
     }
@@ -188,4 +184,5 @@ public class QuestionRepository : IQuestionRepository
             .Skip(paginationDTO.Limit * (paginationDTO.PageNr - 1))
             .Take(paginationDTO.Limit);
     }
+
 }

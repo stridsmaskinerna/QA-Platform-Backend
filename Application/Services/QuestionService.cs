@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.RegularExpressions;
+using Bogus.Bson;
 using Domain.Contracts;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
@@ -5,6 +8,7 @@ using Domain.DTO.Response;
 using Domain.Entities;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services;
 
@@ -78,10 +82,10 @@ public class QuestionService : BaseService, IQuestionService
         var createdQuestionDTO = _sm.Mapper.Map<QuestionDTO>(createdQuestion);
 
         createdQuestionDTO.UserName = _sm.TokenService.GetUserName();
+
         return createdQuestionDTO;
     }
 
-    // TODO Handle Cleaning up Tags that do not exist.
     public async Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO)
     {
         var question = await _qr.GetByIdAsync(id);
@@ -90,16 +94,43 @@ public class QuestionService : BaseService, IQuestionService
             NotFound($"No answer with id {id} exist.");
         }
 
+        var normalizedNewTagValues = questionDTO.Tags
+            .Select(_sm.UtilityService.NormalizeText)
+            .ToList();
+
+        //var existingTagValues = question.Tags
+        //    .Select(tag => tag.Value)
+        //    .ToList();
+
+        var tagsToRemove = question.Tags
+            .Where(t => !normalizedNewTagValues.Contains(t.Value))
+            .ToList();
+
+        foreach (var tag in tagsToRemove)
+        {
+            question.Tags.Remove(tag);
+        }
+
+        await _qr.CompleteAsync();
+
+        foreach (var tag in tagsToRemove)
+        {
+            await _tr.DeleteUnusedTagsAsync(tag);
+        }
+
         await AddNewTags(question, questionDTO.Tags);
-
-        var updated = _sm.Mapper.Map(questionDTO, question);
-
-        await _qr.CompleteAsync(updated);
     }
 
-    private async Task AddNewTags(Question question, IEnumerable<string> tags)
+    private async Task AddNewTags(
+        Question question,
+        IEnumerable<string> tags
+    )
     {
-        foreach (var tagValue in tags)
+        var normalizedNewTagValues = tags
+            .Select(_sm.UtilityService.NormalizeText)
+            .ToList();
+
+        foreach (var tagValue in normalizedNewTagValues)
         {
             var tag = await _tr.GetByValueAsync(tagValue);
 
@@ -109,7 +140,10 @@ public class QuestionService : BaseService, IQuestionService
                 await _tr.AddAsync(tag);
             }
 
-            question.Tags.Add(tag);
+            if (!question.Tags.Any(t => t.Value == tagValue))
+            {
+                question.Tags.Add(tag);
+            }
         }
     }
 }

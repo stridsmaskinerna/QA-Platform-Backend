@@ -61,6 +61,8 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddAsLazy<IAnswerService, AnswerService>();
         builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
         builder.Services.AddAsLazy<ITokenService, TokenService>();
+        builder.Services.AddAsLazy<ITagService, TagService>();
+        builder.Services.AddAsLazy<IUtilityService, UtilityService>();
 
         builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
         builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
