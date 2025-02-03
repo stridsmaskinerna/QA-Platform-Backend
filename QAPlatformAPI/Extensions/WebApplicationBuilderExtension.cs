@@ -68,6 +68,7 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
         builder.Services.AddScoped<ITopicRepository, TopicRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ITagRepository, TagRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(
