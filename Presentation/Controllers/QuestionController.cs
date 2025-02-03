@@ -1,4 +1,7 @@
+using System.Text.Json;
 using Application.Services;
+using Domain.Constants;
+using Domain.DTO.Header;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
@@ -26,8 +29,22 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var questions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO, onlyPublic: false);
+        var (questions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(
+            paginationDTO, searchDTO, onlyPublic: false);
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
+
+        var paginationMeta = new PaginationMetaDTO()
+        {
+            PageNr = paginationDTO.PageNr,
+            Limit = paginationDTO.Limit,
+            TotalItemCount = totalItemCount,
+        };
+
+        Response.Headers.Append(
+            CustomHeaders.Pagination,
+            JsonSerializer.Serialize(paginationMeta)
+        );
+
         return Ok(questionDTOList);
     }
 
@@ -38,7 +55,7 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var publicQuestions = await _sm.QuestionService.GetAllAsync(paginationDTO, searchDTO);
+        var publicQuestions = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
         var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
 
         return Ok(publicQuestionDTOList);

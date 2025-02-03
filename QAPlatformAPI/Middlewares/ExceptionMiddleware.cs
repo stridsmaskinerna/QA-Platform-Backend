@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Text.Json;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -19,6 +20,16 @@ public class ExceptionMiddleware(
         catch (ApiException ex)
         {
             await HandleExceptionAsync(context, ex);
+        }
+        catch (DbException)
+        {
+            var apiException = new InternalServerException();
+            await HandleExceptionAsync(context, apiException);
+        }
+        catch (Exception)
+        {
+            var apiException = new InternalServerException();
+            await HandleExceptionAsync(context, apiException);
         }
     }
 

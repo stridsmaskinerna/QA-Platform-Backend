@@ -1,14 +1,15 @@
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using Application.ProfilesMaps;
 using Application.Services;
 using Domain.Constants;
+using Domain.Contracts;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace QAPlatformAPI.Extensions;
@@ -44,11 +45,26 @@ public static class WebApplicationBuilderExtension
     public static void AddApplicationServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<AnswerProfileMapper>();
+                                                cfg.AddProfile<CommentProfileMapper>();
+                                                cfg.AddProfile<SubjectProfileMapper>();
+                                                cfg.AddProfile<UserProfileMapper>();
+                                                cfg.AddProfile<QuestionProfileMapper>(); });
+
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
         builder.Services.AddAsLazy<IQuestionService, QuestionService>();
+        builder.Services.AddAsLazy<IAnswerService, AnswerService>();
         builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
         builder.Services.AddAsLazy<ITokenService, TokenService>();
+
+        builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+        builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
+        builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+        builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+        builder.Services.AddScoped<ITopicRepository, TopicRepository>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(
@@ -129,7 +145,10 @@ public static class WebApplicationBuilderExtension
             config.AddPolicy("AllowFrontend",
                 p => p.WithOrigins(allowedOrigins)
                       .AllowAnyMethod()
-                      .AllowAnyHeader()  // ✅ Allows `Authorization` header
+                      .AllowAnyHeader() // ✅ Allows `Authorization` header
+                      .WithExposedHeaders([
+                          CustomHeaders.Pagination
+                      ])
             ));
     }
 }

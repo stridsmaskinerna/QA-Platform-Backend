@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
 
-[Authorize(Roles = $"{Roles.USER},{Roles.TEACHER}")]
+[Authorize(Roles = $"{Roles.USER}")]
 [ApiController]
 [Route("api/answers")]
 [Produces("application/json")]
@@ -23,24 +23,28 @@ public class AnswerController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateAnswer(
+    public async Task<ActionResult<AnswerDTO>> CreateAnswer(
         [FromBody] AnswerForCreationDTO body
     )
     {
-        throw new NotImplementedException();
+        var created = await _sm.AnswerService.AddAsync(body);
+
+        return Created(string.Empty, created);
     }
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> PutAnswer(
+    public async Task<IActionResult> PutAnswer(
         [FromRoute] Guid id,
         [FromBody] AnswerForPutDTO body
     )
     {
-        throw new NotImplementedException();
+        await _sm.AnswerService.UpdateAsync(id, body);
+        return Ok();
     }
 
     [HttpDelete("{id}")]
@@ -51,6 +55,7 @@ public class AnswerController : ControllerBase
         [FromRoute] Guid id
     )
     {
-        throw new NotImplementedException();
+        await _sm.AnswerService.DeleteAsync(id);
+        return Ok();
     }
 }

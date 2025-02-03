@@ -9,7 +9,7 @@ public interface IQuestionRepository
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);
     Task DeleteAsync(Guid id);
-    Task<IEnumerable<Question>> GetAllAsync(
+    Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic = true
