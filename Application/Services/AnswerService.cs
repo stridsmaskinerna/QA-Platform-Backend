@@ -45,7 +45,8 @@ public class AnswerService : BaseService, IAnswerService
         }
 
         var updated = _sm.Mapper.Map(answerDTO, answer);
-        await _answerRepository.UpdateAsync(updated);
+
+        await _answerRepository.CompleteAsync(updated);
     }
 
     public async Task DeleteAsync(Guid id)

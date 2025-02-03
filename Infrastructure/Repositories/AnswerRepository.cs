@@ -37,6 +37,11 @@ public class AnswerRepository : IAnswerRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task CompleteAsync(Answer answer)
+    {
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<Answer>> GetAnswersByQuestionIdAsync(Guid questionId)
     {
         return await _dbContext.Answers.Where(a => a.QuestionId == questionId).ToListAsync();
