@@ -4,6 +4,7 @@ using Application.ProfilesMaps;
 using Application.Services;
 using Domain.Constants;
 using Domain.Contracts;
+using Domain.DTO.Response;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Infrastructure.Repositories;
@@ -50,7 +51,9 @@ public static class WebApplicationBuilderExtension
                                                 cfg.AddProfile<CommentProfileMapper>();
                                                 cfg.AddProfile<SubjectProfileMapper>();
                                                 cfg.AddProfile<UserProfileMapper>();
-                                                cfg.AddProfile<QuestionProfileMapper>(); });
+                                                cfg.AddProfile<QuestionProfileMapper>();
+                                                cfg.AddProfile<TagProfileMapper>();
+        });
 
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
@@ -58,6 +61,7 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddAsLazy<IAnswerService, AnswerService>();
         builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
         builder.Services.AddAsLazy<ITokenService, TokenService>();
+        builder.Services.AddAsLazy<ITagService, TagService>();
 
         builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
         builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
@@ -65,6 +69,7 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
         builder.Services.AddScoped<ITopicRepository, TopicRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ITagRepository, TagRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(
