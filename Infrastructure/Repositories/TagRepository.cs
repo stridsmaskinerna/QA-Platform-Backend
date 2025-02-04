@@ -32,7 +32,7 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<Tag>> GetFilteredList(string value)
         {
             var test = await _dbContext.Tags
-                                   .Where(t => EF.Functions.Like(t.Value, $"%{value}%"))
+                                   .Where(t => EF.Functions.ILike(t.Value, $"%{value}%"))
                                    .ToListAsync();
             return test;
         }
