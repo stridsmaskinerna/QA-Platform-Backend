@@ -7,6 +7,7 @@ public class ServiceManager(
     Lazy<IBaseService> baseService,
     Lazy<IQuestionService> questionService,
     Lazy<IAnswerService> answerService,
+    Lazy<ICommentService> commentService,
     Lazy<IAuthenticationService> authenticationService,
     Lazy<ITokenService> tokenService,
     Lazy<ITagService> tagService,
@@ -22,6 +23,5 @@ public class ServiceManager(
     public IAnswerService AnswerService => answerService.Value;
     public ITagService TagService => tagService.Value;
     public IUtilityService UtilityService => utilityService.Value;
+    public ICommentService CommentService => commentService.Value;
 }
-
-
