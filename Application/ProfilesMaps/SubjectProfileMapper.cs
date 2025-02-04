@@ -6,7 +6,8 @@ namespace Application.ProfilesMaps;
 
 public class SubjectProfileMapper : Profile
 {
-    public SubjectProfileMapper() {
+    public SubjectProfileMapper()
+    {
 
         CreateMap<Subject, SubjectDTO>().ReverseMap();
     }

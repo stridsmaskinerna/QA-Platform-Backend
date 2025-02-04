@@ -15,5 +15,5 @@ public interface IQuestionRepository
         QuestionSearchDTO searchDTO,
         bool onlyPublic
     );
-
+    Task CompleteAsync();
 }

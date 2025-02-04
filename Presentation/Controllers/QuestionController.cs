@@ -1,15 +1,17 @@
 using System.Text.Json;
-using Application.Services;
+using Application.Contracts;
 using Domain.Constants;
 using Domain.DTO.Header;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
 
+[Authorize(Roles = $"{Roles.USER}")]
 [ApiController]
 [Route("api/questions")]
 [Produces("application/json")]
@@ -48,6 +50,7 @@ public class QuestionController : ControllerBase
         return Ok(questionDTOList);
     }
 
+    [AllowAnonymous]
     [HttpGet("public")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
@@ -81,17 +84,20 @@ public class QuestionController : ControllerBase
         [FromRoute] Guid id
     )
     {
-        throw new NotImplementedException();
+        var question = await _sm.QuestionService.GetByIdAsync(id);
+        return Ok(question);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> CreateQuestion(
         [FromBody] QuestionForCreationDTO body
     )
     {
-        throw new NotImplementedException();
+        var question = await _sm.QuestionService.AddAsync(body);
+        return Created(String.Empty, question);
     }
 
     [HttpDelete("{id}")]
@@ -102,7 +108,8 @@ public class QuestionController : ControllerBase
         [FromRoute] Guid id
     )
     {
-        throw new NotImplementedException();
+        await _sm.QuestionService.DeleteAsync(id);
+        return Ok();
     }
 
     [HttpPut("{id}")]
@@ -114,7 +121,8 @@ public class QuestionController : ControllerBase
         [FromBody] QuestionForPutDTO body
     )
     {
-        throw new NotImplementedException();
+        await _sm.QuestionService.UpdateAsync(id, body);
+        return Ok();
     }
 
 

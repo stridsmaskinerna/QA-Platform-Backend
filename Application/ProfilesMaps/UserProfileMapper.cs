@@ -7,7 +7,8 @@ namespace Application.ProfilesMaps;
 public class UserProfileMapper : Profile
 {
 
-    public UserProfileMapper() {
+    public UserProfileMapper()
+    {
         CreateMap<User, UserDTO>();
         CreateMap<User, UserWithEmailDTO>();
         CreateMap<User, UserDetailsDTO>().ReverseMap();

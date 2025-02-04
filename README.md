@@ -14,6 +14,14 @@
 
 - Docker version where you run `docker compose` **not** `docker-compose`
 
+- Create a [.NET secret file](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-9.0&tabs=windows) for project `QAPlatformAPI`:
+
+```
+{
+  "secretKey": "Z7yCwJqQBrpqTEx9UmzXiedyzWSPF6cM"
+}
+```
+
 ## Docker
 
 - **For Development (Postgres DB, Postgres ADMIN)**: `docker compose --file docker-compose-dev.yml up -d`

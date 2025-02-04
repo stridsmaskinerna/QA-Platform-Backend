@@ -1,5 +1,3 @@
-using Application.Services;
-using Infrastructure.Repositories;
 using Presentation;
 using QAPlatformAPI.Extensions;
 using QAPlatformAPI.Filters;
@@ -22,7 +20,7 @@ public class Program
         builder.Services.AddControllers(configure =>
         {
             configure.ReturnHttpNotAcceptable = true;
-        }).AddApplicationPart(typeof(AssemblyReference).Assembly);
+        }).AddApplicationPart(typeof(PresentationAssembly).Assembly);
 
         builder.AddCORSConfiguration();
 

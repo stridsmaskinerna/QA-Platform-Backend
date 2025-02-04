@@ -13,10 +13,9 @@ public class AnswerProfileMapper : Profile
         CreateMap<Answer, AnswerDTO>();
 
         CreateMap<AnswerForCreationDTO, Answer>()
-            .ForMember(d => d.UserId, o => o.MapFrom<UserIdResolver>())
             .AfterMap((s, d) =>
             {
-                d.IsHidden = true;
+                d.IsHidden = false;
                 d.Created = DateTime.UtcNow;
             });
 
