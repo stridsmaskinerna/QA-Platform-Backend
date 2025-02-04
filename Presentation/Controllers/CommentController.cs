@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
 
-[Authorize(Roles = $"{Roles.USER},{Roles.TEACHER}")]
+[Authorize(Roles = $"{Roles.USER}")]
 [ApiController]
 [Route("api/comments")]
 [Produces("application/json")]

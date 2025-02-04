@@ -11,11 +11,11 @@ using Infrastructure.Repositories;
 
 namespace Application.Services
 {
-    public class CommentService : BaseService, ICommentService 
+    public class CommentService : BaseService, ICommentService
     {
         private readonly ICommentRepository _commentRepository;
-        private readonly IAnswerRepository _answerRepository;
         private readonly IServiceManager _sm;
+
         public CommentService
             (ICommentRepository commentRepository,
             IServiceManager sm,
@@ -23,8 +23,8 @@ namespace Application.Services
         {
             _commentRepository = commentRepository;
             _sm = sm;
-            _answerRepository = answerRepository;
         }
+
         public async Task<CommentDTO> AddAsync(CommentForCreationDTO commentDTO)
         {
             var comment = _sm.Mapper.Map<Comment>(commentDTO);
@@ -34,9 +34,11 @@ namespace Application.Services
             }
 
             comment.UserId = _sm.TokenService.GetUserId();
+
             var createdcomment = await _commentRepository.AddAsync(comment);
             var createdcommentDTO = _sm.Mapper.Map<CommentDTO>(createdcomment);
-            
+            createdcommentDTO.UserName = _sm.TokenService.GetUserName();
+
             return createdcommentDTO;
         }
 
