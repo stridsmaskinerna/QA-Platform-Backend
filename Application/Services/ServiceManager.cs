@@ -6,6 +6,7 @@ public class ServiceManager(
     Lazy<IBaseService> baseService,
     Lazy<IQuestionService> questionService,
     Lazy<IAnswerService> answerService,
+    Lazy<ICommentService> commentService,
     Lazy<IAuthenticationService> authenticationService,
     Lazy<ITokenService> tokenService,
     IMapper mapper
@@ -17,6 +18,7 @@ public class ServiceManager(
     public ITokenService TokenService => tokenService.Value;
     public IMapper Mapper => mapper;
     public IAnswerService AnswerService => answerService.Value;
+    public ICommentService CommentService => commentService.Value;
 }
 
 
