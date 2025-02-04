@@ -61,7 +61,6 @@ public class QuestionController : ControllerBase
         var (publicQuestions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
         var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
 
-
         var paginationMeta = new PaginationMetaDTO()
         {
             PageNr = paginationDTO.PageNr,

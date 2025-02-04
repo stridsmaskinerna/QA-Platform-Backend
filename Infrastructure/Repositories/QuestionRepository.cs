@@ -1,4 +1,5 @@
 using System.Data;
+using Domain.Constants;
 using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -21,10 +22,17 @@ public class QuestionRepository : IQuestionRepository
         return await _dbContext.Questions
             .Where(q => q.Id == id)
             .Include(q => q.Topic)
-            .ThenInclude(t => t.Subject)
+                .ThenInclude(t => t.Subject)
             .Include(q => q.Tags)
+            // Include Users under questions used for DTO mapping
             .Include(q => q.User)
             .Include(q => q.Answers)
+                .ThenInclude(a => a.Comments)
+                // Include Users under comments used for DTO mapping
+                .ThenInclude(c => c.User)
+            .Include(q => q.Answers)
+                // Include Users under answers used for DTO mapping
+                .ThenInclude(a => a.User)
             .FirstOrDefaultAsync();
     }
 
@@ -59,6 +67,7 @@ public class QuestionRepository : IQuestionRepository
     public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
+        string userId,
         bool onlyPublic
     )
     {
@@ -75,6 +84,7 @@ public class QuestionRepository : IQuestionRepository
 
         query = query
             .Pipe(q => ApplyPublicFilter(q, onlyPublic))
+            .Pipe(q => ApplyUserInteractionTypeFilter(q, searchDTO, userId))
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
             .Pipe(q => ApplySubjectAndTopiFilter(q, searchDTO))
             .Pipe(q => ApplySearchFilter(q, searchDTO))
@@ -87,49 +97,22 @@ public class QuestionRepository : IQuestionRepository
         );
     }
 
-    public async Task<(
-        IEnumerable<Question> MyQuestions,
-        IEnumerable<Question> MyAnswers,
-        IEnumerable<Question> MyComments
-    )> GetUserAssociatedQuestions(
-        string userId
-    )
-    {
-        var query = _dbContext.Questions.AsQueryable();
-
-        query = query.Include(q => q.Topic)
-            .ThenInclude(t => t.Subject)
-            .Include(q => q.Tags)
-            .Include(q => q.Answers)
-            .Include(q => q.User);
-
-        return await GroupUserAssiciatedQuestions(query, userId);
-
-    }
-
-    private async Task<(
-        IEnumerable<Question> MyQuestions,
-        IEnumerable<Question> MyAnswers,
-        IEnumerable<Question> MyComments
-    )> GroupUserAssiciatedQuestions(
+    private IQueryable<Question> ApplyUserInteractionTypeFilter(
         IQueryable<Question> queryable,
+        QuestionSearchDTO searchDTO,
         string userId
     )
     {
-        var myQuestionsQuery = queryable.Where(q =>
-            q.User.Id == userId);
-
-        var myAnswersQuery = queryable.Where(q =>
-            q.Answers.Any(a => a.UserId == userId));
-
-        var myCommentsQuery = queryable.Where(q =>
-            q.Answers.Any(a => a.Comments.Any(c => c.UserId == userId)));
-
-        return (
-            MyQuestions: await myQuestionsQuery.ToListAsync(),
-            MyAnswers: await myAnswersQuery.ToListAsync(),
-            MyComments: await myCommentsQuery.ToListAsync()
-        );
+        return searchDTO.InteractionType switch
+        {
+            InteractionType.CREATED => queryable.Where(
+                q => q.User.Id == userId),
+            InteractionType.ANSWERED => queryable.Where(
+                q => q.Answers.Any(a => a.UserId == userId)),
+            InteractionType.COMMENTED => queryable.Where(
+                q => q.Answers.Any(a => a.Comments.Any(c => c.UserId == userId))),
+            _ => queryable
+        };
     }
 
     private IQueryable<Question> ApplyPublicFilter(

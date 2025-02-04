@@ -34,7 +34,9 @@ public class QuestionService : BaseService, IQuestionService
         bool onlyPublic = true
     )
     {
-        return await _questionRepository.GetItemsAsync(paginationDTO, searchDTO, onlyPublic);
+        var userId = _sm.TokenService.GetUserId();
+        return await _questionRepository.GetItemsAsync(
+            paginationDTO, searchDTO, userId, onlyPublic);
     }
 
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
