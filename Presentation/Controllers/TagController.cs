@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Data.SqlTypes;
 using Application.Contracts;
 using Domain.DTO.Response;
 using Domain.Entities;
@@ -17,14 +19,27 @@ public class TagController : ControllerBase
         _sm = sM;
     }
 
+    //[HttpGet]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetAllTagsAsync()
+    //{
+
+    //    var tagsLyst = await _sm.TagService.GetAllAsync();
+    //    var dtoList = _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(tagsLyst);
+    //    return Ok(dtoList);
+    //}
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetAllTagsAsync()
+    public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetFilteredTagListByValue([FromQuery] string? subTagValue)
     {
+        if (string.IsNullOrWhiteSpace(subTagValue)) return Ok(_sm.Mapper.Map<IEnumerable<TagStandardDTO>>(await _sm.TagService.GetAllAsync()));
 
-        var tagsLyst = await _sm.TagService.GetAllAsync();
+        var tagsLyst = await _sm.TagService.GetFilteredList(subTagValue);
         var dtoList = _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(tagsLyst);
+
         return Ok(dtoList);
+
     }
 
     [HttpDelete]
