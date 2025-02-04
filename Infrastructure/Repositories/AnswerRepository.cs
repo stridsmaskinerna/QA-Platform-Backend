@@ -37,7 +37,7 @@ public class AnswerRepository : IAnswerRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task CompleteAsync(Answer answer)
+    public async Task CompleteAsync()
     {
         await _dbContext.SaveChangesAsync();
     }

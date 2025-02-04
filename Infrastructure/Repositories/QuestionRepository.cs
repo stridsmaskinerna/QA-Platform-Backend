@@ -1,3 +1,4 @@
+using System.Data;
 using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -17,14 +18,21 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<Question?> GetByIdAsync(Guid id)
     {
-        return await _dbContext.Questions.FindAsync(id);
+        return await _dbContext.Questions
+            .Where(q => q.Id == id)
+            .Include(q => q.Topic)
+            .ThenInclude(t => t.Subject)
+            .Include(q => q.Tags)
+            .Include(q => q.User)
+            .Include(q => q.Answers)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<Question> AddAsync(Question question)
     {
         _dbContext.Questions.Add(question);
         await _dbContext.SaveChangesAsync();
-        return question;
+        return await GetByIdAsync(question.Id) ?? throw new DataException();
     }
 
     public async Task UpdateAsync(Question question)
@@ -43,6 +51,11 @@ public class QuestionRepository : IQuestionRepository
         }
     }
 
+    public async Task CompleteAsync()
+    {
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async
     Task<(IEnumerable<Question> Questions, int TotalItemCount)>
     GetItemsAsync(
@@ -55,7 +68,8 @@ public class QuestionRepository : IQuestionRepository
 
         var query = _dbContext.Questions.AsQueryable();
 
-        query = query.Include(q => q.Topic)
+        query = query
+            .Include(q => q.Topic)
             .ThenInclude(t => t.Subject)
             .Include(q => q.Tags)
             .Include(q => q.Answers)
@@ -170,4 +184,5 @@ public class QuestionRepository : IQuestionRepository
             .Skip(paginationDTO.Limit * (paginationDTO.PageNr - 1))
             .Take(paginationDTO.Limit);
     }
+
 }

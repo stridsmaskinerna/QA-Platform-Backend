@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json;
+using Application;
+using Application.Contracts;
 using Application.ProfilesMaps;
 using Application.Services;
 using Domain.Constants;
@@ -46,11 +48,7 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddHttpContextAccessor();
 
-        builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<AnswerProfileMapper>();
-                                                cfg.AddProfile<CommentProfileMapper>();
-                                                cfg.AddProfile<SubjectProfileMapper>();
-                                                cfg.AddProfile<UserProfileMapper>();
-                                                cfg.AddProfile<QuestionProfileMapper>(); });
+        builder.Services.AddAutoMapper(typeof(ApplicationAssembly).Assembly);
 
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
         builder.Services.AddAsLazy<IBaseService, BaseService>();
@@ -58,7 +56,12 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddAsLazy<IAnswerService, AnswerService>();
         builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
         builder.Services.AddAsLazy<ITokenService, TokenService>();
+<<<<<<< HEAD
         builder.Services.AddAsLazy<ICommentService, CommentService>();
+=======
+        builder.Services.AddAsLazy<ITagService, TagService>();
+        builder.Services.AddAsLazy<IUtilityService, UtilityService>();
+>>>>>>> development
 
         builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
         builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
@@ -66,6 +69,7 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
         builder.Services.AddScoped<ITopicRepository, TopicRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ITagRepository, TagRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
@@ -31,12 +32,11 @@ namespace Application.Services
             {
                 BadRequest("Could not create the new comment");
             }
-            //comment.UserId = "03ba7422-eaf0-4f16-a6f8-44170c9d0ad6";
+
             comment.UserId = _sm.TokenService.GetUserId();
             var createdcomment = await _commentRepository.AddAsync(comment);
             var createdcommentDTO = _sm.Mapper.Map<CommentDTO>(createdcomment);
-            createdcommentDTO.UserName = _sm.TokenService.GetUserName();
-            //createdcommentDTO.UserName = "Earnest Hammes";
+            
             return createdcommentDTO;
         }
 

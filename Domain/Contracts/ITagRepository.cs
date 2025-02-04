@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Entities;
 
 namespace Infrastructure.Repositories
@@ -16,6 +11,7 @@ namespace Infrastructure.Repositories
         Task UpdateAsync(Tag tag);
         Task DeleteAsync(Guid id);
         Task<bool> IsTagValueTakenAsync(string tagValue);
+        Task DeleteUnusedTagsAsync(Tag tag);
         // Task<List<Question>> GetQuestionsByTagIdAsync(Guid tagId);
     }
 }

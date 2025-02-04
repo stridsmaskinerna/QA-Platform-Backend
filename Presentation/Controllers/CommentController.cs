@@ -1,4 +1,4 @@
-using Application.Services;
+using Application.Contracts;
 using Domain.Constants;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
@@ -30,13 +30,7 @@ public class CommentController : ControllerBase
         [FromBody] CommentForCreationDTO body
     )
     {
-        //var username = User.FindFirst("username")?.Value;
-        //var userId = User.FindFirst("userId")?.Value;
-        //var email = User.FindFirst("email")?.Value;
-        //var roles = User.FindFirst("roles")?.Value;
-        //throw new NotImplementedException();
         var created = await _sm.CommentService.AddAsync(body);
-
         return Created(string.Empty, created);
     }
 

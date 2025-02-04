@@ -11,5 +11,5 @@ public interface IAnswerRepository
     Task<IEnumerable<Answer>> GetAnswersByQuestionIdAsync(Guid questionId);
     Task<IEnumerable<Answer>> GetAnswersByUserIdAsync(Guid userId);
     Task<int> GetAnswerCountByQuestionIdAsync(Guid questionId);
-    Task CompleteAsync(Answer answer);
+    Task CompleteAsync();
 }
