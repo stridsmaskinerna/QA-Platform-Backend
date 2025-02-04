@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Domain.Contracts;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
@@ -9,35 +10,36 @@ namespace Application.Services;
 
 public class QuestionService : BaseService, IQuestionService
 {
-    private readonly IQuestionRepository _qr;
-    private readonly ITagRepository _tr;
+    private readonly IQuestionRepository _questionRepository;
+    private readonly ITagRepository _tagRepository;
+    private readonly ITopicRepository _topicRepostitory;
     private readonly IServiceManager _sm;
 
     public QuestionService(
-        IQuestionRepository qr,
-        ITagRepository tr,
+        IQuestionRepository questionRepository,
+        ITagRepository tagRepository,
+        ITopicRepository topicRepository,
         IServiceManager sm
     )
     {
-        _qr = qr;
-        _tr = tr;
+        _questionRepository = questionRepository;
+        _tagRepository = tagRepository;
+        _topicRepostitory = topicRepository;
         _sm = sm;
     }
 
-    public async
-    Task<(IEnumerable<Question> Questions, int TotalItemCount)>
-    GetItemsAsync(
+    public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic = true
     )
     {
-        return await _qr.GetItemsAsync(paginationDTO, searchDTO, onlyPublic);
+        return await _questionRepository.GetItemsAsync(paginationDTO, searchDTO, onlyPublic);
     }
 
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
-        var question = await _qr.GetByIdAsync(id);
+        var question = await _questionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
@@ -49,21 +51,23 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task DeleteAsync(Guid id)
     {
-        var question = await _qr.GetByIdAsync(id);
+        var question = await _questionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
             NotFound();
         }
 
-        await _qr.DeleteAsync(id);
+        await _questionRepository.DeleteAsync(id);
     }
 
     public async Task<QuestionDTO> AddAsync(QuestionForCreationDTO questionDTO)
     {
         var question = _sm.Mapper.Map<Question>(questionDTO);
 
-        if (question == null)
+        var topic = await _topicRepostitory.GetByIdAsync(questionDTO.TopicId);
+
+        if (question == null || topic == null)
         {
             BadRequest("Invalid Question body");
         }
@@ -72,7 +76,7 @@ public class QuestionService : BaseService, IQuestionService
 
         await AddNewTags(question, questionDTO.Tags);
 
-        var createdQuestion = await _qr.AddAsync(question);
+        var createdQuestion = await _questionRepository.AddAsync(question);
 
         var createdQuestionDTO = _sm.Mapper.Map<QuestionDTO>(createdQuestion);
 
@@ -83,7 +87,8 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO)
     {
-        var question = await _qr.GetByIdAsync(id);
+        var question = await _questionRepository.GetByIdAsync(id);
+
         if (question == null)
         {
             NotFound($"No answer with id {id} exist.");
@@ -102,11 +107,11 @@ public class QuestionService : BaseService, IQuestionService
             question.Tags.Remove(tag);
         }
 
-        await _qr.CompleteAsync();
+        await _questionRepository.CompleteAsync();
 
         foreach (var tag in tagsToRemove)
         {
-            await _tr.DeleteUnusedTagsAsync(tag);
+            await _tagRepository.DeleteUnusedTagsAsync(tag);
         }
 
         await AddNewTags(question, questionDTO.Tags);
@@ -123,12 +128,12 @@ public class QuestionService : BaseService, IQuestionService
 
         foreach (var tagValue in normalizedNewTagValues)
         {
-            var tag = await _tr.GetByValueAsync(tagValue);
+            var tag = await _tagRepository.GetByValueAsync(tagValue);
 
             if (tag == null)
             {
                 tag = new Tag { Value = tagValue };
-                await _tr.AddAsync(tag);
+                await _tagRepository.AddAsync(tag);
             }
 
             if (!question.Tags.Any(t => t.Value == tagValue))
