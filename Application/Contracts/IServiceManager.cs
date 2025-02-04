@@ -1,6 +1,6 @@
 using AutoMapper;
 
-namespace Application.Services;
+namespace Application.Contracts;
 
 public interface IServiceManager
 {

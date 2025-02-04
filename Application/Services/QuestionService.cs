@@ -1,3 +1,4 @@
+using Application.Contracts;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;

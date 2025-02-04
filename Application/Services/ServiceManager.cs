@@ -1,3 +1,4 @@
+using Application.Contracts;
 using AutoMapper;
 
 namespace Application.Services;

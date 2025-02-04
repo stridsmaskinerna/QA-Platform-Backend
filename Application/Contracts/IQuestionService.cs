@@ -3,7 +3,7 @@ using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 
-namespace Application.Services;
+namespace Application.Contracts;
 
 public interface IQuestionService
 {
