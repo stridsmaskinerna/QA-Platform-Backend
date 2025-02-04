@@ -47,12 +47,14 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddHttpContextAccessor();
 
-        builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<AnswerProfileMapper>();
-                                                cfg.AddProfile<CommentProfileMapper>();
-                                                cfg.AddProfile<SubjectProfileMapper>();
-                                                cfg.AddProfile<UserProfileMapper>();
-                                                cfg.AddProfile<QuestionProfileMapper>();
-                                                cfg.AddProfile<TagProfileMapper>();
+        builder.Services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile<AnswerProfileMapper>();
+            cfg.AddProfile<CommentProfileMapper>();
+            cfg.AddProfile<SubjectProfileMapper>();
+            cfg.AddProfile<UserProfileMapper>();
+            cfg.AddProfile<QuestionProfileMapper>();
+            cfg.AddProfile<TagProfileMapper>();
         });
 
         builder.Services.AddScoped<IServiceManager, ServiceManager>();

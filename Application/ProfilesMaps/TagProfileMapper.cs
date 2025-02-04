@@ -6,7 +6,8 @@ namespace Application.ProfilesMaps;
 
 public class TagProfileMapper : Profile
 {
-    public TagProfileMapper() {
+    public TagProfileMapper()
+    {
 
         CreateMap<Tag, TagStandardDTO>().ReverseMap();
     }
