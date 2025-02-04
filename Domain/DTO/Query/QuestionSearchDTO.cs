@@ -6,4 +6,5 @@ public class QuestionSearchDTO
     public Guid? SubjectId { get; set; }
     public Guid? TopicId { get; set; }
     public bool? IsResolved { get; set; }
+    public string? InteractionType { get; set; }
 }

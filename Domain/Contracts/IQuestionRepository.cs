@@ -13,6 +13,7 @@ public interface IQuestionRepository
     Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
+        string userId,
         bool onlyPublic
     );
     Task CompleteAsync();
