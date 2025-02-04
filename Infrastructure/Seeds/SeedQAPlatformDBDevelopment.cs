@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds;
 
-public static class SeedQAPlatformDB
+public static class SeedQAPlatformDBDevelopment
 {
     public static async Task RunAsync(
         QAPlatformContext context,
@@ -71,23 +71,23 @@ public static class SeedQAPlatformDB
         };
 
         string[] prefixes =
-[
-    "CS",
-    "MA",
-    "EN",
-    "LA",
-    "IT",
-    "FR",
-    "DE",
-    "SP",
-    "RU",
-    "JP",
-    "BR",
-    "CH",
-    "IN",
-    "US",
-    "UK"
-];
+        [
+            "CS",
+            "MA",
+            "EN",
+            "LA",
+            "IT",
+            "FR",
+            "DE",
+            "SP",
+            "RU",
+            "JP",
+            "BR",
+            "CH",
+            "IN",
+            "US",
+            "UK"
+        ];
 
         foreach (var category in categories)
         {
@@ -116,15 +116,7 @@ public static class SeedQAPlatformDB
         RoleManager<IdentityRole> roleManager
     )
     {
-        string[] roles = [Roles.TEACHER, Roles.USER, Roles.ADMIN];
-        foreach (var roleName in roles)
-        {
-            if (await roleManager.RoleExistsAsync(roleName)) continue;
-            var role = new IdentityRole { Name = roleName };
-            var result = await roleManager.CreateAsync(role);
-
-            if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
-        }
+        await SeedQAPlatformDBProduction.CreateUserRoles(roleManager);
     }
 
     private static async Task<List<User>> CreateUsers(
@@ -144,16 +136,16 @@ public static class SeedQAPlatformDB
         {
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
-            await userManager.AddToRoleAsync(user, Roles.USER);
-            await userManager.AddToRoleAsync(user, Roles.TEACHER);
-            await userManager.AddToRoleAsync(user, Roles.ADMIN);
+            await userManager.AddToRoleAsync(user, DomainRoles.USER);
+            await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
+            await userManager.AddToRoleAsync(user, DomainRoles.ADMIN);
         }
 
         foreach (var user in users.GetRange(nrOfAdmins, users.Count - nrOfAdmins))
         {
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
-            await userManager.AddToRoleAsync(user, Roles.USER);
+            await userManager.AddToRoleAsync(user, DomainRoles.USER);
         }
 
         return users;
@@ -328,33 +320,23 @@ public static class SeedQAPlatformDB
 
         foreach (var user in users)
         {
-
             //Simulate not all users have voted for every answer
             if (RandomInt(0, 11) > 8)
             {
                 continue;
             }
 
-
             foreach (var answer in answers)
             {
-
                 //Simulate not all users have voted for every answer
                 if (RandomInt(0, 11) > 8)
                 {
                     answerVotes.Add(new AnswerVotes() { Vote = MostlyTrueBool(), User = user, UserId = user.Id, Answer = answer, AnswerId = answer.Id });
                 }
-
-
             }
-
-
         }
         return answerVotes;
-
     }
-
-
 
     private static bool RandomBool()
     {
@@ -374,10 +356,4 @@ public static class SeedQAPlatformDB
         Random random = new Random();
         return random.Next(0, 11) > 2;
     }
-
-
-
-
 }
-
-

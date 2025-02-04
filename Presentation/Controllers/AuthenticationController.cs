@@ -66,7 +66,7 @@ public class AuthenticationController : ControllerBase
         // }
     }
 
-    [Authorize(Roles = Roles.USER)]
+    [Authorize(Roles = DomainRoles.USER)]
     [HttpGet("debug-claims")]
     public IActionResult DebugRoles()
     {

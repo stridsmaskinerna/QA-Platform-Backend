@@ -6,6 +6,7 @@ using Infrastructure.Contexts;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Infrastructure.Repositories;
 
 public class QuestionRepository : IQuestionRepository
@@ -172,24 +173,33 @@ public class QuestionRepository : IQuestionRepository
             return queryable;
         }
 
-        var query = $"%{searchDTO.SearchString}%";
+        var searchStrings = searchDTO.SearchString.Split(
+            [' '],
+            StringSplitOptions.RemoveEmptyEntries);
 
-        return queryable.Where(q =>
-            EF.Functions.ILike(q.Title, query) ||
+        foreach (var word in searchStrings)
+        {
+            var query = $"%{word}%";
 
-            q.Tags.Any(tag => EF.Functions.ILike(tag.Value, query)) ||
+            queryable = queryable.Where(q =>
+                EF.Functions.ILike(q.Title, query) ||
 
-            _dbContext.Topics
-                .Where(t => t.Id == q.TopicId)
-                .Any(t => EF.Functions.ILike(t.Name, query)) ||
+                q.Tags.Any(tag => EF.Functions.ILike(tag.Value, query)) ||
 
-            _dbContext.Subjects
-                .Where(s => _dbContext.Topics
-                    .Where(t => t.Id == q.TopicId && t.SubjectId == s.Id)
-                    .Any())
-                .Any(s => EF.Functions.ILike(s.Name, query) ||
-                    (s.SubjectCode != null && EF.Functions.ILike(s.SubjectCode, query)))
-        );
+                _dbContext.Topics
+                    .Where(t => t.Id == q.TopicId)
+                    .Any(t => EF.Functions.ILike(t.Name, query)) ||
+
+                _dbContext.Subjects
+                    .Where(s => _dbContext.Topics
+                        .Where(t => t.Id == q.TopicId && t.SubjectId == s.Id)
+                        .Any())
+                    .Any(s => EF.Functions.ILike(s.Name, query) ||
+                        (s.SubjectCode != null && EF.Functions.ILike(s.SubjectCode, query)))
+            );
+        }
+
+        return queryable;
     }
 
     private IQueryable<Question> ApplySorting(

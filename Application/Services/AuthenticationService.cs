@@ -104,7 +104,7 @@ public class AuthenticationService : BaseService, IAuthenticationService
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sKey));
         var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        await _userManager.AddToRoleAsync(user, Roles.USER);
+        await _userManager.AddToRoleAsync(user, DomainRoles.USER);
     }
     private async Task<User?> ValidateUserCredential(string? email, string? password)
     {
