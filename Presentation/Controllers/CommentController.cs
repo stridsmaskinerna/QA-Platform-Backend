@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
 
-//[Authorize(Roles = $"{Roles.USER},{Roles.TEACHER}")]
+[Authorize(Roles = $"{Roles.USER},{Roles.TEACHER}")]
 [ApiController]
 [Route("api/comments")]
 [Produces("application/json")]
@@ -23,7 +23,7 @@ public class CommentController : ControllerBase
 
 
     [HttpPost]
-    //[Authorize(Roles = Roles.USER)]
+    [Authorize(Roles = Roles.USER)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> CreateComment(
