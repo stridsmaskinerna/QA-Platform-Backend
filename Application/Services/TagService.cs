@@ -26,6 +26,11 @@ public class TagService : ITagService
         return await _repository.GetAllAsync();
     }
 
+    public async Task<IEnumerable<Tag>> GetFilteredList(string value)
+    {
+        return await _repository.GetFilteredList(value);
+    }
+
     public async Task<Tag?> GetByIdAsync(Guid id)
     {
         return await _repository.GetByIdAsync(id);

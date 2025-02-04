@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,14 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<Tag>> GetAllAsync()
         {
             return await _dbContext.Tags.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Tag>> GetFilteredList(string value)
+        {
+            var test = await _dbContext.Tags
+                                   .Where(t => EF.Functions.Like(t.Value, $"%{value}%"))
+                                   .ToListAsync();
+            return test;
         }
 
         public async Task<Tag> AddAsync(Tag tag)
