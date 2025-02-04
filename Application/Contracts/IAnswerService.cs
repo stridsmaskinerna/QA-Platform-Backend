@@ -1,7 +1,7 @@
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 
-namespace Application.Services;
+namespace Application.Contracts;
 
 public interface IAnswerService
 {

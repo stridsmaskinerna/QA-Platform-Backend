@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Application.Contracts;
 using Domain.Exceptions;
 
 namespace Application.Services;

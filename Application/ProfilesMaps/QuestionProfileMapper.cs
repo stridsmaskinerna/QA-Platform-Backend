@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 
@@ -27,5 +28,18 @@ public class QuestionProfileMapper : Profile
         .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
         .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.Topic.Subject.Id))
         .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.Select(t => t.Value).ToList()));
+
+        CreateMap<QuestionForCreationDTO, Question>()
+        .ForMember(dest => dest.Tags, opt => opt.Ignore())
+        .AfterMap((src, dest, context) =>
+        {
+
+            dest.IsProtected = false;
+            dest.IsHidden = false;
+            dest.Created = DateTime.UtcNow;
+        });
+
+        CreateMap<QuestionForPutDTO, Question>()
+        .ForMember(dest => dest.Tags, opt => opt.Ignore());
     }
 }

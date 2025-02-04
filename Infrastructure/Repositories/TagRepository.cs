@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -56,10 +51,24 @@ namespace Infrastructure.Repositories
             }
         }
 
+        public async Task DeleteUnusedTagsAsync(
+            Tag tag
+        )
+        {
+            var isTagUsed = await _dbContext.Questions
+                .AnyAsync(q => q.Tags.Any(t => t.Id == tag.Id));
+
+            if (!isTagUsed)
+            {
+                _dbContext.Tags.Remove(tag);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<bool> IsTagValueTakenAsync(string tagValue)
         {
             return await _dbContext.Tags.AnyAsync(t => t.Value == tagValue);
         }
-
     }
 }

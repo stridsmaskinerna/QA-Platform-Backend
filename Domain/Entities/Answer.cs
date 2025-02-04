@@ -6,7 +6,7 @@ public class Answer
 
     public Guid QuestionId { get; set; }
 
-    public required string UserId { get; set; }
+    public string? UserId { get; set; }
 
     public string Value { get; set; } = String.Empty;
 

@@ -1,15 +1,8 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Text.Json;
-using Application.Services;
-using Domain.Constants;
-using Domain.DTO.Header;
-using Domain.DTO.Query;
-using Domain.DTO.Request;
+using Application.Contracts;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 namespace Presentation.Controllers;
 
 [ApiController]

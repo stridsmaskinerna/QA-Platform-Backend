@@ -212,7 +212,9 @@ public static class SeedQAPlatformDB
             "Internships"
         };
 
-        foreach (var tagName in tagValues)
+        var normailzedTagValues = tagValues.Select(value => value.ToUpperInvariant()).ToList();
+
+        foreach (var tagName in normailzedTagValues)
         {
             var tag = new Tag()
             {

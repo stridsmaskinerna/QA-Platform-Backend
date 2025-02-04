@@ -3,7 +3,7 @@ namespace Domain.DTO.Response;
 public class AnswerDTO
 {
     public Guid Id { get; set; }
-    public required string UserName { get; set; }
+    public string? UserName { get; set; }
     public required string Value { get; set; }
     public int Rating { get; set; }
     public string? FilePath { get; set; }
