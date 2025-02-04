@@ -44,9 +44,7 @@ public class QuestionRepository : IQuestionRepository
         }
     }
 
-    public async
-    Task<(IEnumerable<Question> Questions, int TotalItemCount)>
-    GetItemsAsync(
+    public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic
@@ -60,8 +58,7 @@ public class QuestionRepository : IQuestionRepository
             .ThenInclude(t => t.Subject)
             .Include(q => q.Tags)
             .Include(q => q.Answers)
-            .Include(q => q.User)
-            .OrderBy(q => q.Created);
+            .Include(q => q.User);
 
         query = query
             .Pipe(q => ApplyPublicFilter(q, onlyPublic))
@@ -77,6 +74,50 @@ public class QuestionRepository : IQuestionRepository
         );
     }
 
+    public async Task<(
+        IEnumerable<Question> MyQuestions,
+        IEnumerable<Question> MyAnswers,
+        IEnumerable<Question> MyComments
+    )> GetUserAssociatedQuestions(
+        string userId
+    )
+    {
+        var query = _dbContext.Questions.AsQueryable();
+
+        query = query.Include(q => q.Topic)
+            .ThenInclude(t => t.Subject)
+            .Include(q => q.Tags)
+            .Include(q => q.Answers)
+            .Include(q => q.User);
+
+        return await GroupUserAssiciatedQuestions(query, userId);
+
+    }
+
+    private async Task<(
+        IEnumerable<Question> MyQuestions,
+        IEnumerable<Question> MyAnswers,
+        IEnumerable<Question> MyComments
+    )> GroupUserAssiciatedQuestions(
+        IQueryable<Question> queryable,
+        string userId
+    )
+    {
+        var myQuestionsQuery = queryable.Where(q =>
+            q.User.Id == userId);
+
+        var myAnswersQuery = queryable.Where(q =>
+            q.Answers.Any(a => a.UserId == userId));
+
+        var myCommentsQuery = queryable.Where(q =>
+            q.Answers.Any(a => a.Comments.Any(c => c.UserId == userId)));
+
+        return (
+            MyQuestions: await myQuestionsQuery.ToListAsync(),
+            MyAnswers: await myAnswersQuery.ToListAsync(),
+            MyComments: await myCommentsQuery.ToListAsync()
+        );
+    }
 
     private IQueryable<Question> ApplyPublicFilter(
         IQueryable<Question> queryable,
@@ -85,7 +126,7 @@ public class QuestionRepository : IQuestionRepository
     {
         if (onlyPublic)
         {
-            queryable = queryable.Where(q => !q.IsProtected);
+            return queryable.Where(q => !q.IsProtected);
         }
 
         return queryable;
