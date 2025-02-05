@@ -135,18 +135,7 @@ public class QuestionController : ControllerBase
         [FromQuery] string vote
     )
     {
-        if (!VoteType.ALL_TYPES.Contains(vote))
-        {
-            NotFound($"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]");
-        }
-
-        bool? voteAsBoolean = vote switch
-        {
-            VoteType.LIKE => true,
-            VoteType.DISLIKE => false,
-            _ => null
-        };
-
+        bool? voteAsBoolean = _sm.VoteService.GetVoteAsBoolean(vote);
         await _sm.VoteService.CastVoteAsync(answerId, voteAsBoolean);
         return Ok();
     }

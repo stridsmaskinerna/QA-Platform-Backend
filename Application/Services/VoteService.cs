@@ -1,10 +1,7 @@
 using Application.Contracts;
 using Domain.Constants;
 using Domain.Contracts;
-using Domain.DTO.Response;
-using Domain.Entities;
 using Infrastructure.Repositories;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
@@ -28,6 +25,23 @@ public class VoteService : BaseService, IVoteService
         _sm = sm;
     }
 
+    public bool? GetVoteAsBoolean(string vote)
+    {
+        if (!VoteType.ALL_TYPES.Contains(vote))
+        {
+            BadRequest($"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]");
+        }
+
+        bool? voteAsBoolean = vote switch
+        {
+            VoteType.LIKE => true,
+            VoteType.DISLIKE => false,
+            _ => null
+        };
+
+        return voteAsBoolean;
+    }
+
     public async Task CastVoteAsync(Guid answerId, bool? voteAsBoolean)
     {
         var answer = await _answerRepository.GetByIdAsync(answerId);
@@ -43,11 +57,14 @@ public class VoteService : BaseService, IVoteService
             Unauthorized($"INvalid authentication user could not be found");
         }
 
-        var answerVoteEntry = await _answerVoteRepository.GetAsync(answerId, userId);
+        var answerVoteEntry = await _answerVoteRepository.GetAsync(
+            answerId,
+            userId
+        );
 
-        if (voteAsBoolean != null && answerVoteEntry == null)
+        if (answerVoteEntry == null && voteAsBoolean != null)
         {
-            await HandleNewVote(new AnswerVotes()
+            await CreateNewAnswerVote(new AnswerVotes()
             {
                 AnswerId = answerId,
                 UserId = userId,
@@ -58,20 +75,20 @@ public class VoteService : BaseService, IVoteService
         }
         else if (answerVoteEntry != null && voteAsBoolean != null)
         {
-            await HandleUpdatedVote(voteAsBoolean.Value, answerVoteEntry);
+            await UpdateAnswerVote(voteAsBoolean.Value, answerVoteEntry);
         }
         else if (answerVoteEntry != null && voteAsBoolean == null)
         {
-            await HandleDeletedVote(answerId, userId);
+            await DeleteAnswerVote(answerId, userId);
         }
     }
 
-    private async Task HandleNewVote(AnswerVotes answerVote)
+    private async Task CreateNewAnswerVote(AnswerVotes answerVote)
     {
         await _answerVoteRepository.AddAsync(answerVote);
     }
 
-    private async Task HandleUpdatedVote(
+    private async Task UpdateAnswerVote(
         bool vote,
         AnswerVotes answerVote
     )
@@ -80,7 +97,7 @@ public class VoteService : BaseService, IVoteService
         await _answerVoteRepository.UpdateAsync(answerVote);
     }
 
-    private async Task HandleDeletedVote(Guid answerId, string userId)
+    private async Task DeleteAnswerVote(Guid answerId, string userId)
     {
         await _answerVoteRepository.DeleteAsync(answerId, userId);
     }
