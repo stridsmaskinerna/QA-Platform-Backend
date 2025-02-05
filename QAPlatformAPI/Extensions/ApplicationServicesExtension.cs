@@ -23,6 +23,7 @@ public static class ApplicationServicesExtension
         builder.Services.AddAsLazy<ICommentService, CommentService>();
         builder.Services.AddAsLazy<ITagService, TagService>();
         builder.Services.AddAsLazy<IUtilityService, UtilityService>();
+        builder.Services.AddAsLazy<IVoteService, VoteService>();
 
         builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
         builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
@@ -31,6 +32,7 @@ public static class ApplicationServicesExtension
         builder.Services.AddScoped<ITopicRepository, TopicRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<ITagRepository, TagRepository>();
+        builder.Services.AddScoped<IAnswerVoteRepository, AnswerVoteRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(

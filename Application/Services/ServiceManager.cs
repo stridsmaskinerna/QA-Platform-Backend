@@ -12,6 +12,7 @@ public class ServiceManager(
     Lazy<ITokenService> tokenService,
     Lazy<ITagService> tagService,
     Lazy<IUtilityService> utilityService,
+    Lazy<IVoteService> voteService,
     IMapper mapper
 ) : IServiceManager
 {
@@ -24,4 +25,5 @@ public class ServiceManager(
     public ITagService TagService => tagService.Value;
     public IUtilityService UtilityService => utilityService.Value;
     public ICommentService CommentService => commentService.Value;
+    public IVoteService VoteService => voteService.Value;
 }

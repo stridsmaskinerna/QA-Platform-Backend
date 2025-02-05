@@ -1,3 +1,5 @@
+using Domain.Constants;
+
 namespace Domain.DTO.Response;
 
 public class AnswerDTO
@@ -9,7 +11,7 @@ public class AnswerDTO
     public string? FilePath { get; set; }
     public DateTime Created { get; set; }
     public bool IsHidden { get; set; }
-    public bool IsTeacher { get; set; }
+    public int VoteCount { get; set; }
     public bool IsAccepted { get; set; }
-    public IEnumerable<CommentDTO>? Comments { get; set; }
+    public IEnumerable<CommentDTO> Comments { get; set; } = [];
 }

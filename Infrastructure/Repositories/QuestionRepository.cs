@@ -34,6 +34,9 @@ public class QuestionRepository : IQuestionRepository
             .Include(q => q.Answers)
                 // Include Users under answers used for DTO mapping
                 .ThenInclude(a => a.User)
+            .Include(q => q.Answers)
+                // Include AnswerVotes under answers used for DTO mapping
+                .ThenInclude(a => a.AnswerVotes)
             .FirstOrDefaultAsync();
     }
 

@@ -1,10 +1,12 @@
 using Application.Contracts;
+using Domain.Constants;
 using Domain.Contracts;
 using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
@@ -13,18 +15,21 @@ public class QuestionService : BaseService, IQuestionService
     private readonly IQuestionRepository _questionRepository;
     private readonly ITagRepository _tagRepository;
     private readonly ITopicRepository _topicRepostitory;
+    private readonly UserManager<User> _userManager;
     private readonly IServiceManager _sm;
 
     public QuestionService(
         IQuestionRepository questionRepository,
         ITagRepository tagRepository,
         ITopicRepository topicRepository,
+        UserManager<User> userManager,
         IServiceManager sm
     )
     {
         _questionRepository = questionRepository;
         _tagRepository = tagRepository;
         _topicRepostitory = topicRepository;
+        _userManager = userManager;
         _sm = sm;
     }
 
@@ -50,7 +55,64 @@ public class QuestionService : BaseService, IQuestionService
             NotFound();
         }
 
-        return _sm.Mapper.Map<QuestionDetailedDTO>(question);
+        var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
+
+        await UpdatingAnsweredByTeacherField(questionDTO);
+
+        UpdatingMyVoteField(question, questionDTO);
+
+        return questionDTO;
+    }
+
+    private async Task UpdatingAnsweredByTeacherField(QuestionDetailedDTO questionDTO)
+    {
+        var usernames = questionDTO.Answers?
+            .Select(a => a.UserName)
+            .ToList();
+
+        var teachers = await _userManager
+            .GetUsersInRoleAsync(DomainRoles.TEACHER);
+
+        var teacherUsernames = teachers
+            .Select(u => u.UserName)
+            .ToHashSet();
+
+        foreach (var answer in questionDTO.Answers ?? [])
+        {
+            if (teacherUsernames.Contains(answer.UserName))
+            {
+                answer.AnsweredByTeacher = true;
+            }
+        }
+    }
+
+    private void UpdatingMyVoteField(
+        Question question,
+        QuestionDetailedDTO questionDTO
+    )
+    {
+        var userId = _sm.TokenService.GetUserId();
+
+        var answerVotesDict = (question.Answers ?? Enumerable.Empty<Answer>())
+            .SelectMany(a => a.AnswerVotes)
+            .Where(v => v.UserId == userId)
+            .ToDictionary(v => v.AnswerId, v => v.Vote);
+
+        foreach (var answerDTO in questionDTO.Answers ?? [])
+        {
+            if (answerVotesDict.TryGetValue(answerDTO.Id, out bool vote))
+            {
+                answerDTO.MyVote = vote switch
+                {
+                    true => VoteType.LIKE,
+                    false => VoteType.DISLIKE
+                };
+            }
+            else
+            {
+                answerDTO.MyVote = VoteType.NEUTRAL;
+            }
+        }
     }
 
     public async Task DeleteAsync(Guid id)

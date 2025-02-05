@@ -125,15 +125,18 @@ public class QuestionController : ControllerBase
     }
 
 
-    [HttpPut("{id}/rating")]
+    [HttpPut("{answerId}/rating")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> VoteQuestion(
-        [FromRoute] Guid id,
-        [FromQuery] bool vote
+        [FromRoute] Guid answerId,
+        [FromQuery] string vote
     )
     {
-        throw new NotImplementedException(); ;
+        bool? voteAsBoolean = _sm.VoteService.GetVoteAsBoolean(vote);
+        await _sm.VoteService.CastVoteAsync(answerId, voteAsBoolean);
+        return Ok();
     }
 }
