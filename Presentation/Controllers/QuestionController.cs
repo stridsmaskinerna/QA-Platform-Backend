@@ -131,7 +131,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> VoteQuestion(
-        [FromRoute] Guid id,
+        [FromRoute] Guid answerId,
         [FromQuery] string vote
     )
     {

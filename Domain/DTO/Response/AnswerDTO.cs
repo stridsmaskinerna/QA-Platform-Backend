@@ -13,5 +13,5 @@ public class AnswerDTO
     public bool IsHidden { get; set; }
     public int VoteCount { get; set; }
     public bool IsAccepted { get; set; }
-    public IEnumerable<CommentDTO>? Comments { get; set; }
+    public IEnumerable<CommentDTO> Comments { get; set; } = [];
 }
