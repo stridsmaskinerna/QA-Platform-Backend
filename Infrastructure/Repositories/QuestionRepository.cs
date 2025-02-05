@@ -67,8 +67,8 @@ public class QuestionRepository : IQuestionRepository
     public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
-        string userId,
-        bool onlyPublic
+        bool onlyPublic,
+        string? userId
     )
     {
         var totalItemCount = await _dbContext.Questions.CountAsync();
@@ -100,19 +100,23 @@ public class QuestionRepository : IQuestionRepository
     private IQueryable<Question> ApplyUserInteractionTypeFilter(
         IQueryable<Question> queryable,
         QuestionSearchDTO searchDTO,
-        string userId
+        string? userId
     )
     {
-        return searchDTO.InteractionType switch
+        if (userId is not null)
         {
-            InteractionType.CREATED => queryable.Where(
-                q => q.User.Id == userId),
-            InteractionType.ANSWERED => queryable.Where(
-                q => q.Answers.Any(a => a.UserId == userId)),
-            InteractionType.COMMENTED => queryable.Where(
-                q => q.Answers.Any(a => a.Comments.Any(c => c.UserId == userId))),
-            _ => queryable
-        };
+            return searchDTO.InteractionType switch
+            {
+                InteractionType.CREATED => queryable.Where(
+                    q => q.User.Id == userId),
+                InteractionType.ANSWERED => queryable.Where(
+                    q => q.Answers.Any(a => a.UserId == userId)),
+                InteractionType.COMMENTED => queryable.Where(
+                    q => q.Answers.Any(a => a.Comments.Any(c => c.UserId == userId))),
+                _ => queryable
+            };
+        }
+        return queryable;
     }
 
     private IQueryable<Question> ApplyPublicFilter(
