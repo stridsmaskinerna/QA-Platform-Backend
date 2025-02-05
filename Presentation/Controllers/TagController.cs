@@ -35,7 +35,7 @@ public class TagController : ControllerBase
     }
 
     [HttpDelete]
-    [Authorize(Roles = $"{Roles.ADMIN}")]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteTagAsync(Guid id)
