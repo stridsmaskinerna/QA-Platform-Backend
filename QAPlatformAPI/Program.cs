@@ -17,45 +17,43 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers(configure =>
-        {
-            configure.ReturnHttpNotAcceptable = true;
-        }).AddApplicationPart(typeof(PresentationAssembly).Assembly);
+        builder.AddControllerExtension();
 
-        builder.AddCORSConfiguration();
+        builder.AddCORSConfigurationExtension();
 
-        builder.AddDBExtension();
+        builder.AddDatabaseExtension();
+
+        builder.AddJWTSecurityExtension();
 
         builder.AddIdentityCoreExtension();
 
-        builder.AddJSONSerializerOptions();
+        builder.AddJSONSerializerOptionsExtension();
 
-        builder.AddApplicationServices();
+        builder.AddApplicationServicesExtension();
 
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(opt =>
-        {
-            opt.OperationFilter<CustomHeadersOperationFilter>();
-        });
+        builder.AddOpenAPIExtension();
 
         return builder.Build();
     }
 
     private static async Task ConfigureWebApplicationPipeline(WebApplication app)
     {
-        app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddlewareExtension();
 
         if (app.Environment.IsDevelopment())
         {
-            await app.UseDataSeedAsyncExtension();
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseOpenAPIExtension();
+            await app.UseDevelopmentDataSeedExtension();
+            app.UseCORSDevelopmentPolicyExtension();
+        }
+        else
+        {
+            await app.UseProductionDataSeedExtension();
+            app.UseCORSProductionPolicyExtension();
         }
 
-        app.UseCors("AllowFrontend");
-
         app.UseAuthentication();
+
         app.UseAuthorization();
 
         app.MapControllers();

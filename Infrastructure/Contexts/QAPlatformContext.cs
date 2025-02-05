@@ -1,3 +1,4 @@
+using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,7 @@ public class QAPlatformContext : IdentityDbContext<User, IdentityRole, string>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
         builder.ApplyConfiguration(new SubjectTeacherConfiguration());
         builder.ApplyConfiguration(new AnswerVotesConfiguration());
     }
