@@ -140,7 +140,14 @@ public class QuestionController : ControllerBase
             NotFound($"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]");
         }
 
-        await _sm.VoteService.CastVoteAsync(answerId, vote);
+        bool? voteAsBoolean = vote switch
+        {
+            VoteType.LIKE => true,
+            VoteType.DISLIKE => false,
+            _ => null
+        };
+
+        await _sm.VoteService.CastVoteAsync(answerId, voteAsBoolean);
         return Ok();
     }
 }
