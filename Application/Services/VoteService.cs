@@ -28,59 +28,60 @@ public class VoteService : BaseService, IVoteService
         _sm = sm;
     }
 
-    public async Task CastVote(
-        Guid answerId,
-        string vote
-    )
+    public async Task CastVoteAsync(Guid answerId, bool? voteAsBoolean)
     {
         var answer = await _answerRepository.GetByIdAsync(answerId);
-
         if (answer == null)
         {
             NotFound($"Answer with provided id {answerId} not found");
         }
 
         var userId = _sm.TokenService.GetUserId();
-
         var user = await _userRepository.GetByIdAsync(userId);
-
         if (user == null)
         {
-            BadRequest();
+            Unauthorized($"INvalid authentication user could not be found");
         }
 
-        var answerVote = await _answerVoteRepository.GetAsync(answerId, userId);
+        var answerVoteEntry = await _answerVoteRepository.GetAsync(answerId, userId);
 
-
-        if (answerVote == null && vote == VoteType.NEUTRAL)
+        if (voteAsBoolean != null && answerVoteEntry == null)
         {
-            var newAnswerVote = new AnswerVotes()
+            await HandleNewVote(new AnswerVotes()
             {
                 AnswerId = answerId,
                 UserId = userId,
                 Answer = answer,
                 User = user,
-                // Vote = vote
-            };
-            await _answerVoteRepository.AddAsync(newAnswerVote);
+                Vote = voteAsBoolean.Value
+            });
         }
-        else
+        else if (answerVoteEntry != null && voteAsBoolean != null)
         {
-            if (vote == VoteType.LIKE || vote == VoteType.DISLIKE)
-            {
-                //var voteAsBool = vote switch
-                //{
-                //    VoteType.LIKE => true,
-                //    VoteType.DISLIKE => false,
-                //    _ => null
-                //};
-                // answerVote.Vote = vote
-                await _answerVoteRepository.UpdateAsync(answerVote);
-            }
-            else
-            {
-                await _answerVoteRepository.DeleteAsync(answerId, userId);
-            }
+            await HandleUpdatedVote(voteAsBoolean.Value, answerVoteEntry);
         }
+        else if (answerVoteEntry != null && voteAsBoolean == null)
+        {
+            await HandleDeletedVote(answerId, userId);
+        }
+    }
+
+    private async Task HandleNewVote(AnswerVotes answerVote)
+    {
+        await _answerVoteRepository.AddAsync(answerVote);
+    }
+
+    private async Task HandleUpdatedVote(
+        bool vote,
+        AnswerVotes answerVote
+    )
+    {
+        answerVote.Vote = vote;
+        await _answerVoteRepository.UpdateAsync(answerVote);
+    }
+
+    private async Task HandleDeletedVote(Guid answerId, string userId)
+    {
+        await _answerVoteRepository.DeleteAsync(answerId, userId);
     }
 }

@@ -125,7 +125,7 @@ public class QuestionController : ControllerBase
     }
 
 
-    [HttpPut("{id}/rating")]
+    [HttpPut("{answerId}/rating")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -135,6 +135,12 @@ public class QuestionController : ControllerBase
         [FromQuery] string vote
     )
     {
-        throw new NotImplementedException(); ;
+        if (!VoteType.ALL_TYPES.Contains(vote))
+        {
+            NotFound($"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]");
+        }
+
+        await _sm.VoteService.CastVoteAsync(answerId, vote);
+        return Ok();
     }
 }

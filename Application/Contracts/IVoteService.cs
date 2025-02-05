@@ -1,7 +1,6 @@
-namespace Application.Contracts
+namespace Application.Contracts;
+
+public interface IVoteService
 {
-    public interface IVoteService
-    {
-        Task CastVote(Guid answerId, string vote);
-    }
+    Task CastVoteAsync(Guid answerId, bool? voteAsBoolean);
 }

@@ -11,6 +11,7 @@ public interface IServiceManager
     IAuthenticationService AuthenticationService { get; }
     ITokenService TokenService { get; }
     IUtilityService UtilityService { get; }
-    IMapper Mapper { get; }
     ITagService TagService { get; }
+    IVoteService VoteService { get; }
+    IMapper Mapper { get; }
 }
