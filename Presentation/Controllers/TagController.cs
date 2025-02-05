@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using Application.Contracts;
+using Domain.Constants;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 namespace Presentation.Controllers;
@@ -19,16 +21,6 @@ public class TagController : ControllerBase
         _sm = sM;
     }
 
-    //[HttpGet]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetAllTagsAsync()
-    //{
-
-    //    var tagsLyst = await _sm.TagService.GetAllAsync();
-    //    var dtoList = _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(tagsLyst);
-    //    return Ok(dtoList);
-    //}
-
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetFilteredTagListByValue([FromQuery] string? subTagValue)
@@ -43,6 +35,7 @@ public class TagController : ControllerBase
     }
 
     [HttpDelete]
+    [Authorize(Roles = $"{Roles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteTagAsync(Guid id)
