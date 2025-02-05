@@ -1,5 +1,4 @@
 using Domain.Contracts;
-using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +16,7 @@ public class AnswerVoteRepository : IAnswerVoteRepository
     public async Task<AnswerVotes?> GetAsync(Guid answerId, string userId)
     {
         return await _dbContext.AnswerVotes
+            .Include(av => av.Answer)
             .FirstOrDefaultAsync(av =>
                 av.AnswerId == answerId &&
                 av.UserId == userId);
