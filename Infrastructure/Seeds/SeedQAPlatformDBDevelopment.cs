@@ -19,7 +19,7 @@ public static class SeedQAPlatformDBDevelopment
 
         await CreateUserRoles(roleManager);
 
-        var users = await CreateUsers(50, userManager);
+        var users = await CreateUsers(100, userManager);
 
         var topics = CreateTopics(subjects);
         await context.AddRangeAsync(topics);
@@ -123,28 +123,56 @@ public static class SeedQAPlatformDBDevelopment
         int nrOfUsers,
         UserManager<User> userManager,
         int nrOfAdmins = 1,
+        int nrOfTeachers = 10,
         string password = "password"
     )
     {
+        var userSet = new HashSet<string>();
+
         var faker = new Faker<User>()
-            .RuleFor(u => u.UserName, f => f.Person.UserName)
-            .RuleFor(u => u.Email, (f, u) => $"{u.UserName}@ltu.se".ToLower());
+            .CustomInstantiator(f =>
+            {
+                string uniqueUserName;
+                do
+                {
+                    uniqueUserName = f.Internet.UserName();
+                } while (!userSet.Add(uniqueUserName));
 
-        var users = faker.Generate(nrOfUsers);
+                return new User
+                {
+                    UserName = uniqueUserName,
+                    Email = $"{uniqueUserName}@ltu.se".ToLower()
+                };
+            });
 
-        foreach (var user in users.GetRange(0, nrOfAdmins))
+        var users = faker.Generate(nrOfUsers + nrOfAdmins + nrOfTeachers);
+
+        for (int i = 0; i < nrOfAdmins; i++)
         {
+            var user = users[i];
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
-            await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
             await userManager.AddToRoleAsync(user, DomainRoles.ADMIN);
         }
 
-        foreach (var user in users.GetRange(nrOfAdmins, users.Count - nrOfAdmins))
+        for (int i = nrOfAdmins; i < nrOfAdmins + nrOfTeachers; i++)
         {
+            var user = users[i];
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+
+            await userManager.AddToRoleAsync(user, DomainRoles.USER);
+            await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
+        }
+
+        for (int i = nrOfAdmins + nrOfTeachers; i < users.Count; i++)
+        {
+            var user = users[i];
+            var result = await userManager.CreateAsync(user, password);
+            if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
         }
 

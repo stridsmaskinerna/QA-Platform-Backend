@@ -127,11 +127,12 @@ public class QuestionController : ControllerBase
 
     [HttpPut("{id}/rating")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> VoteQuestion(
         [FromRoute] Guid id,
-        [FromQuery] bool vote
+        [FromQuery] string vote
     )
     {
         throw new NotImplementedException(); ;
