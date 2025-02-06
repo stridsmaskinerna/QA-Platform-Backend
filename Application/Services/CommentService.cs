@@ -1,22 +1,22 @@
 using Application.Contracts;
+using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
-using Infrastructure.Repositories;
 
 namespace Application.Services;
 
 public class CommentService : BaseService, ICommentService
 {
-    private readonly ICommentRepository _commentRepository;
+    private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
 
-    public CommentService
-        (ICommentRepository commentRepository,
-        IServiceManager sm,
-        IAnswerRepository answerRepository)
+    public CommentService(
+        IRepositoryManager rm,
+        IServiceManager sm
+    )
     {
-        _commentRepository = commentRepository;
+        _rm = rm;
         _sm = sm;
     }
 
@@ -30,7 +30,7 @@ public class CommentService : BaseService, ICommentService
 
         comment.UserId = _sm.TokenService.GetUserId();
 
-        var createdcomment = await _commentRepository.AddAsync(comment);
+        var createdcomment = await _rm.CommentRepository.AddAsync(comment);
         var createdcommentDTO = _sm.Mapper.Map<CommentDTO>(createdcomment);
         createdcommentDTO.UserName = _sm.TokenService.GetUserName();
 
@@ -39,18 +39,18 @@ public class CommentService : BaseService, ICommentService
 
     public async Task DeleteAsync(Guid id)
     {
-        var comment = await _commentRepository.GetByIdAsync(id);
+        var comment = await _rm.CommentRepository.GetByIdAsync(id);
         if (comment == null)
         {
             NotFound($"No comment with id {id} exist.");
         }
 
-        await _commentRepository.DeleteAsync(id);
+        await _rm.CommentRepository.DeleteAsync(id);
     }
 
     public async Task UpdateAsync(Guid id, CommentForPutDTO commentDTO)
     {
-        var comment = await _commentRepository.GetByIdAsync(id);
+        var comment = await _rm.CommentRepository.GetByIdAsync(id);
         if (comment == null)
         {
             NotFound($"No comment with id {id} exist.");
@@ -58,7 +58,7 @@ public class CommentService : BaseService, ICommentService
 
         var updated = _sm.Mapper.Map(commentDTO, comment);
 
-        await _commentRepository.UpdateAsync(updated);
+        await _rm.CommentRepository.UpdateAsync(updated);
 
     }
 }

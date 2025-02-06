@@ -1,22 +1,22 @@
 using Application.Contracts;
+using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
-using Infrastructure.Repositories;
 
 namespace Application.Services;
 
 public class AnswerService : BaseService, IAnswerService
 {
-    private readonly IAnswerRepository _answerRepository;
+    private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
 
     public AnswerService(
-        IAnswerRepository answerRepository,
+        IRepositoryManager rm,
         IServiceManager sm
     )
     {
-        _answerRepository = answerRepository;
+        _rm = rm;
         _sm = sm;
     }
 
@@ -29,7 +29,7 @@ public class AnswerService : BaseService, IAnswerService
         }
 
         answer.UserId = _sm.TokenService.GetUserId();
-        var createdAnswer = await _answerRepository.AddAsync(answer);
+        var createdAnswer = await _rm.AnswerRepository.AddAsync(answer);
         var createdAnswerDTO = _sm.Mapper.Map<AnswerDTO>(createdAnswer);
         createdAnswerDTO.UserName = _sm.TokenService.GetUserName();
         return createdAnswerDTO;
@@ -40,7 +40,7 @@ public class AnswerService : BaseService, IAnswerService
         AnswerForPutDTO answerDTO
     )
     {
-        var answer = await _answerRepository.GetByIdAsync(id);
+        var answer = await _rm.AnswerRepository.GetByIdAsync(id);
         if (answer == null)
         {
             NotFound($"No answer with id {id} exist.");
@@ -48,17 +48,17 @@ public class AnswerService : BaseService, IAnswerService
 
         var updated = _sm.Mapper.Map(answerDTO, answer);
 
-        await _answerRepository.CompleteAsync();
+        await _rm.AnswerRepository.CompleteAsync();
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var answer = await _answerRepository.GetByIdAsync(id);
+        var answer = await _rm.AnswerRepository.GetByIdAsync(id);
         if (answer == null)
         {
             NotFound($"No answer with id {id} exist.");
         }
 
-        await _answerRepository.DeleteAsync(answer);
+        await _rm.AnswerRepository.DeleteAsync(answer);
     }
 }

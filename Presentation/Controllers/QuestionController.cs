@@ -33,7 +33,6 @@ public class QuestionController : ControllerBase
     {
         var (questions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(
             paginationDTO, searchDTO, onlyPublic: false);
-        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(questions);
 
         var paginationMeta = new PaginationMetaDTO()
         {
@@ -47,7 +46,7 @@ public class QuestionController : ControllerBase
             JsonSerializer.Serialize(paginationMeta)
         );
 
-        return Ok(questionDTOList);
+        return Ok(questions);
     }
 
     [AllowAnonymous]
@@ -59,7 +58,6 @@ public class QuestionController : ControllerBase
     )
     {
         var (publicQuestions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
-        var publicQuestionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(publicQuestions);
 
         var paginationMeta = new PaginationMetaDTO()
         {
@@ -73,7 +71,7 @@ public class QuestionController : ControllerBase
             JsonSerializer.Serialize(paginationMeta)
         );
 
-        return Ok(publicQuestionDTOList);
+        return Ok(publicQuestions);
     }
 
     [HttpGet("{id}")]
