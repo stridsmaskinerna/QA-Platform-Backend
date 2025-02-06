@@ -19,7 +19,7 @@ public static class SeedQAPlatformDBDevelopment
 
         await CreateUserRoles(roleManager);
 
-        var users = await CreateUsers(100, userManager);
+        var users = await CreateUsers(100, userManager, subjects);
 
         var topics = CreateTopics(subjects);
         await context.AddRangeAsync(topics);
@@ -122,6 +122,7 @@ public static class SeedQAPlatformDBDevelopment
     private static async Task<List<User>> CreateUsers(
         int nrOfUsers,
         UserManager<User> userManager,
+        List<Subject> subjects,
         int nrOfAdmins = 1,
         int nrOfTeachers = 10,
         string password = "password"
@@ -165,6 +166,19 @@ public static class SeedQAPlatformDBDevelopment
 
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
             await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
+
+            var rangeBottom = RandomInt(0, subjects.Count);
+            var rangeTop = RandomInt(rangeBottom, subjects.Count);
+
+            for (int j = 0; j < subjects.Count; j++)
+            {
+                if (RandomInt(0, 11) > 7)
+                {
+                    user.Subjects.Add(subjects[j]);
+                }
+            }
+
+
         }
 
         for (int i = nrOfAdmins + nrOfTeachers; i < users.Count; i++)
@@ -304,7 +318,11 @@ public static class SeedQAPlatformDBDevelopment
                 var answer = new Faker<Answer>("en").Rules((f, a) =>
                 {
                     a.QuestionId = question.Id;
-                    a.UserId = users[RandomInt(0, users.Count)].Id;
+                    a.UserId = RandomInt(0, 11) > 3 ? users[RandomInt(0, users.Count)].Id
+                    : users.Where(u => u.Subjects.Any(s => s.Id == question.Topic.SubjectId))
+                    .Select(u => u.Id)
+                    .FirstOrDefault();
+
                     a.Value = $"{f.Lorem.Sentence(20, 100)}";
                     a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddDays(1), question.Created.AddDays(100)), DateTimeKind.Utc);
                     a.IsHidden = RandomInt(0, 11) > 8;

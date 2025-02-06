@@ -7,6 +7,7 @@ using Domain.DTO.Response;
 using Domain.Entities;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -66,20 +67,18 @@ public class QuestionService : BaseService, IQuestionService
 
     private async Task UpdatingAnsweredByTeacherField(QuestionDetailedDTO questionDTO)
     {
-        var usernames = questionDTO.Answers?
+        var answersUsernames = questionDTO.Answers?
             .Select(a => a.UserName)
             .ToList();
 
-        var teachers = await _userManager
-            .GetUsersInRoleAsync(DomainRoles.TEACHER);
-
-        var teacherUsernames = teachers
-            .Select(u => u.UserName)
-            .ToHashSet();
+        var teachersUsernames = await _userManager.Users
+        .Where(u => u.Subjects.Any(s => s.Id == questionDTO.SubjectId))
+        .Select(u => u.UserName)
+        .ToListAsync();
 
         foreach (var answer in questionDTO.Answers ?? [])
         {
-            if (teacherUsernames.Contains(answer.UserName))
+            if (teachersUsernames.Contains(answer.UserName))
             {
                 answer.AnsweredByTeacher = true;
             }
