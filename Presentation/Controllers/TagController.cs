@@ -1,7 +1,6 @@
 using Application.Contracts;
 using Domain.Constants;
 using Domain.DTO.Response;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
