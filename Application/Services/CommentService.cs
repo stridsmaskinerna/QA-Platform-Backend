@@ -20,12 +20,14 @@ public class CommentService : BaseService, ICommentService
         _sm = sm;
     }
 
+    public string MsgAddAsyncBadRequest() => "Could not create the new comment";
+
     public async Task<CommentDTO> AddAsync(CommentForCreationDTO commentDTO)
     {
         var comment = _sm.Mapper.Map<Comment>(commentDTO);
         if (comment == null)
         {
-            BadRequest("Could not create the new comment");
+            BadRequest(MsgAddAsyncBadRequest());
         }
 
         comment.UserId = _sm.TokenService.GetUserId();
