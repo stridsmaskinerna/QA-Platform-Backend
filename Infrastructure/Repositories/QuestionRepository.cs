@@ -181,7 +181,8 @@ public class QuestionRepository : IQuestionRepository
         }
 
         var searchStrings = searchDTO.SearchString.Split(
-            [' '],
+            //Build error (on Mac) if not explicitly typing the space, i.e new char[] { ' ' } or new string[] { " " },
+            new char[] { ' ' },
             StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var word in searchStrings)
