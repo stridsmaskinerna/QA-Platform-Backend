@@ -31,7 +31,24 @@
         },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -84,12 +101,16 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/QuestionDTO"
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
                   }
                 }
               }
@@ -134,7 +155,21 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -186,6 +221,20 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -200,6 +249,104 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authentication/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authentication/debug-claims": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
                 }
               }
             }
@@ -286,6 +433,20 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -336,7 +497,21 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -368,24 +543,76 @@
         ],
         "parameters": [
           {
-            "name": "searchString",
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageNr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchString",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "limit",
+            "name": "SubjectId",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "TopicId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "IsResolved",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "InteractionType",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -426,12 +653,113 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/questions/public": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageNr",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchString",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SubjectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "TopicId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "IsResolved",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "InteractionType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionDTO"
+                  }
                 }
               }
             }
@@ -458,6 +786,20 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -498,7 +840,21 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -559,6 +915,20 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -593,14 +963,14 @@
         }
       }
     },
-    "/api/questions/{id}/rating": {
+    "/api/questions/{answerId}/rating": {
       "put": {
         "tags": [
           "Question"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "answerId",
             "in": "path",
             "required": true,
             "schema": {
@@ -612,19 +982,142 @@
             "name": "vote",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/QuestionDTO"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags": {
+      "get": {
+        "tags": [
+          "Tag"
+        ],
+        "parameters": [
+          {
+            "name": "subTagValue",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagStandardDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tag"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Pagination": {
+                "description": "Pagination meta data",
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Limit": 20,
+                    "PageNr": 1,
+                    "TotalItemCount": 200,
+                    "TotalPageCount": 10
                   }
                 }
               }
@@ -658,7 +1151,6 @@
     "schemas": {
       "AnswerDTO": {
         "required": [
-          "userName",
           "value"
         ],
         "type": "object",
@@ -690,8 +1182,9 @@
           "isHidden": {
             "type": "boolean"
           },
-          "isTeacher": {
-            "type": "boolean"
+          "voteCount": {
+            "type": "integer",
+            "format": "int32"
           },
           "isAccepted": {
             "type": "boolean"
@@ -702,6 +1195,63 @@
               "$ref": "#/components/schemas/CommentDTO"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnswerDetailedDTO": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "filePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isHidden": {
+            "type": "boolean"
+          },
+          "voteCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isAccepted": {
+            "type": "boolean"
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentDTO"
+            },
+            "nullable": true
+          },
+          "myVote": {
+            "type": "string",
+            "nullable": true
+          },
+          "answeredByTeacher": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -733,10 +1283,6 @@
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "value": {
             "type": "string",
             "nullable": true
@@ -806,10 +1352,6 @@
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "value": {
             "type": "string",
             "nullable": true
@@ -849,6 +1391,7 @@
           "description",
           "subjectName",
           "title",
+          "topicId",
           "topicName",
           "userName"
         ],
@@ -862,6 +1405,10 @@
             "type": "string",
             "nullable": true
           },
+          "topicId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "subjectName": {
             "type": "string",
             "nullable": true
@@ -869,6 +1416,10 @@
           "subjectCode": {
             "type": "string",
             "nullable": true
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
           },
           "userName": {
             "type": "string",
@@ -918,6 +1469,7 @@
           "description",
           "subjectName",
           "title",
+          "topicId",
           "topicName",
           "userName"
         ],
@@ -931,6 +1483,10 @@
             "type": "string",
             "nullable": true
           },
+          "topicId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "subjectName": {
             "type": "string",
             "nullable": true
@@ -938,6 +1494,10 @@
           "subjectCode": {
             "type": "string",
             "nullable": true
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
           },
           "userName": {
             "type": "string",
@@ -982,7 +1542,7 @@
           "answers": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AnswerDTO"
+              "$ref": "#/components/schemas/AnswerDetailedDTO"
             },
             "nullable": true
           }
@@ -999,10 +1559,6 @@
           "topicId": {
             "type": "string",
             "format": "uuid"
-          },
-          "userId": {
-            "type": "string",
-            "nullable": true
           },
           "title": {
             "type": "string",
@@ -1032,18 +1588,6 @@
       "QuestionForPutDTO": {
         "type": "object",
         "properties": {
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "topicId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "userId": {
-            "type": "string",
-            "nullable": true
-          },
           "title": {
             "type": "string",
             "nullable": true
@@ -1065,10 +1609,38 @@
               "type": "string"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegistrationDTO": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string",
+            "nullable": true
           },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TagStandardDTO": {
+        "type": "object",
+        "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Domain.Constants;
-using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Services;

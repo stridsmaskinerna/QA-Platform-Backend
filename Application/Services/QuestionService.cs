@@ -5,7 +5,6 @@ using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
-using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,28 +12,22 @@ namespace Application.Services;
 
 public class QuestionService : BaseService, IQuestionService
 {
-    private readonly IQuestionRepository _questionRepository;
-    private readonly ITagRepository _tagRepository;
-    private readonly ITopicRepository _topicRepostitory;
+    private readonly IRepositoryManager _rm;
     private readonly UserManager<User> _userManager;
     private readonly IServiceManager _sm;
 
     public QuestionService(
-        IQuestionRepository questionRepository,
-        ITagRepository tagRepository,
-        ITopicRepository topicRepository,
+        IRepositoryManager rm,
         UserManager<User> userManager,
         IServiceManager sm
     )
     {
-        _questionRepository = questionRepository;
-        _tagRepository = tagRepository;
-        _topicRepostitory = topicRepository;
+        _rm = rm;
         _userManager = userManager;
         _sm = sm;
     }
 
-    public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
+    public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic = true
@@ -43,13 +36,21 @@ public class QuestionService : BaseService, IQuestionService
         string? userId = null;
         if (!onlyPublic) userId = _sm.TokenService.GetUserId();
 
-        return await _questionRepository.GetItemsAsync(
+        var questionWithItemCount = await _rm.QuestionRepository.GetItemsAsync(
             paginationDTO, searchDTO, onlyPublic, userId);
+
+        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
+            questionWithItemCount.Questions);
+
+        return (
+            Questions: questionDTOList,
+            TotalItemCount: questionWithItemCount.TotalItemCount
+        );
     }
 
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
-        var question = await _questionRepository.GetByIdAsync(id);
+        var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
@@ -116,21 +117,21 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task DeleteAsync(Guid id)
     {
-        var question = await _questionRepository.GetByIdAsync(id);
+        var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
             NotFound();
         }
 
-        await _questionRepository.DeleteAsync(id);
+        await _rm.QuestionRepository.DeleteAsync(id);
     }
 
     public async Task<QuestionDTO> AddAsync(QuestionForCreationDTO questionDTO)
     {
         var question = _sm.Mapper.Map<Question>(questionDTO);
 
-        var topic = await _topicRepostitory.GetByIdAsync(questionDTO.TopicId);
+        var topic = await _rm.TopicRepository.GetByIdAsync(questionDTO.TopicId);
 
         if (question == null || topic == null)
         {
@@ -141,7 +142,7 @@ public class QuestionService : BaseService, IQuestionService
 
         await AddNewTags(question, questionDTO.Tags);
 
-        var createdQuestion = await _questionRepository.AddAsync(question);
+        var createdQuestion = await _rm.QuestionRepository.AddAsync(question);
 
         var createdQuestionDTO = _sm.Mapper.Map<QuestionDTO>(createdQuestion);
 
@@ -152,7 +153,7 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO)
     {
-        var question = await _questionRepository.GetByIdAsync(id);
+        var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
@@ -172,11 +173,11 @@ public class QuestionService : BaseService, IQuestionService
             question.Tags.Remove(tag);
         }
 
-        await _questionRepository.CompleteAsync();
+        await _rm.QuestionRepository.CompleteAsync();
 
         foreach (var tag in tagsToRemove)
         {
-            await _tagRepository.DeleteUnusedTagsAsync(tag);
+            await _rm.TagRepository.DeleteUnusedTagsAsync(tag);
         }
 
         await AddNewTags(question, questionDTO.Tags);
@@ -193,12 +194,12 @@ public class QuestionService : BaseService, IQuestionService
 
         foreach (var tagValue in normalizedNewTagValues)
         {
-            var tag = await _tagRepository.GetByValueAsync(tagValue);
+            var tag = await _rm.TagRepository.GetByValueAsync(tagValue);
 
             if (tag == null)
             {
                 tag = new Tag { Value = tagValue };
-                await _tagRepository.AddAsync(tag);
+                await _rm.TagRepository.AddAsync(tag);
             }
 
             if (!question.Tags.Any(t => t.Value == tagValue))

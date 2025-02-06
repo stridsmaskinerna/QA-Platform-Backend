@@ -25,14 +25,14 @@ public static class ApplicationServicesExtension
         builder.Services.AddAsLazy<IUtilityService, UtilityService>();
         builder.Services.AddAsLazy<IVoteService, VoteService>();
 
-        builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
-        builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
-        builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-        builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
-        builder.Services.AddScoped<ITopicRepository, TopicRepository>();
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<ITagRepository, TagRepository>();
-        builder.Services.AddScoped<IAnswerVoteRepository, AnswerVoteRepository>();
+        builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+        builder.Services.AddAsLazy<IQuestionRepository, QuestionRepository>();
+        builder.Services.AddAsLazy<IAnswerRepository, AnswerRepository>();
+        builder.Services.AddAsLazy<ICommentRepository, CommentRepository>();
+        builder.Services.AddAsLazy<ISubjectRepository, SubjectRepository>();
+        builder.Services.AddAsLazy<ITopicRepository, TopicRepository>();
+        builder.Services.AddAsLazy<ITagRepository, TagRepository>();
+        builder.Services.AddAsLazy<IAnswerVoteRepository, AnswerVoteRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(

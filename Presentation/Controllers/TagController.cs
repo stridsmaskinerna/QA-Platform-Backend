@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Data.SqlTypes;
 using Application.Contracts;
 using Domain.Constants;
 using Domain.DTO.Response;
@@ -23,28 +21,29 @@ public class TagController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetFilteredTagListByValue([FromQuery] string? subTagValue)
+    public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetFilteredTagListByValue(
+        [FromQuery] string? subTagValue
+    )
     {
-        if (string.IsNullOrWhiteSpace(subTagValue)) return Ok(_sm.Mapper.Map<IEnumerable<TagStandardDTO>>(await _sm.TagService.GetAllAsync()));
+        if (string.IsNullOrWhiteSpace(subTagValue))
+        {
+            return Ok(await _sm.TagService.GetAllAsync());
+        }
 
-        var tagsLyst = await _sm.TagService.GetFilteredList(subTagValue);
-        var dtoList = _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(tagsLyst);
+        var tags = await _sm.TagService.GetFilteredList(subTagValue);
 
-        return Ok(dtoList);
+        return Ok(tags);
 
     }
 
     [HttpDelete]
     [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteTagAsync(Guid id)
     {
-        Tag? tagToRemove = await _sm.TagService.GetByIdAsync(id);
-        if (tagToRemove == null)
-        {
-            return NotFound(new { message = "Tag not in the database" });
-        }
+        var tagToRemove = await _sm.TagService.GetByIdAsync(id);
         await _sm.TagService.DeleteAsync(id);
         return Ok(new { message = "Tag removed: ", data = id });
     }
