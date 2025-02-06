@@ -167,9 +167,6 @@ public static class SeedQAPlatformDBDevelopment
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
             await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
 
-            var rangeBottom = RandomInt(0, subjects.Count);
-            var rangeTop = RandomInt(rangeBottom, subjects.Count);
-
             for (int j = 0; j < subjects.Count; j++)
             {
                 if (RandomInt(0, 11) > 7)
