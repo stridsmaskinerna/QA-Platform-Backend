@@ -51,7 +51,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
 
         _mockTokenService
             .Setup(t => t.GetUserId())
-            .Returns("UserTestId");
+            .Returns(_mockUser.Object.Id);
 
         _mockAnswerRepository
             .Setup(r => r.AddAsync(It.IsAny<Answer>()))

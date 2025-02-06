@@ -6,24 +6,21 @@ using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
 public class QuestionService : BaseService, IQuestionService
 {
     private readonly IRepositoryManager _rm;
-    private readonly UserManager<User> _userManager;
     private readonly IServiceManager _sm;
 
     public QuestionService(
         IRepositoryManager rm,
-        UserManager<User> userManager,
-        IServiceManager sm
+        IServiceManager sm,
+        UserManager<User> userManager
     )
     {
         _rm = rm;
-        _userManager = userManager;
         _sm = sm;
     }
 
@@ -72,10 +69,9 @@ public class QuestionService : BaseService, IQuestionService
             .Select(a => a.UserName)
             .ToList();
 
-        var teachersUsernames = await _userManager.Users
-        .Where(u => u.Subjects.Any(s => s.Id == questionDTO.SubjectId))
-        .Select(u => u.UserName)
-        .ToListAsync();
+        var teachers = await _rm.UserRepository.GetTeachersBySubjectIdAsync(questionDTO.SubjectId);
+
+        var teachersUsernames = teachers.Select(u => u.UserName).ToList();
 
         foreach (var answer in questionDTO.Answers ?? [])
         {

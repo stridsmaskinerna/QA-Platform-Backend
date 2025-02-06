@@ -53,7 +53,7 @@ public class CommentServiceTests : BaseServiceSetupTests
 
         _mockTokenService
             .Setup(t => t.GetUserId())
-            .Returns("UserTestId");
+            .Returns(_mockUser.Object.Id);
 
         _mockCommentRepository
             .Setup(r => r.AddAsync(It.IsAny<Comment>()))

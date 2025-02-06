@@ -3,7 +3,6 @@ using Application.Tests.Utilities;
 using Domain.Constants;
 using Domain.Entities;
 using Domain.Exceptions;
-using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace Application.Tests.Services;
@@ -13,7 +12,6 @@ public class VoteServiceTests : BaseServiceSetupTests
     private readonly Mock<Question> _mockQuestion;
     private readonly Mock<User> _mockUser;
     private readonly Mock<ITokenService> _mockTokenService;
-    private readonly Mock<UserManager<User>> _mockUserManager;
     private readonly VoteService _voteService;
 
     public VoteServiceTests()
@@ -23,11 +21,6 @@ public class VoteServiceTests : BaseServiceSetupTests
         _mockUser = new Mock<User>();
 
         _mockTokenService = new Mock<ITokenService>();
-
-        _mockUserManager = new Mock<UserManager<User>>(
-            Mock.Of<IUserStore<User>>(),
-            null!, null!, null!, null!, null!, null!, null!, null!
-        );
 
         _voteService = new VoteService(
             _mockRepositoryManager.Object,

@@ -1,7 +1,9 @@
 using Application.Contracts;
 using AutoMapper;
 using Domain.Contracts;
+using Domain.Entities;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace Application.Tests.Services;
@@ -18,8 +20,10 @@ public class BaseServiceSetupTests
     protected readonly Mock<ISubjectRepository> _mockSubjectRepository;
     protected readonly Mock<ITagRepository> _mockTagRepository;
     protected readonly Mock<ITopicRepository> _mockTopicRepository;
+    protected readonly Mock<IUserRepository> _mockUserRepository;
 
     protected readonly Mock<IMapper> _mockMapper;
+    protected readonly Mock<UserManager<User>> _mockUserManager;
 
     public BaseServiceSetupTests()
     {
@@ -31,9 +35,14 @@ public class BaseServiceSetupTests
         _mockSubjectRepository = new Mock<ISubjectRepository>();
         _mockTagRepository = new Mock<ITagRepository>();
         _mockTopicRepository = new Mock<ITopicRepository>();
+        _mockUserRepository = new Mock<IUserRepository>();
 
-        // Mock general services
+        // Mock General services
         _mockMapper = new Mock<IMapper>();
+        _mockUserManager = new Mock<UserManager<User>>(
+            Mock.Of<IUserStore<User>>(),
+            null!, null!, null!, null!, null!, null!, null!, null!
+        );
 
         // Mock Repository manager
         _mockRepositoryManager = new Mock<IRepositoryManager>();
@@ -65,6 +74,10 @@ public class BaseServiceSetupTests
         _mockRepositoryManager
             .Setup(rm => rm.TopicRepository)
             .Returns(_mockTopicRepository.Object);
+
+        _mockRepositoryManager
+            .Setup(rm => rm.UserRepository)
+            .Returns(_mockUserRepository.Object);
 
         // Mock Service manager
         _mockServiceManager = new Mock<IServiceManager>();
