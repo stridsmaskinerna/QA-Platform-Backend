@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Infrastructure.Contexts;
 
 namespace Application.Services;
 
@@ -10,18 +11,29 @@ public class SubjectService : ISubjectService
 {
     private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
+    private QAPlatformContext _dbContext;
 
-    public SubjectService(IRepositoryManager rm, IServiceManager sm)
+    public SubjectService(IRepositoryManager rm, IServiceManager sm, QAPlatformContext dbContext)
     {
         _rm = rm;
         _sm = sm;
+        _dbContext = dbContext;
     }
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
     {
         Console.WriteLine("prova : ");
         try
         {
-            var sbjObj = _sm.Mapper.Map<Subject>(subject);
+            Subject sbjObj = new();
+            sbjObj.Name = subject.Name;
+            sbjObj.SubjectCode = subject.SubjectCode;
+            foreach (string mail in subject.Teachers)
+            {
+                User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                if (choosenTeacher != null)
+                    sbjObj.Teachers.Add(choosenTeacher);
+            }
+            sbjObj.Topics = [];
             return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.AddAsync(sbjObj));
 
         }
@@ -61,7 +73,17 @@ public class SubjectService : ISubjectService
 
     public async Task UpdateAsync(SubjectForCreationDTO subject)
     {
-        Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
+
+        Subject sbjObj = new();
+        sbjObj.Name = subject.Name;
+        sbjObj.SubjectCode = subject.SubjectCode;
+        foreach (string mail in subject.Teachers) {
+            User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault() ;
+            if (choosenTeacher != null)
+                sbjObj.Teachers.Add(choosenTeacher);
+        }
+        sbjObj.Topics = [];
+
         await _rm.SubjectRepository.UpdateAsync(sbjObj);
     }
 }
