@@ -6,7 +6,7 @@ using Moq;
 
 namespace Application.Tests.Services;
 
-public class BaseServiceTest
+public class BaseServiceSetupTests
 {
     protected readonly Mock<IRepositoryManager> _mockRepositoryManager;
     protected readonly Mock<IServiceManager> _mockServiceManager;
@@ -19,10 +19,9 @@ public class BaseServiceTest
     protected readonly Mock<ITagRepository> _mockTagRepository;
     protected readonly Mock<ITopicRepository> _mockTopicRepository;
 
-    protected readonly Mock<ITokenService> _mockTokenService;
     protected readonly Mock<IMapper> _mockMapper;
 
-    public BaseServiceTest()
+    public BaseServiceSetupTests()
     {
         // Mock repositories
         _mockAnswerRepository = new Mock<IAnswerRepository>();
@@ -33,8 +32,7 @@ public class BaseServiceTest
         _mockTagRepository = new Mock<ITagRepository>();
         _mockTopicRepository = new Mock<ITopicRepository>();
 
-        // Mock services
-        _mockTokenService = new Mock<ITokenService>();
+        // Mock general services
         _mockMapper = new Mock<IMapper>();
 
         // Mock Repository manager
@@ -70,10 +68,6 @@ public class BaseServiceTest
 
         // Mock Service manager
         _mockServiceManager = new Mock<IServiceManager>();
-
-        _mockServiceManager
-            .Setup(sm => sm.TokenService)
-            .Returns(_mockTokenService.Object);
 
         _mockServiceManager
             .Setup(sm => sm.Mapper)

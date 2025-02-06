@@ -47,14 +47,10 @@ namespace Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Comment comment)
         {
-            var comment = await _dbContext.Comments.FindAsync(id);
-            if (comment != null)
-            {
-                _dbContext.Comments.Remove(comment);
-                await _dbContext.SaveChangesAsync();
-            }
+            _dbContext.Comments.Remove(comment);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
