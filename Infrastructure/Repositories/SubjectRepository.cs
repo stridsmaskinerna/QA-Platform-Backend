@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -20,18 +15,18 @@ namespace Infrastructure.Repositories
         }
         public async Task<IEnumerable<Subject>> GetAllAsync()
         {
-            return await _dbContext.Subjects.ToListAsync();
+            return await _dbContext.Subjects.Include(us => us.Teachers).ToListAsync();
         }
 
 
         public async Task<Subject?> GetByIdAsync(Guid id)
         {
-            return await _dbContext.Subjects.FindAsync(id);
+            return await _dbContext.Subjects.Include(us => us.Teachers).FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<Subject?> GetByNameAsync(string name)
         {
-            return await _dbContext.Subjects.FirstOrDefaultAsync(s => s.Name == name);
+            return await _dbContext.Subjects.Include(us => us.Teachers).FirstOrDefaultAsync(s => s.Name == name);
         }
 
         public async Task<Subject?> GetByCodeAsync(string code)
