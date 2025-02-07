@@ -77,7 +77,7 @@ public class QuestionController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<QuestionDetailedDTO>>> GetQuestionDetail(
+    public async Task<ActionResult<QuestionDetailedDTO>> GetQuestionDetail(
         [FromRoute] Guid id
     )
     {

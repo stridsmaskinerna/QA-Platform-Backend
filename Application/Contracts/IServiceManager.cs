@@ -13,5 +13,6 @@ public interface IServiceManager
     IUtilityService UtilityService { get; }
     ITagService TagService { get; }
     IVoteService VoteService { get; }
+    ISubjectService SubjectService { get; }
     IMapper Mapper { get; }
 }
