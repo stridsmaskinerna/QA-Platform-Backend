@@ -10,7 +10,7 @@ namespace Application.Contracts
         Task<SubjectDTO> GetByNameAsync(string name);
         Task<SubjectDTO> GetByCodeAsync(string code);
         Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject);
-        Task UpdateAsync(SubjectForCreationDTO subject);
-        Task Delete(Guid id);
+        Task UpdateAsync(Guid Id, SubjectForCreationDTO subject);
+        Task DeleteAsync(Guid id);
     }
 }

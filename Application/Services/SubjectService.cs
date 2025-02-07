@@ -7,7 +7,7 @@ using Infrastructure.Contexts;
 
 namespace Application.Services;
 
-public class SubjectService : ISubjectService
+public class SubjectService : BaseService, ISubjectService
 {
     private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
@@ -39,14 +39,14 @@ public class SubjectService : ISubjectService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Errore durante il mapping: " + ex.Message);
+            Console.WriteLine(ex.Message);
             throw;
         }
 
     }
 
 
-    public async Task Delete(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
         await _rm.SubjectRepository.DeleteAsync(id);
     }
@@ -71,19 +71,33 @@ public class SubjectService : ISubjectService
         return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.GetByNameAsync(name));
     }
 
-    public async Task UpdateAsync(SubjectForCreationDTO subject)
+    public async Task UpdateAsync(Guid Id, SubjectForCreationDTO subject)
     {
+        try
+        {
 
-        Subject sbjObj = new();
-        sbjObj.Name = subject.Name;
-        sbjObj.SubjectCode = subject.SubjectCode;
-        foreach (string mail in subject.Teachers) {
-            User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault() ;
-            if (choosenTeacher != null)
-                sbjObj.Teachers.Add(choosenTeacher);
+            var sbjObj = await _rm.SubjectRepository.GetByIdAsync(Id);
+
+            if (sbjObj == null)
+            {
+                NotFound($"No answer with id {Id} exist.");
+            }
+
+            sbjObj.Name = subject.Name;
+            sbjObj.SubjectCode = subject.SubjectCode;
+            foreach (string mail in subject.Teachers)
+            {
+                User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                if (choosenTeacher != null)
+                    sbjObj.Teachers.Add(choosenTeacher);
+            }
+
+            await _rm.SubjectRepository.UpdateAsync(sbjObj);
         }
-        sbjObj.Topics = [];
-
-        await _rm.SubjectRepository.UpdateAsync(sbjObj);
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return; 
+        }
     }
 }
