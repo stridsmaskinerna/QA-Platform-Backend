@@ -22,9 +22,7 @@ public class CommentService : BaseService, ICommentService
 
     public string MsgAddAsyncBadRequest() => "Could not create the new comment";
 
-    public string MsgUpdateAsyncNotFound(Guid id) => $"No comment with id {id} exist.";
-
-    public string MsgDeleteAsyncNotFound(Guid id) => $"No comment with id {id} exist.";
+    public string MsgNotFound(Guid id) => $"No comment with id {id} exist.";
 
     public async Task<CommentDTO> AddAsync(CommentForCreationDTO commentDTO)
     {
@@ -48,7 +46,7 @@ public class CommentService : BaseService, ICommentService
         var comment = await _rm.CommentRepository.GetByIdAsync(id);
         if (comment == null)
         {
-            NotFound(MsgUpdateAsyncNotFound(id));
+            NotFound(MsgNotFound(id));
         }
 
         var updated = _sm.Mapper.Map(commentDTO, comment);
@@ -61,7 +59,7 @@ public class CommentService : BaseService, ICommentService
         var comment = await _rm.CommentRepository.GetByIdAsync(id);
         if (comment == null)
         {
-            NotFound($"No comment with id {id} exist.");
+            NotFound(MsgNotFound(id));
         }
 
         await _rm.CommentRepository.DeleteAsync(comment);

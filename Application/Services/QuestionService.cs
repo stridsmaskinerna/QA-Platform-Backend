@@ -24,6 +24,10 @@ public class QuestionService : BaseService, IQuestionService
         _sm = sm;
     }
 
+    public string MsgNotFound(Guid id) => $"Question with id {id} does not exist.";
+
+    public string MsgBadRequest() => "Invalid question body";
+
     public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
@@ -51,7 +55,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null)
         {
-            NotFound();
+            NotFound(MsgNotFound(id));
         }
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
@@ -117,7 +121,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null)
         {
-            NotFound();
+            NotFound(MsgNotFound(id));
         }
 
         await _rm.QuestionRepository.DeleteAsync(id);
@@ -131,7 +135,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null || topic == null)
         {
-            BadRequest("Invalid Question body");
+            BadRequest(MsgBadRequest());
         }
 
         question.UserId = _sm.TokenService.GetUserId();
@@ -153,7 +157,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null)
         {
-            NotFound($"No answer with id {id} exist.");
+            NotFound(MsgNotFound(id));
         }
 
         var normalizedNewTagValues = questionDTO.Tags
