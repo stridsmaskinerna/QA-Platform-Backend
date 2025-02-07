@@ -67,6 +67,24 @@ public class QuestionService : BaseService, IQuestionService
         return questionDTO;
     }
 
+    public async Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id)
+    {
+        var question = await _rm.QuestionRepository.GetByIdAsync(id);
+
+        // If question is protected send NotFound
+        // to not provide any information to unauthenticated users.
+        if (question == null || question.IsProtected)
+        {
+            NotFound(MsgNotFound(id));
+        }
+
+        var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
+
+        await UpdatingAnsweredByTeacherField(questionDTO);
+
+        return questionDTO;
+    }
+
     private async Task UpdatingAnsweredByTeacherField(QuestionDetailedDTO questionDTO)
     {
         var answersUsernames = questionDTO.Answers?
