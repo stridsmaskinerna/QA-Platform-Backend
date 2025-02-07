@@ -195,7 +195,7 @@ public class CommentServiceTests : BaseServiceSetupTests
             _mockCommentRepository.Verify(
                 r => r.UpdateAsync(It.IsAny<Comment>()),
                 Times.Never);
-        }   
+        }
     }
 
     public class DeleteAsync : CommentServiceTests
