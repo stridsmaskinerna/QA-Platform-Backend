@@ -1,9 +1,9 @@
 using Application.Services;
 using Application.Tests.Utilities;
-using Domain.DTO.Query;
+using Domain.Constants;
 using Domain.DTO.Response;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+using Domain.Exceptions;
 using Moq;
 
 namespace Application.Tests.Services;
@@ -34,41 +34,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
     }
 
     [Fact]
-    public async Task GetByIdAsync_ShouldSetAnsweredByTeacher_WhenTeacherAnswers()
-    {
-        // Arrange
-        var questionId = Guid.NewGuid();
-        var subjectId = Guid.NewGuid();
-        var answerId = Guid.NewGuid();
-
-        var question = QuestionFactory.CreateQuestionEntity(
-            questionId, _mockTopic.Object, _mockUser.Object);
-
-        var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
-            _mockTopic.Object.Id);
-
-        _mockQuestionRepository
-            .Setup(q => q.GetByIdAsync(questionId))
-            .ReturnsAsync(question);
-
-        _mockMapper
-            .Setup(m => m.Map<QuestionDetailedDTO>(question))
-            .Returns(questionDTO);
-
-        _mockUserRepository
-            .Setup(t => t.GetTeachersBySubjectIdAsync(subjectId))
-            .ReturnsAsync([]);
-
-        // Act
-        var result = await _questionService.GetByIdAsync(questionId);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(result.Id, questionDTO.Id);
-    }
-
-    [Fact]
-    public async Task GetByIdAsync_ShouldReturnQuestion_WhenExists()
+    public async Task GetByIdAsync_ShouldReturnDetailedQuestion_WhenExists()
     {
         // Arrange
         var questionId = Guid.NewGuid();
@@ -79,7 +45,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
             questionId, _mockTopic.Object, _mockUser.Object);
 
         var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
-            _mockTopic.Object.Id);
+            questionId, _mockTopic.Object.Id);
 
         _mockQuestionRepository
             .Setup(q => q.GetByIdAsync(questionId))
@@ -102,10 +68,186 @@ public class QuestionServiceTests : BaseServiceSetupTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(questionDTO.Id, result.Id);
-        // TODO Fix failing Question Id
-        // Assert.Equal(questionEntity.Id, result.Id);
+        Assert.Equal(questionEntity.Id, result.Id);
     }
 
+    [Fact]
+    public async Task GetByIdAsync_ShouldThrowNotFound_WhenQuestionDoesNotExist()
+    {
+        // Arrange
+        var questionId = Guid.NewGuid();
+        _mockQuestionRepository
+            .Setup(q => q.GetByIdAsync(questionId))
+            .ReturnsAsync(default(Question));
 
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<NotFoundException>(
+            () => _questionService.GetByIdAsync(questionId));
+
+        Assert.Equal(
+            _questionService.MsgNotFound(questionId),
+            exception.Message);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldSetAnsweredByTeacher_WhenTeacherAnswers()
+    {
+        // Arrange
+        var questionId = Guid.NewGuid();
+        var answerId = Guid.NewGuid();
+
+        var teacherUser = UserFactory.CreateUser("teacher123", "teacher-userName");
+
+        var questionEntity = QuestionFactory.CreateQuestionEntity(
+            questionId, _mockTopic.Object, _mockUser.Object);
+
+        questionEntity.Answers = [AnswerFactory.CreateAnswerEntity(
+            answerId, questionEntity, teacherUser)];
+
+        var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+            questionId, _mockTopic.Object.Id);
+
+        questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
+            questionEntity.Answers.First(), teacherUser.UserName ?? String.Empty)];
+
+        questionDTO.SubjectId = Guid.NewGuid();
+
+        _mockQuestionRepository
+            .Setup(q => q.GetByIdAsync(questionId))
+            .ReturnsAsync(questionEntity);
+
+        _mockMapper
+            .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+            .Returns(questionDTO);
+
+        _mockUserRepository
+            .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
+            .ReturnsAsync([teacherUser]);
+
+        // Act
+        var result = await _questionService.GetByIdAsync(questionId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Answers);
+
+        Assert.Equal(result.Answers, questionDTO.Answers);
+        Assert.True(result.Answers.First().AnsweredByTeacher);
+    }
+
+    [Theory]
+    [InlineData(VoteType.DISLIKE, false)]
+    [InlineData(VoteType.LIKE, true)]
+    [InlineData(VoteType.NEUTRAL, null)]
+    public async Task GetByIdAsync_ShouldSetMyVoteField_WhenUsersHaveVoted(
+        string expectedVoteValue, bool? voteValueAsBoolean
+    )
+    {
+        // Arrange
+        var questionId = Guid.NewGuid();
+        var userId = "user123";
+        var answerId = Guid.NewGuid();
+
+        var user = UserFactory.CreateUser("user123", "test userName");
+
+        var questionEntity = QuestionFactory.CreateQuestionEntity(
+            questionId, _mockTopic.Object, _mockUser.Object);
+
+        questionEntity.Answers = [AnswerFactory.CreateAnswerEntity(
+            answerId, questionEntity, user)];
+
+        if (voteValueAsBoolean != null)
+        {
+            questionEntity.Answers.First().AnswerVotes = [
+            AnswerVoteFactory.CreateAnswerVoteEntity(
+                answerId, user, questionEntity.Answers.First(), voteValueAsBoolean.Value)
+            ];
+        }
+
+        var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+            questionId, _mockTopic.Object.Id);
+
+        questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
+            questionEntity.Answers.First(), user.UserName ?? String.Empty)];
+
+        _mockQuestionRepository
+            .Setup(q => q.GetByIdAsync(questionId))
+            .ReturnsAsync(questionEntity);
+
+        _mockMapper
+            .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+            .Returns(questionDTO);
+
+        _mockTokenService
+            .Setup(t => t.GetUserId())
+            .Returns(userId);
+
+        _mockUserRepository
+            .Setup(u => u.GetTeachersBySubjectIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync([]);
+
+        // Act
+        var result = await _questionService.GetByIdAsync(questionId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Answers);
+
+        Assert.Equal(expectedVoteValue, result.Answers.First().MyVote);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldDeleteQuestion_WhenExists()
+    {
+        // Arrange
+        var questionId = Guid.NewGuid();
+        var question = QuestionFactory.CreateQuestionEntity(
+            questionId, _mockTopic.Object, _mockUser.Object);
+
+        _mockQuestionRepository
+            .Setup(q => q.GetByIdAsync(questionId))
+            .ReturnsAsync(question);
+
+        // Act
+        await _questionService.DeleteAsync(questionId);
+
+        // Assert
+        _mockQuestionRepository.Verify(
+            q => q.DeleteAsync(questionId),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldThrowNotFound_WhenQuestionDoesNotExist()
+    {
+        // Arrange
+        var questionId = Guid.NewGuid();
+        _mockQuestionRepository
+            .Setup(q => q.GetByIdAsync(questionId))
+            .ReturnsAsync(default(Question));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<NotFoundException>(
+            () => _questionService.DeleteAsync(questionId));
+
+        Assert.Equal(_questionService.MsgNotFound(questionId), exception.Message);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldNotCallDelete_WhenQuestionDoesNotExist()
+    {
+        // Arrange
+        var questionId = Guid.NewGuid();
+        _mockQuestionRepository
+            .Setup(q => q.GetByIdAsync(questionId))
+            .ReturnsAsync(default(Question));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<NotFoundException>(
+            () => _questionService.DeleteAsync(questionId));
+
+        _mockQuestionRepository.Verify(
+            q => q.DeleteAsync(questionId),
+            Times.Never);
+    }
 }

@@ -166,7 +166,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
             _answerService.UpdateAsync(answerId, answerPutDto));
 
         Assert.Equal(
-            _answerService.MsgUpdateAsyncNotFound(answerId),
+            _answerService.MsgNotFound(answerId),
             exception.Message);
     }
 
@@ -230,7 +230,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
             _answerService.DeleteAsync(answerId));
 
         Assert.Equal(
-            _answerService.MsgDeleteAsyncNotFound(answerId),
+            _answerService.MsgNotFound(answerId),
             exception.Message);
     }
 

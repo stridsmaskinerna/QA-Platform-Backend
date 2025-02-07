@@ -122,7 +122,7 @@ public class CommentServiceTests : BaseServiceSetupTests
     public async Task UpdateAsync_ShouldUpdateComment_WhenCommentExist()
     {
         // Arrange
-        var commentId = new Guid();
+        var commentId = Guid.NewGuid();
 
         var commentEntity = CommentFactory.CreateCommentEntity(
             commentId, _mockAnswer.Object, _mockUser.Object);
@@ -166,7 +166,7 @@ public class CommentServiceTests : BaseServiceSetupTests
             _commentService.UpdateAsync(commentId, commentPutDto));
 
         Assert.Equal(
-            _commentService.MsgUpdateAsyncNotFound(commentId),
+            _commentService.MsgNotFound(commentId),
             exception.Message);
     }
 
@@ -232,7 +232,7 @@ public class CommentServiceTests : BaseServiceSetupTests
             _commentService.DeleteAsync(commentId));
 
         Assert.Equal(
-            _commentService.MsgDeleteAsyncNotFound(commentId),
+            _commentService.MsgNotFound(commentId),
             exception.Message);
     }
 

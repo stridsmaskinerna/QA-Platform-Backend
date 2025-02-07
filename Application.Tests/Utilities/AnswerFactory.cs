@@ -37,4 +37,14 @@ public static class AnswerFactory
         Value = answer.Value,
         UserName = userName
     };
+
+    public static AnswerDetailedDTO CreateAnswerDetailedDTO(
+        Answer answer,
+        string userName
+    ) => new()
+    {
+        Id = answer.Id,
+        Value = answer.Value,
+        UserName = userName
+    };
 }
