@@ -97,7 +97,7 @@ public class SubjectService : BaseService, ISubjectService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return; 
+            return;
         }
     }
 }

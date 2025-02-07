@@ -85,6 +85,18 @@ public class QuestionController : ControllerBase
         return Ok(question);
     }
 
+    [AllowAnonymous]
+    [HttpGet("public/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<QuestionDetailedDTO>> GetQuestionDetailPublic(
+        [FromRoute] Guid id
+    )
+    {
+        var question = await _sm.QuestionService.GetPublicQuestionByIdAsync(id);
+        return Ok(question);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
