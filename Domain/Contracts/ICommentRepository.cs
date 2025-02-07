@@ -14,6 +14,6 @@ namespace Infrastructure.Repositories
         Task<IEnumerable<Comment>> GetCommentsByUserIdAsync(Guid userId);
         Task<Comment> AddAsync(Comment comment);
         Task UpdateAsync(Comment comment);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(Comment comment);
     }
 }

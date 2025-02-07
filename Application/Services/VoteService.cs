@@ -23,11 +23,20 @@ public class VoteService : BaseService, IVoteService
         _um = um;
     }
 
+    public string MsgInvalidVoteType() =>
+        $"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]";
+
+    public string MsgCastVoteAnswerNotFound(Guid answerId) =>
+        $"Answer with provided id {answerId} not found";
+
+    public string MsgCastVoteUserUnauthorized() =>
+        $"Invalid authentication user could not be found";
+
     public bool? GetVoteAsBoolean(string vote)
     {
         if (!VoteType.ALL_TYPES.Contains(vote))
         {
-            BadRequest($"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]");
+            BadRequest(MsgInvalidVoteType());
         }
 
         bool? voteAsBoolean = vote switch
@@ -45,14 +54,14 @@ public class VoteService : BaseService, IVoteService
         var answer = await _rm.AnswerRepository.GetByIdAsync(answerId);
         if (answer == null)
         {
-            NotFound($"Answer with provided id {answerId} not found");
+            NotFound(MsgCastVoteAnswerNotFound(answerId));
         }
 
         var userId = _sm.TokenService.GetUserId();
         var user = await _um.FindByIdAsync(userId);
         if (user == null)
         {
-            Unauthorized($"INvalid authentication user could not be found");
+            Unauthorized(MsgCastVoteUserUnauthorized());
         }
 
         var answerVoteEntry = await _rm.AnswerVoteRepository.GetAsync(

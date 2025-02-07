@@ -33,6 +33,7 @@ public static class ApplicationServicesExtension
         builder.Services.AddAsLazy<ISubjectRepository, SubjectRepository>();
         builder.Services.AddAsLazy<ITopicRepository, TopicRepository>();
         builder.Services.AddAsLazy<ITagRepository, TagRepository>();
+        builder.Services.AddAsLazy<IUserRepository, UserRepository>();
         builder.Services.AddAsLazy<IAnswerVoteRepository, AnswerVoteRepository>();
     }
 
