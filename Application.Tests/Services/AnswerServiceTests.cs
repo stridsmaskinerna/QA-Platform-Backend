@@ -32,224 +32,234 @@ public class AnswerServiceTests : BaseServiceSetupTests
             .Returns(_mockTokenService.Object);
     }
 
-    [Fact]
-    public async Task AddAsync_ShouldReturnAnswerDTO_WhenSuccessful()
+    public class AddAsync : AnswerServiceTests
     {
-        // Arrange
-        var answerCreateDto = AnswerFactory.CreateAnswerForCreationDTO();
-
-        var answerEntity = AnswerFactory.CreateAnswerEntity(
-            Guid.NewGuid(), _mockQuestion.Object, _mockUser.Object);
-
-        var userName = "TestUser";
-        var answerDtoResponse = AnswerFactory.CreateAnswerDTO(
-            answerEntity, userName);
-
-        _mockMapper
-            .Setup(m => m.Map<Answer>(answerCreateDto))
-            .Returns(answerEntity);
-
-        _mockTokenService
-            .Setup(t => t.GetUserId())
-            .Returns(_mockUser.Object.Id);
-
-        _mockAnswerRepository
-            .Setup(r => r.AddAsync(It.IsAny<Answer>()))
-            .ReturnsAsync(answerEntity);
-
-        _mockMapper
-            .Setup(m => m.Map<AnswerDTO>(answerEntity))
-            .Returns(answerDtoResponse);
-
-        _mockTokenService
-            .Setup(t => t.GetUserName())
-            .Returns(userName);
-
-        // Act
-        var result = await _answerService.AddAsync(answerCreateDto);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(answerEntity.Id, result.Id);
-        Assert.Equal(userName, result.UserName);
-
-        _mockAnswerRepository.Verify(
-            r => r.AddAsync(It.IsAny<Answer>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task AddAsync_ShouldThrowBadRequest_WhenMappingFails()
-    {
-        // Arrange
-        var answerCreateDto = AnswerFactory.CreateAnswerForCreationDTO();
-
-        _mockMapper
-            .Setup(m => m.Map<Answer>(answerCreateDto))
-            .Returns((Answer)default!);
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
-            _answerService.AddAsync(answerCreateDto));
-
-        Assert.Equal(
-            _answerService.MsgAddAsyncBadRequest(),
-            exception.Message);
-    }
-
-    [Fact]
-    public async Task AddAsync_ShouldNotCallAdd_WhenMappingFails()
-    {
-        // Arrange
-        var answerCreateDto = AnswerFactory.CreateAnswerForCreationDTO();
-
-        _mockMapper
-            .Setup(m => m.Map<Answer>(answerCreateDto))
-            .Returns((Answer)default!);
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
-            _answerService.AddAsync(answerCreateDto));
-
-        _mockAnswerRepository.Verify(
-            r => r.AddAsync(It.IsAny<Answer>()),
-            Times.Never);
-    }
-
-    [Fact]
-    public async Task UpdateAsync_ShouldUpdateAnswer_WhenAnswerExists()
-    {
-        // Arrange
-        var answerId = Guid.NewGuid();
-        var answerEntity = AnswerFactory.CreateAnswerEntity(
-           answerId, _mockQuestion.Object, _mockUser.Object);
-
-        var answerPutDto = new AnswerForPutDTO
+        [Fact]
+        public async Task ShouldReturnAnswerDTO_WhenSuccessful()
         {
-            Value = "Updated Content"
-        };
+            // Arrange
+            var answerCreateDto = AnswerFactory.CreateAnswerForCreationDTO();
 
-        _mockAnswerRepository
-            .Setup(r => r.GetByIdAsync(answerId))
-            .ReturnsAsync(answerEntity);
+            var answerEntity = AnswerFactory.CreateAnswerEntity(
+                Guid.NewGuid(), _mockQuestion.Object, _mockUser.Object);
 
-        _mockMapper
-            .Setup(m => m.Map(answerPutDto, answerEntity));
+            var userName = "TestUser";
+            var answerDtoResponse = AnswerFactory.CreateAnswerDTO(
+                answerEntity, userName);
 
-        // Act
-        await _answerService.UpdateAsync(answerId, answerPutDto);
+            _mockMapper
+                .Setup(m => m.Map<Answer>(answerCreateDto))
+                .Returns(answerEntity);
 
-        // Assert
-        _mockMapper.Verify(
-            m => m.Map(answerPutDto, answerEntity),
-            Times.Once);
+            _mockTokenService
+                .Setup(t => t.GetUserId())
+                .Returns(_mockUser.Object.Id);
 
-        _mockAnswerRepository.Verify(
-            r => r.CompleteAsync(),
-            Times.Once);
+            _mockAnswerRepository
+                .Setup(r => r.AddAsync(It.IsAny<Answer>()))
+                .ReturnsAsync(answerEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<AnswerDTO>(answerEntity))
+                .Returns(answerDtoResponse);
+
+            _mockTokenService
+                .Setup(t => t.GetUserName())
+                .Returns(userName);
+
+            // Act
+            var result = await _answerService.AddAsync(answerCreateDto);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(answerEntity.Id, result.Id);
+            Assert.Equal(userName, result.UserName);
+
+            _mockAnswerRepository.Verify(
+                r => r.AddAsync(It.IsAny<Answer>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowBadRequest_WhenMappingFails()
+        {
+            // Arrange
+            var answerCreateDto = AnswerFactory.CreateAnswerForCreationDTO();
+
+            _mockMapper
+                .Setup(m => m.Map<Answer>(answerCreateDto))
+                .Returns((Answer)default!);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
+                _answerService.AddAsync(answerCreateDto));
+
+            Assert.Equal(
+                _answerService.MsgAddAsyncBadRequest(),
+                exception.Message);
+        }
+
+        [Fact]
+        public async Task ShouldNotCallAdd_WhenMappingFails()
+        {
+            // Arrange
+            var answerCreateDto = AnswerFactory.CreateAnswerForCreationDTO();
+
+            _mockMapper
+                .Setup(m => m.Map<Answer>(answerCreateDto))
+                .Returns((Answer)default!);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
+                _answerService.AddAsync(answerCreateDto));
+
+            _mockAnswerRepository.Verify(
+                r => r.AddAsync(It.IsAny<Answer>()),
+                Times.Never);
+        }
     }
 
-    [Fact]
-    public async Task UpdateAsync_ShouldThrowNotFound_WhenAnswerDoesNotExist()
+    public class UpdateAsync : AnswerServiceTests
     {
-        // Arrange
-        var answerPutDto = AnswerFactory.CreateAnswerForPutDTO();
+        [Fact]
+        public async Task ShouldUpdateAnswer_WhenAnswerExists()
+        {
+            // Arrange
+            var answerId = Guid.NewGuid();
+            var answerEntity = AnswerFactory.CreateAnswerEntity(
+               answerId, _mockQuestion.Object, _mockUser.Object);
 
-        var answerId = Guid.NewGuid();
+            var answerPutDto = new AnswerForPutDTO
+            {
+                Value = "Updated Content"
+            };
 
-        _mockAnswerRepository
-            .Setup(r => r.GetByIdAsync(answerId))
-            .ReturnsAsync((Answer)default!);
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync(answerEntity);
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _answerService.UpdateAsync(answerId, answerPutDto));
+            _mockMapper
+                .Setup(m => m.Map(answerPutDto, answerEntity));
 
-        Assert.Equal(
-            _answerService.MsgNotFound(answerId),
-            exception.Message);
+            // Act
+            await _answerService.UpdateAsync(answerId, answerPutDto);
+
+            // Assert
+            _mockMapper.Verify(
+                m => m.Map(answerPutDto, answerEntity),
+                Times.Once);
+
+            _mockAnswerRepository.Verify(
+                r => r.CompleteAsync(),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenAnswerDoesNotExist()
+        {
+            // Arrange
+            var answerPutDto = AnswerFactory.CreateAnswerForPutDTO();
+
+            var answerId = Guid.NewGuid();
+
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync((Answer)default!);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _answerService.UpdateAsync(answerId, answerPutDto));
+
+            Assert.Equal(
+                _answerService.MsgNotFound(answerId),
+                exception.Message);
+        }
+
+        [Fact]
+        public async Task ShouldNotCallUpdate_WhenAnswerDoesNotExist()
+        {
+            // Arrange
+            var answerPutDto = AnswerFactory.CreateAnswerForPutDTO();
+
+            var answerId = Guid.NewGuid();
+
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync(default(Answer));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _answerService.UpdateAsync(answerId, answerPutDto));
+
+            _mockAnswerRepository.Verify(
+                r => r.UpdateAsync(It.IsAny<Answer>()),
+                Times.Never);
+        }
     }
 
-    [Fact]
-    public async Task UpdateAsync_ShouldNotCallUpdate_WhenAnswerDoesNotExist()
+    public class DeleteAsync : AnswerServiceTests
     {
-        // Arrange
-        var answerPutDto = AnswerFactory.CreateAnswerForPutDTO();
+        [Fact]
+        public async Task ShouldDeleteAnswer_WhenAnswerExists()
+        {
+            // Arrange
+            var answerId = Guid.NewGuid();
+            var answerEntity = AnswerFactory.CreateAnswerEntity(
+                answerId, _mockQuestion.Object, _mockUser.Object);
 
-        var answerId = Guid.NewGuid();
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync(answerEntity);
 
-        _mockAnswerRepository
-            .Setup(r => r.GetByIdAsync(answerId))
-            .ReturnsAsync(default(Answer));
+            _mockAnswerRepository
+                .Setup(r => r.DeleteAsync(answerEntity));
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _answerService.UpdateAsync(answerId, answerPutDto));
+            // Act
+            await _answerService.DeleteAsync(answerId);
 
-        _mockAnswerRepository.Verify(
-            r => r.UpdateAsync(It.IsAny<Answer>()),
-            Times.Never);
-    }
+            // Assert
+            _mockAnswerRepository.Verify(
+                r => r.DeleteAsync(answerEntity),
+                Times.Once);
+        }
 
-    [Fact]
-    public async Task DeleteAsync_ShouldDeleteAnswer_WhenAnswerExists()
-    {
-        // Arrange
-        var answerId = Guid.NewGuid();
-        var answerEntity = AnswerFactory.CreateAnswerEntity(
-            answerId, _mockQuestion.Object, _mockUser.Object);
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenAnswerDoesNotExist()
+        {
+            // Arrange
+            var answerId = Guid.NewGuid();
 
-        _mockAnswerRepository
-            .Setup(r => r.GetByIdAsync(answerId))
-            .ReturnsAsync(answerEntity);
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync(default(Answer));
 
-        _mockAnswerRepository
-            .Setup(r => r.DeleteAsync(answerEntity));
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _answerService.DeleteAsync(answerId));
 
-        // Act
-        await _answerService.DeleteAsync(answerId);
+            Assert.Equal(
+                _answerService.MsgNotFound(answerId),
+                exception.Message);
+        }
 
-        // Assert
-        _mockAnswerRepository.Verify(
-            r => r.DeleteAsync(answerEntity),
-            Times.Once);
-    }
+        [Fact]
+        public async Task ShouldNotCallDelete_WhenAnswerDoesNotExist()
+        {
+            // Arrange
+            var answerId = Guid.NewGuid();
 
-    [Fact]
-    public async Task DeleteAsync_ShouldThrowNotFound_WhenAnswerDoesNotExist()
-    {
-        // Arrange
-        var answerId = Guid.NewGuid();
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync(default(Answer));
 
-        _mockAnswerRepository
-            .Setup(r => r.GetByIdAsync(answerId))
-            .ReturnsAsync(default(Answer));
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _answerService.DeleteAsync(answerId));
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _answerService.DeleteAsync(answerId));
+            _mockAnswerRepository.Verify(
+                r => r.UpdateAsync(It.IsAny<Answer>()),
+                Times.Never);
+        }
 
-        Assert.Equal(
-            _answerService.MsgNotFound(answerId),
-            exception.Message);
-    }
-
-    [Fact]
-    public async Task DeleteAsync_ShouldNotCallDelete_WhenAnswerDoesNotExist()
-    {
-        // Arrange
-        var answerId = Guid.NewGuid();
-
-        _mockAnswerRepository
-            .Setup(r => r.GetByIdAsync(answerId))
-            .ReturnsAsync(default(Answer));
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _answerService.DeleteAsync(answerId));
-
-        _mockAnswerRepository.Verify(
-            r => r.UpdateAsync(It.IsAny<Answer>()),
-            Times.Never);
     }
 }

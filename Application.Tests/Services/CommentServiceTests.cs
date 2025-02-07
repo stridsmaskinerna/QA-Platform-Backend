@@ -32,228 +32,238 @@ public class CommentServiceTests : BaseServiceSetupTests
             .Returns(_mockTokenService.Object);
     }
 
-    [Fact]
-    public async Task AddAsync_ShouldReturnCommentDTO_WhenSuccessful()
+    public class AddAsync : CommentServiceTests
     {
-        // Arrange
-        var answerId = Guid.NewGuid();
-        var commentCreateDto = CommentFactory.CreateCommentForCreationDTO(answerId);
+        [Fact]
+        public async Task ShouldReturnCommentDTO_WhenSuccessful()
+        {
+            // Arrange
+            var answerId = Guid.NewGuid();
+            var commentCreateDto = CommentFactory.CreateCommentForCreationDTO(answerId);
 
-        var commentId = Guid.NewGuid();
-        var commentEntity = CommentFactory.CreateCommentEntity(
-            commentId, _mockAnswer.Object, _mockUser.Object);
+            var commentId = Guid.NewGuid();
+            var commentEntity = CommentFactory.CreateCommentEntity(
+                commentId, _mockAnswer.Object, _mockUser.Object);
 
-        var userName = "TestUser";
-        var commentDtoResponse = CommentFactory.CreateCommentDTO(
-            commentEntity, userName);
+            var userName = "TestUser";
+            var commentDtoResponse = CommentFactory.CreateCommentDTO(
+                commentEntity, userName);
 
-        _mockMapper
-            .Setup(m => m.Map<Comment>(commentCreateDto))
-            .Returns(commentEntity);
+            _mockMapper
+                .Setup(m => m.Map<Comment>(commentCreateDto))
+                .Returns(commentEntity);
 
-        _mockTokenService
-            .Setup(t => t.GetUserId())
-            .Returns(_mockUser.Object.Id);
+            _mockTokenService
+                .Setup(t => t.GetUserId())
+                .Returns(_mockUser.Object.Id);
 
-        _mockCommentRepository
-            .Setup(r => r.AddAsync(It.IsAny<Comment>()))
-            .ReturnsAsync(commentEntity);
+            _mockCommentRepository
+                .Setup(r => r.AddAsync(It.IsAny<Comment>()))
+                .ReturnsAsync(commentEntity);
 
-        _mockMapper
-            .Setup(m => m.Map<CommentDTO>(commentEntity))
-            .Returns(commentDtoResponse);
+            _mockMapper
+                .Setup(m => m.Map<CommentDTO>(commentEntity))
+                .Returns(commentDtoResponse);
 
-        _mockTokenService
-            .Setup(t => t.GetUserName())
-            .Returns(userName);
+            _mockTokenService
+                .Setup(t => t.GetUserName())
+                .Returns(userName);
 
-        // Act
-        var result = await _commentService.AddAsync(commentCreateDto);
+            // Act
+            var result = await _commentService.AddAsync(commentCreateDto);
 
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(commentEntity.Id, result.Id);
-        Assert.Equal(userName, result.UserName);
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(commentEntity.Id, result.Id);
+            Assert.Equal(userName, result.UserName);
 
-        _mockCommentRepository.Verify(r => r.AddAsync(commentEntity), Times.Once);
+            _mockCommentRepository.Verify(r => r.AddAsync(commentEntity), Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowBadRequest_WhenMappingFails()
+        {
+            // Arrange
+            var commentCreateDto = CommentFactory.CreateCommentForCreationDTO(
+                Guid.NewGuid());
+
+            _mockMapper
+                .Setup(m => m.Map<Comment>(It.IsAny<CommentForCreationDTO>()))
+                .Returns((Comment)default!);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
+                _commentService.AddAsync(commentCreateDto));
+
+            Assert.Equal(
+                _commentService.MsgAddAsyncBadRequest(),
+                exception.Message);
+        }
+
+        [Fact]
+        public async Task ShouldNotCallAdd_WhenMappingFails()
+        {
+            // Arrange
+            var commentCreateDto = CommentFactory.CreateCommentForCreationDTO(
+                Guid.NewGuid());
+
+            _mockMapper
+                .Setup(m => m.Map<Comment>(It.IsAny<CommentForCreationDTO>()))
+                .Returns((Comment)default!);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
+                _commentService.AddAsync(commentCreateDto));
+
+            _mockCommentRepository.Verify
+                (r => r.AddAsync(It.IsAny<Comment>()),
+                Times.Never);
+        }
+
     }
 
-    [Fact]
-    public async Task AddAsync_ShouldThrowBadRequest_WhenMappingFails()
+    public class UpdateAsync : CommentServiceTests
     {
-        // Arrange
-        var commentCreateDto = CommentFactory.CreateCommentForCreationDTO(
-            Guid.NewGuid());
+        [Fact]
+        public async Task ShouldUpdateComment_WhenCommentExist()
+        {
+            // Arrange
+            var commentId = Guid.NewGuid();
 
-        _mockMapper
-            .Setup(m => m.Map<Comment>(It.IsAny<CommentForCreationDTO>()))
-            .Returns((Comment)default!);
+            var commentEntity = CommentFactory.CreateCommentEntity(
+                commentId, _mockAnswer.Object, _mockUser.Object);
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
-            _commentService.AddAsync(commentCreateDto));
+            var commentPutDto = CommentFactory.CreateCommentForPutDTO();
 
-        Assert.Equal(
-            _commentService.MsgAddAsyncBadRequest(),
-            exception.Message);
+            _mockCommentRepository
+                .Setup(r => r.GetByIdAsync(commentId))
+                .ReturnsAsync(commentEntity);
+
+            _mockMapper
+                .Setup(m => m.Map(commentPutDto, commentEntity));
+
+            // Act
+            await _commentService.UpdateAsync(commentId, commentPutDto);
+
+            // Assert
+            _mockMapper.Verify(
+                m => m.Map(commentPutDto, commentEntity),
+                Times.Once);
+
+            _mockCommentRepository.Verify(
+                r => r.UpdateAsync(It.IsAny<Comment>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenCommentDoesNotExist()
+        {
+            // Arrange
+            var commentPutDto = CommentFactory.CreateCommentForPutDTO();
+
+            var commentId = Guid.NewGuid();
+
+            _mockCommentRepository
+                .Setup(r => r.GetByIdAsync(commentId))
+                .ReturnsAsync(default(Comment));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _commentService.UpdateAsync(commentId, commentPutDto));
+
+            Assert.Equal(
+                _commentService.MsgNotFound(commentId),
+                exception.Message);
+        }
+
+        [Fact]
+        public async Task ShouldNotCallUpdate_WhenCommentDoesNotExist()
+        {
+            // Arrange
+            var commentPutDto = CommentFactory.CreateCommentForPutDTO();
+
+            var commentId = Guid.NewGuid();
+
+            _mockCommentRepository
+                .Setup(r => r.GetByIdAsync(commentId))
+                .ReturnsAsync(default(Comment));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _commentService.UpdateAsync(commentId, commentPutDto));
+
+            _mockCommentRepository.Verify(
+                r => r.UpdateAsync(It.IsAny<Comment>()),
+                Times.Never);
+        }   
     }
 
-    [Fact]
-    public async Task AddAsync_ShouldNotCallAdd_WhenMappingFails()
+    public class DeleteAsync : CommentServiceTests
     {
-        // Arrange
-        var commentCreateDto = CommentFactory.CreateCommentForCreationDTO(
-            Guid.NewGuid());
+        [Fact]
+        public async Task ShouldDeleteComment_WhenCommentExists()
+        {
+            // Arrange
+            var commentId = Guid.NewGuid();
+            var commentEntity = CommentFactory.CreateCommentEntity(
+                commentId, _mockAnswer.Object, _mockUser.Object);
 
-        _mockMapper
-            .Setup(m => m.Map<Comment>(It.IsAny<CommentForCreationDTO>()))
-            .Returns((Comment)default!);
+            _mockCommentRepository
+                .Setup(r => r.GetByIdAsync(commentId))
+                .ReturnsAsync(commentEntity);
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<BadRequestException>(() =>
-            _commentService.AddAsync(commentCreateDto));
+            _mockCommentRepository
+                .Setup(r => r.DeleteAsync(commentEntity));
 
-        _mockCommentRepository.Verify
-            (r => r.AddAsync(It.IsAny<Comment>()),
-            Times.Never);
-    }
+            // Act
+            await _commentService.DeleteAsync(commentId);
 
-    [Fact]
-    public async Task UpdateAsync_ShouldUpdateComment_WhenCommentExist()
-    {
-        // Arrange
-        var commentId = Guid.NewGuid();
+            // Assert
+            _mockCommentRepository.Verify(
+                r => r.DeleteAsync(commentEntity),
+                Times.Once);
+        }
 
-        var commentEntity = CommentFactory.CreateCommentEntity(
-            commentId, _mockAnswer.Object, _mockUser.Object);
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenCommentDoesNotExists()
+        {
+            // Arrange
+            var commentId = Guid.NewGuid();
+            var commentEntity = CommentFactory.CreateCommentEntity(
+                commentId, _mockAnswer.Object, _mockUser.Object);
 
-        var commentPutDto = CommentFactory.CreateCommentForPutDTO();
+            _mockCommentRepository
+                .Setup(r => r.GetByIdAsync(commentId))
+                .ReturnsAsync(default(Comment));
 
-        _mockCommentRepository
-            .Setup(r => r.GetByIdAsync(commentId))
-            .ReturnsAsync(commentEntity);
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _commentService.DeleteAsync(commentId));
 
-        _mockMapper
-            .Setup(m => m.Map(commentPutDto, commentEntity));
+            Assert.Equal(
+                _commentService.MsgNotFound(commentId),
+                exception.Message);
+        }
 
-        // Act
-        await _commentService.UpdateAsync(commentId, commentPutDto);
+        [Fact]
+        public async Task ShouldNotCallDelete_WhenCommentDoesNotExists()
+        {
+            // Arrange
+            var commentId = Guid.NewGuid();
+            var commentEntity = CommentFactory.CreateCommentEntity(
+                commentId, _mockAnswer.Object, _mockUser.Object);
 
-        // Assert
-        _mockMapper.Verify(
-            m => m.Map(commentPutDto, commentEntity),
-            Times.Once);
+            _mockCommentRepository
+                .Setup(r => r.GetByIdAsync(commentId))
+                .ReturnsAsync(default(Comment));
 
-        _mockCommentRepository.Verify(
-            r => r.UpdateAsync(It.IsAny<Comment>()),
-            Times.Once);
-    }
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
+                _commentService.DeleteAsync(commentId));
 
-    [Fact]
-    public async Task UpdateAsync_ShouldThrowNotFound_WhenCommentDoesNotExist()
-    {
-        // Arrange
-        var commentPutDto = CommentFactory.CreateCommentForPutDTO();
-
-        var commentId = Guid.NewGuid();
-
-        _mockCommentRepository
-            .Setup(r => r.GetByIdAsync(commentId))
-            .ReturnsAsync(default(Comment));
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _commentService.UpdateAsync(commentId, commentPutDto));
-
-        Assert.Equal(
-            _commentService.MsgNotFound(commentId),
-            exception.Message);
-    }
-
-    [Fact]
-    public async Task UpdateAsync_ShouldNotCallUpdate_WhenCommentDoesNotExist()
-    {
-        // Arrange
-        var commentPutDto = CommentFactory.CreateCommentForPutDTO();
-
-        var commentId = Guid.NewGuid();
-
-        _mockCommentRepository
-            .Setup(r => r.GetByIdAsync(commentId))
-            .ReturnsAsync(default(Comment));
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _commentService.UpdateAsync(commentId, commentPutDto));
-
-        _mockCommentRepository.Verify(
-            r => r.UpdateAsync(It.IsAny<Comment>()),
-            Times.Never);
-    }
-
-    [Fact]
-    public async Task DeleteAsync_ShouldDeleteComment_WhenCommentExists()
-    {
-        // Arrange
-        var commentId = Guid.NewGuid();
-        var commentEntity = CommentFactory.CreateCommentEntity(
-            commentId, _mockAnswer.Object, _mockUser.Object);
-
-        _mockCommentRepository
-            .Setup(r => r.GetByIdAsync(commentId))
-            .ReturnsAsync(commentEntity);
-
-        _mockCommentRepository
-            .Setup(r => r.DeleteAsync(commentEntity));
-
-        // Act
-        await _commentService.DeleteAsync(commentId);
-
-        // Assert
-        _mockCommentRepository.Verify(
-            r => r.DeleteAsync(commentEntity),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task DeleteAsync_ShouldThrowNotFound_WhenCommentDoesNotExists()
-    {
-        // Arrange
-        var commentId = Guid.NewGuid();
-        var commentEntity = CommentFactory.CreateCommentEntity(
-            commentId, _mockAnswer.Object, _mockUser.Object);
-
-        _mockCommentRepository
-            .Setup(r => r.GetByIdAsync(commentId))
-            .ReturnsAsync(default(Comment));
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _commentService.DeleteAsync(commentId));
-
-        Assert.Equal(
-            _commentService.MsgNotFound(commentId),
-            exception.Message);
-    }
-
-    [Fact]
-    public async Task DeleteAsync_ShouldNotCallDelete_WhenCommentDoesNotExists()
-    {
-        // Arrange
-        var commentId = Guid.NewGuid();
-        var commentEntity = CommentFactory.CreateCommentEntity(
-            commentId, _mockAnswer.Object, _mockUser.Object);
-
-        _mockCommentRepository
-            .Setup(r => r.GetByIdAsync(commentId))
-            .ReturnsAsync(default(Comment));
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
-            _commentService.DeleteAsync(commentId));
-
-        _mockCommentRepository.Verify(
-            r => r.DeleteAsync(commentEntity),
-            Times.Never);
+            _mockCommentRepository.Verify(
+                r => r.DeleteAsync(commentEntity),
+                Times.Never);
+        }
     }
 }
