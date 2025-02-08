@@ -20,9 +20,9 @@ public class CommentService : BaseService, ICommentService
         _sm = sm;
     }
 
-    public string MsgAddAsyncBadRequest() => "Could not create the new comment";
+    public static string MsgAddAsyncBadRequest() => "Could not create the new comment";
 
-    public string MsgNotFound(Guid id) => $"No comment with id {id} exist.";
+    public static string MsgNotFound(Guid id) => $"No comment with id {id} exist.";
 
     public async Task<CommentDTO> AddAsync(CommentForCreationDTO commentDTO)
     {
