@@ -15,15 +15,13 @@ using Microsoft.Extensions.Options;
 using QAPlatformAPI.Extensions;
 
 // Todo check if version 9 is of for DB in infra and startup project.
-// Todo when running in github action docker database container must be started first.
 public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         var testEnvironment = Environment.GetEnvironmentVariable("TEST_ENV");
 
-        // Choose the correct appsettings file
-        var settingsFileName = testEnvironment = "appsettings.Testing.json";
+        var settingsFileName = "appsettings.Testing.json";
 
         var testSettingsPath = Path.Combine(
             Directory.GetCurrentDirectory(),
@@ -93,8 +91,23 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.MigrateAsync();
-        await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+        int retries = 5;
+        while (retries > 0)
+        {
+            try
+            {
+                Console.WriteLine("Trying to connect to the database...");
+                await dbContext.Database.EnsureDeletedAsync();
+                await dbContext.Database.MigrateAsync();
+                await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+                break;
+            }
+            catch (Exception ex)
+            {
+                retries--;
+                Console.WriteLine($"Database connection failed: {ex.Message}. Retrying in 5s...");
+                await Task.Delay(5000);
+            }
+        }
     }
 }

@@ -16,15 +16,6 @@ jobs:
     - name: Start Database with Docker Compose
       run: docker compose -f docker-compose-test.yml up -d qa-platform-db
 
-    - name: Wait for PostgreSQL to be ready
-      run: |
-        echo "Waiting for PostgreSQL to be ready..."
-        until docker exec $(docker ps -qf "name=qa-platform-db") pg_isready -U devuser -d qa-platform-db; do
-          echo "PostgreSQL is unavailable - sleeping"
-          sleep 5
-        done
-        echo "PostgreSQL is up!"
-
     - uses: actions/checkout@v4
 
     - name: Start API Container
@@ -41,8 +32,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    - name: Run All Tests
-      run: dotnet test --no-build --verbosity normal
+    - name: Run Application Project Unit Tests
+      run: dotnet test Application.Tests --no-build --verbosity normal
+
+    - name: Run Integrations Tests
+      run: dotnet test QAPlatformAPI.Integration --no-build --verbosity normal
 
     - name: Stop and clean up containers
       run: docker compose -f docker-compose-test.yml down
