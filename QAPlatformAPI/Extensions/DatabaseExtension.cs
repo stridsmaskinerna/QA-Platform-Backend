@@ -33,7 +33,8 @@ public static class DatabaseExtension
             services.AddIdentity<IdentityUser, IdentityRole>()
                .AddEntityFrameworkStores<QAPlatformContext>()
                .AddDefaultTokenProviders();
-        }
+        });
+    }
 
     public static async Task UseDevelopmentDataSeedExtension(this IApplicationBuilder app)
         {
