@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Tests", "Application.Tests\Application.Tests.csproj", "{7C0200DD-1D22-4FAD-B4B6-F2B83EF179CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAPlatformAPI.Integration", "QAPlatformAPI.Integration\QAPlatformAPI.Integration.csproj", "{3EFB94E7-3669-4109-B5DD-22A268F3C791}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAPlatformAPI.IntegrationTests", "QAPlatformAPI.IntegrationTests\QAPlatformAPI.IntegrationTests.csproj", "{3EFB94E7-3669-4109-B5DD-22A268F3C791}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

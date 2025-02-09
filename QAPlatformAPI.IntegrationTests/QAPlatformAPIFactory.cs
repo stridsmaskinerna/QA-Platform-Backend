@@ -1,166 +1,113 @@
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Infrastructure.Seeds;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
-using QAPlatformAPI.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
-using Domain.Constants;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Authorization;
-using System.Reflection;
+using QAPlatformAPI.Extensions;
 
-namespace QAPlatformAPI.IntegrationTests;
-
+// Todo check if version 9 is of for DB in infra and startup project.
 public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        base.ConfigureWebHost(builder);
+        var testEnvironment = Environment.GetEnvironmentVariable("TEST_ENV");
 
-        // ✅ Load `appsettings.Testing.json` from the test project's root directory
+        var settingsFileName = "appsettings.Testing.json";
+
         var testSettingsPath = Path.Combine(
             Directory.GetCurrentDirectory(),
-            "appsettings.Testing.json");
+            settingsFileName);
+
+        Console.WriteLine($"[DEBUG] Appsettings.Testing.json path: {testSettingsPath}");
 
         if (!File.Exists(testSettingsPath))
         {
-            throw new FileNotFoundException($"Could not find appsettings.Testing.json at {testSettingsPath}");
+            throw new FileNotFoundException($"Appsettings.Testing.json is missing: {testSettingsPath}");
         }
 
-        // ✅ Manually create a new WebApplicationBuilder to call extensions
-        var testBuilder = WebApplication.CreateBuilder();
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile(testSettingsPath, optional: false, reloadOnChange: true)
+            .Build();
 
-        // ✅ Call your extensions that expect `WebApplicationBuilder`
-        testBuilder.AddControllerExtension();
-        testBuilder.AddCORSConfigurationExtension();
-        testBuilder.AddIdentityCoreExtension();
-        testBuilder.AddJWTSecurityExtension();
-        testBuilder.AddJSONSerializerOptionsExtension();
-        testBuilder.AddApplicationServicesExtension();
-
-        builder.ConfigureServices(services =>
+        builder.ConfigureAppConfiguration((context, config) =>
         {
-            // ✅ Remove existing DbContext registration
-            var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<QAPlatformContext>));
+            config.AddConfiguration(configuration);
+        });
 
-            if (descriptor != null)
+        builder.ConfigureServices((context, services) =>
+        {
+            var connectionString = context.Configuration.GetConnectionString(
+                "PostgreSQLConnection");
+            Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
+
+            if (string.IsNullOrEmpty(connectionString))
             {
-                services.Remove(descriptor);
+                throw new InvalidOperationException("Connection string not found in appsettings.Testing.json.");
             }
 
-            var connectionString =
-                testBuilder.Configuration.GetConnectionString("PostgreSQLConnection")
-                ?? throw new InvalidOperationException("Connection string not found.");
+            var serviceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<QAPlatformContext>));
+            if (serviceDescriptor != null)
+            {
+                services.Remove(serviceDescriptor);
+            }
 
-            // ✅ Register test database in builder (not in testBuilder)
             services.AddDbContext<QAPlatformContext>(options =>
                 options.UseNpgsql(connectionString));
 
-            // ✅ Copy all services from `testBuilder` to `builder`
-            foreach (var service in testBuilder.Services)
-            {
-                services.Add(service);
-            }
+            services.AddControllerExtension();
+            services.AddCORSConfigurationExtension(context.Configuration);
+            services.AddIdentityCoreExtension();
+            services.AddJSONSerializerOptionsExtension();
+            services.AddApplicationServicesExtension();
 
-            // ✅ Ensure database is set up before tests
+            // Set up database before tests
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
-            EnsureTestDatabaseSetup(scope).Wait();
+            SeedTestDatabase(scope, connectionString).Wait();
         });
 
         builder.ConfigureTestServices(services =>
         {
-            // ✅ Remove real authentication handlers
-            var authHandler = services.FirstOrDefault(s => s.ServiceType == typeof(IAuthenticationSchemeProvider));
-            if (authHandler != null) services.Remove(authHandler);
+            services.RemoveAll(typeof(IAuthenticationSchemeProvider));
+            // services.RemoveAll(typeof(IAuthorizationPolicyProvider));
+            services.RemoveAll(typeof(IConfigureOptions<AuthenticationOptions>));
 
-            // ✅ Remove real authentication handlers
-            var policyProvider = services.FirstOrDefault(s => s.ServiceType == typeof(IAuthorizationPolicyProvider));
-            if (policyProvider != null) services.Remove(policyProvider);
-
-            // ✅ Add fake authentication for testing
-            services.AddAuthentication("TestAuthScheme")
-                .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>("TestAuthScheme", options => { });
-
-            // ✅ Configure authorization to allow all authenticated users
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("TestPolicy", policy =>
-                    policy.RequireAuthenticatedUser().RequireRole(DomainRoles.USER));
-            });
+            services.AddJWTSecurityExtension(configuration);
         });
     }
 
-    private async Task EnsureTestDatabaseSetup(IServiceScope scope)
+    private async Task SeedTestDatabase(IServiceScope scope, string connectionString)
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<QAPlatformContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // ✅ Ensure database is clean before each test
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.MigrateAsync();
-
-        // ✅ Seed initial data
-        await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
-    }
-}
-
-/// <summary>
-/// ✅ Custom test authentication handler (automatically authenticates requests)
-/// </summary>
-public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
-{
-    public TestAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder
-    ) : base(options, logger, encoder)
-    {
-    }
-
-    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
-    {
-        var claims = new[] {
-            new Claim(ClaimTypes.Name, "TestUser"),
-            new Claim(ClaimTypes.Role, DomainRoles.USER)
-        };
-        var identity = new ClaimsIdentity(claims, "TestAuthScheme");
-        var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, "TestAuthScheme");
-
-        return Task.FromResult(AuthenticateResult.Success(ticket));
-    }
-}
-
-/// <summary>
-/// ✅ Custom authorization handler that allows all requests for testing
-/// </summary>
-public class AllowAnonymousHandler : IAuthorizationHandler
-{
-    public Task HandleAsync(AuthorizationHandlerContext context)
-    {
-        foreach (var requirement in context.PendingRequirements.ToList())
+        int retries = 5;
+        while (retries > 0)
         {
-            context.Succeed(requirement);
+            try
+            {
+                Console.WriteLine("Trying to connect to the database...");
+                await dbContext.Database.EnsureDeletedAsync();
+                await dbContext.Database.MigrateAsync();
+                await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+                break;
+            }
+            catch (Exception ex)
+            {
+                retries--;
+                Console.WriteLine($"Database connection failed: {ex.Message}. Retrying in 5s...");
+                await Task.Delay(5000);
+            }
         }
-
-        return Task.CompletedTask;
     }
 }
