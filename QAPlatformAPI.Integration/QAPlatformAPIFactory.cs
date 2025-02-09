@@ -23,9 +23,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         var testEnvironment = Environment.GetEnvironmentVariable("TEST_ENV");
 
         // Choose the correct appsettings file
-        var settingsFileName = testEnvironment == "GITHUB_ACTIONS"
-            ? "appsettings.Testing.json"
-            : "appsettings.Testing.Local.json";
+        var settingsFileName = testEnvironment = "appsettings.Testing.json";
 
         var testSettingsPath = Path.Combine(
             Directory.GetCurrentDirectory(),
@@ -95,28 +93,8 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // await dbContext.Database.EnsureDeletedAsync();
-        // await dbContext.Database.MigrateAsync();
-        // await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
-
-        int retries = 5;
-        while (retries > 0)
-        {
-            try
-            {
-                Console.WriteLine("Trying to connect to the database...");
-                Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
-                await dbContext.Database.EnsureDeletedAsync();
-                await dbContext.Database.MigrateAsync();
-                await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
-                break;
-            }
-            catch (Exception ex)
-            {
-                retries--;
-                Console.WriteLine($"Database connection failed: {ex.Message}. Retrying in 5s...");
-                await Task.Delay(5000);
-            }
-        }
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.MigrateAsync();
+        await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
     }
 }
