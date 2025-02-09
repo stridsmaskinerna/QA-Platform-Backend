@@ -42,7 +42,6 @@ public class TagController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteTagAsync(Guid id)
     {
-        var tagToRemove = await _sm.TagService.GetByIdAsync(id);
         await _sm.TagService.DeleteAsync(id);
         return Ok(new { message = "Tag removed: ", data = id });
     }

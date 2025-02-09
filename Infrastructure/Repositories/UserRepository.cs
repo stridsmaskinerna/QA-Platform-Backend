@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repositories;
 
 /// <summary>
-/// A repository class that wrap UserManager<User> used
+/// A repository class that wrap and extend UserManager<User> used
 /// to improve testing.
 /// </summary>
 public class UserRepository : IUserRepository
@@ -25,5 +25,18 @@ public class UserRepository : IUserRepository
         return await _userManager.Users
             .Where(u => u.Subjects.Any(s => s.Id == subjectId))
             .ToListAsync();
+    }
+
+    public async Task<User?> ValidateUserCredential(string? email, string? password)
+    {
+        var user = await _userManager.FindByEmailAsync(email!);
+
+        if (user == null ||
+            !await _userManager.CheckPasswordAsync(user, password!))
+        {
+            return null;
+        };
+
+        return user;
     }
 }

@@ -232,20 +232,24 @@ public class TagServiceTests : SetupServiceTests
 
     public class IsTagValueTakenAsync : TagServiceTests
     {
-        [Fact]
-        public async Task ShouldReturnTrue_WhenTagExists()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ShouldReturnTrue_WhenTagExists(
+            bool expected
+        )
         {
             // Arrange
             var tagValue = "TestTag";
             _mockTagRepository
                 .Setup(r => r.IsTagValueTakenAsync(tagValue))
-                .ReturnsAsync(true);
+                .ReturnsAsync(expected);
 
             // Act
             var result = await _tagService.IsTagValueTakenAsync(tagValue);
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(expected, result);
         }
     }
 
