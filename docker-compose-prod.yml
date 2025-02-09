@@ -24,19 +24,6 @@ services:
     networks:
       - qa-platform-network-prod
 
-  qa-platform-db-admin:
-    image: dpage/pgadmin4
-    restart: on-failure
-    environment:
-      PGADMIN_DEFAULT_EMAIL: dev@dev.com
-      PGADMIN_DEFAULT_PASSWORD: devpassword
-    ports:
-      - "8081:80"
-    depends_on:
-      - qa-platform-db
-    networks:
-      - qa-platform-network-prod
-
 volumes:
   qa-platform-volume-prod:
 

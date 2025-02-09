@@ -10,7 +10,10 @@ public class QuestionControllerTests : IntegrationTestBase
 {
     public QuestionControllerTests(
         QAPlatformAPIFactory<Program> factory
-    ) : base(factory) { }
+    ) : base(factory)
+    {
+        AuthenticateAsync().Wait();
+    }
 
     [Fact]
     public async Task CreateSubject_ShouldReturn_Created()
@@ -20,7 +23,7 @@ public class QuestionControllerTests : IntegrationTestBase
         // Arrange
         var requestBody = new SubjectForCreationDTO
         {
-            Name = "Test answer",
+            Name = "Test subject",
             SubjectCode = "TestCode"
         };
 
