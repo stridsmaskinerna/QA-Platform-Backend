@@ -76,7 +76,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
             // Set up database before tests
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
-            SeedTestDatabase(scope).Wait();
+            SeedTestDatabase(scope, connectionString).Wait();
         });
 
         builder.ConfigureTestServices(services =>
@@ -89,7 +89,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         });
     }
 
-    private async Task SeedTestDatabase(IServiceScope scope)
+    private async Task SeedTestDatabase(IServiceScope scope, string connectionString)
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<QAPlatformContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -105,6 +105,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
             try
             {
                 Console.WriteLine("Trying to connect to the database...");
+                Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
                 await dbContext.Database.EnsureDeletedAsync();
                 await dbContext.Database.MigrateAsync();
                 await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
