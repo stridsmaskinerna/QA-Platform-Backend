@@ -23,7 +23,7 @@ public class QuestionControllerTests : IntegrationTestBase
         // Arrange
         var requestBody = new SubjectForCreationDTO
         {
-            Name = "Test subject",
+            Name = "Test subject 2.0",
             SubjectCode = "TestCode"
         };
 

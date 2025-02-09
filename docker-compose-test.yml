@@ -6,6 +6,8 @@ services:
     restart: on-failure
     ports:
       - "5050:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
     depends_on:
       qa-platform-db:
         condition: service_healthy

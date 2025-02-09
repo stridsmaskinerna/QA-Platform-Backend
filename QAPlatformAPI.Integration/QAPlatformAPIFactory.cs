@@ -44,7 +44,8 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
 
         builder.ConfigureServices((context, services) =>
         {
-            var connectionString = context.Configuration.GetConnectionString("PostgreSQLConnection");
+            var connectionString = context.Configuration.GetConnectionString(
+                "PostgreSQLConnectionTest");
             Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
 
             if (string.IsNullOrEmpty(connectionString))
