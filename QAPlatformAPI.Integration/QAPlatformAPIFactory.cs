@@ -1,11 +1,7 @@
-using System.Security.Claims;
-using System.Text.Encodings.Web;
-using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Infrastructure.Seeds;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -18,12 +14,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QAPlatformAPI.Extensions;
 
+// Todo check if version 9 is of for DB in infra and startup project.
 public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // TODO. Seems like production environment are used even if
-        // explicit saying testing here
         builder.UseEnvironment("Testing");
 
         var testSettingsPath = Path.Combine(
