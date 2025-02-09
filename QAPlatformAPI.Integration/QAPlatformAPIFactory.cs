@@ -95,8 +95,27 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.MigrateAsync();
-        await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+        // await dbContext.Database.EnsureDeletedAsync();
+        // await dbContext.Database.MigrateAsync();
+        // await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+
+        int retries = 5;
+        while (retries > 0)
+        {
+            try
+            {
+                Console.WriteLine("Trying to connect to the database...");
+                await dbContext.Database.EnsureDeletedAsync();
+                await dbContext.Database.MigrateAsync();
+                await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+                break;  // ✅ Exit loop if successful
+            }
+            catch (Exception ex)
+            {
+                retries--;
+                Console.WriteLine($"Database connection failed: {ex.Message}. Retrying in 5s...");
+                await Task.Delay(5000);  // Wait 5 seconds before retrying
+            }
+        }
     }
 }

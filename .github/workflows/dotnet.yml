@@ -16,6 +16,15 @@ jobs:
     - name: Start Database with Docker Compose
       run: docker compose -f docker-compose-test.yml up -d qa-platform-db
 
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        echo "Waiting for PostgreSQL to be ready..."
+        until docker exec $(docker ps -qf "name=qa-platform-db") pg_isready -U devuser -d qa-platform-db; do
+          echo "PostgreSQL is unavailable - sleeping"
+          sleep 5
+        done
+        echo "PostgreSQL is up!"
+
   run-tests:
     runs-on: ubuntu-latest
     needs: setup-db
