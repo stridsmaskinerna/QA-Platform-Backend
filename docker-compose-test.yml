@@ -28,7 +28,7 @@ services:
     depends_on:
       - qa-platform-db
     networks:
-      - qa-platform-network-dev
+      - qa-platform-network-test
 
 volumes:
   qa-platform-volume-test:
