@@ -8,33 +8,33 @@ namespace QAPlatformAPI.Extensions;
 
 public static class ApplicationServicesExtension
 {
-    public static void AddApplicationServicesExtension(this WebApplicationBuilder builder)
+    public static void AddApplicationServicesExtension(this IServiceCollection services)
     {
-        builder.Services.AddHttpContextAccessor();
+        services.AddHttpContextAccessor();
 
-        builder.Services.AddAutoMapper(typeof(ApplicationAssembly).Assembly);
+        services.AddAutoMapper(typeof(ApplicationAssembly).Assembly);
 
-        builder.Services.AddScoped<IServiceManager, ServiceManager>();
-        builder.Services.AddAsLazy<IBaseService, BaseService>();
-        builder.Services.AddAsLazy<IQuestionService, QuestionService>();
-        builder.Services.AddAsLazy<IAnswerService, AnswerService>();
-        builder.Services.AddAsLazy<IAuthenticationService, AuthenticationService>();
-        builder.Services.AddAsLazy<ITokenService, TokenService>();
-        builder.Services.AddAsLazy<ICommentService, CommentService>();
-        builder.Services.AddAsLazy<ITagService, TagService>();
-        builder.Services.AddAsLazy<IUtilityService, UtilityService>();
-        builder.Services.AddAsLazy<ISubjectService, SubjectService>();
-        builder.Services.AddAsLazy<IVoteService, VoteService>();
+        services.AddScoped<IServiceManager, ServiceManager>();
+        services.AddAsLazy<IBaseService, BaseService>();
+        services.AddAsLazy<IQuestionService, QuestionService>();
+        services.AddAsLazy<IAnswerService, AnswerService>();
+        services.AddAsLazy<IAuthenticationService, AuthenticationService>();
+        services.AddAsLazy<ITokenService, TokenService>();
+        services.AddAsLazy<ICommentService, CommentService>();
+        services.AddAsLazy<ITagService, TagService>();
+        services.AddAsLazy<IUtilityService, UtilityService>();
+        services.AddAsLazy<ISubjectService, SubjectService>();
+        services.AddAsLazy<IVoteService, VoteService>();
 
-        builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-        builder.Services.AddAsLazy<IQuestionRepository, QuestionRepository>();
-        builder.Services.AddAsLazy<IAnswerRepository, AnswerRepository>();
-        builder.Services.AddAsLazy<ICommentRepository, CommentRepository>();
-        builder.Services.AddAsLazy<ISubjectRepository, SubjectRepository>();
-        builder.Services.AddAsLazy<ITopicRepository, TopicRepository>();
-        builder.Services.AddAsLazy<ITagRepository, TagRepository>();
-        builder.Services.AddAsLazy<IUserRepository, UserRepository>();
-        builder.Services.AddAsLazy<IAnswerVoteRepository, AnswerVoteRepository>();
+        services.AddScoped<IRepositoryManager, RepositoryManager>();
+        services.AddAsLazy<IQuestionRepository, QuestionRepository>();
+        services.AddAsLazy<IAnswerRepository, AnswerRepository>();
+        services.AddAsLazy<ICommentRepository, CommentRepository>();
+        services.AddAsLazy<ISubjectRepository, SubjectRepository>();
+        services.AddAsLazy<ITopicRepository, TopicRepository>();
+        services.AddAsLazy<ITagRepository, TagRepository>();
+        services.AddAsLazy<IUserRepository, UserRepository>();
+        services.AddAsLazy<IAnswerVoteRepository, AnswerVoteRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(

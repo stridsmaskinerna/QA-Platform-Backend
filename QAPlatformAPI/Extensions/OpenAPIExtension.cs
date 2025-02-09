@@ -4,11 +4,11 @@ namespace QAPlatformAPI.Extensions;
 
 public static class OpenAPIExtension
 {
-    public static void AddOpenAPIExtension(this WebApplicationBuilder builder)
+    public static void AddOpenAPIExtension(this IServiceCollection services)
     {
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(opt =>
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(opt =>
         {
             opt.OperationFilter<CustomHeadersOperationFilter>();
         });

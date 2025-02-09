@@ -28,14 +28,14 @@ namespace Presentation.Controllers
         }
 
         [HttpPost("create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         //[Authorize(Roles = $"{DomainRoles.ADMIN}")]
-        public async Task CreateNewSubject([FromBody] SubjectForCreationDTO newSubject)
+        public async Task<ActionResult<SubjectDTO>> CreateNewSubject([FromBody] SubjectForCreationDTO newSubject)
         {
 
-            await _sm.SubjectService.AddAsync(newSubject);
-
+            var subjectDTO = await _sm.SubjectService.AddAsync(newSubject);
+            return Created(String.Empty, subjectDTO);
         }
 
         [HttpDelete("delete/{id}")]
