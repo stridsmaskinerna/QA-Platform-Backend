@@ -1,4 +1,17 @@
 services:
+  qa-platform-api:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "5050:8080"
+    depends_on:
+      qa-platform-db:
+        condition: service_healthy
+    networks:
+      - qa-platform-network-test
+
   qa-platform-db:
     image: postgres:latest
     environment:
