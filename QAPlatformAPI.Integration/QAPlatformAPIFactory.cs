@@ -20,11 +20,16 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        var testEnvironment = Environment.GetEnvironmentVariable("TEST_ENV");
+
+        // Choose the correct appsettings file
+        var settingsFileName = testEnvironment == "GITHUB_ACTIONS"
+            ? "appsettings.Testing.CI.json"
+            : "appsettings.Testing.Local.json";
 
         var testSettingsPath = Path.Combine(
             Directory.GetCurrentDirectory(),
-            "appsettings.Testing.json");
+            settingsFileName);
 
         Console.WriteLine($"[DEBUG] Appsettings.Testing.json path: {testSettingsPath}");
 
@@ -45,7 +50,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         builder.ConfigureServices((context, services) =>
         {
             var connectionString = context.Configuration.GetConnectionString(
-                "PostgreSQLConnectionTest");
+                "PostgreSQLConnection");
             Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
 
             if (string.IsNullOrEmpty(connectionString))

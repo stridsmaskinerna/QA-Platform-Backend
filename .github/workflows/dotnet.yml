@@ -38,6 +38,8 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Run All Tests
+      env:
+        TEST_ENV: "GITHUB_ACTIONS"
       run: dotnet test --no-build --verbosity normal
 
     - name: Stop and clean up containers
