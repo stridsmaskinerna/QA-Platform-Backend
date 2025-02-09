@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using QAPlatformAPI.Extensions;
 
 namespace QAPlatformAPI;

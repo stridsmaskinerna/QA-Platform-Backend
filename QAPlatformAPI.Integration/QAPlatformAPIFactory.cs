@@ -24,7 +24,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
 
         // Choose the correct appsettings file
         var settingsFileName = testEnvironment == "GITHUB_ACTIONS"
-            ? "appsettings.Testing.CI.json"
+            ? "appsettings.Testing.json"
             : "appsettings.Testing.Local.json";
 
         var testSettingsPath = Path.Combine(
@@ -108,13 +108,13 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
                 await dbContext.Database.EnsureDeletedAsync();
                 await dbContext.Database.MigrateAsync();
                 await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
-                break;  // ✅ Exit loop if successful
+                break;
             }
             catch (Exception ex)
             {
                 retries--;
                 Console.WriteLine($"Database connection failed: {ex.Message}. Retrying in 5s...");
-                await Task.Delay(5000);  // Wait 5 seconds before retrying
+                await Task.Delay(5000);
             }
         }
     }

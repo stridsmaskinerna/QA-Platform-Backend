@@ -26,49 +26,44 @@ public static class DatabaseExtension
             if (environment.IsDevelopment())
             {
                 Console.WriteLine($"Connection String: {connectionString}");
-            }
-
-            if (environment.IsDevelopment())
-            {
                 options.EnableSensitiveDataLogging();
             }
-        });
 
-        // TODO! Is this Duplicated, see IdentityCoreExtension ??? Remove ???
-        services.AddIdentity<IdentityUser, IdentityRole>()
-           .AddEntityFrameworkStores<QAPlatformContext>()
-           .AddDefaultTokenProviders();
-    }
+            // TODO! Is this Duplicated, see IdentityCoreExtension ??? Remove ???
+            services.AddIdentity<IdentityUser, IdentityRole>()
+               .AddEntityFrameworkStores<QAPlatformContext>()
+               .AddDefaultTokenProviders();
+        }
 
     public static async Task UseDevelopmentDataSeedExtension(this IApplicationBuilder app)
-    {
-        using var scope = app.ApplicationServices.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var context = serviceProvider.GetRequiredService<QAPlatformContext>();
-        await context.Database.MigrateAsync();
-        if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
         {
-            return;
+            using var scope = app.ApplicationServices.CreateScope();
+            var serviceProvider = scope.ServiceProvider;
+            var context = serviceProvider.GetRequiredService<QAPlatformContext>();
+            await context.Database.MigrateAsync();
+            if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
+            {
+                return;
+            }
+            Console.WriteLine("Seeding data...");
+            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            await SeedQAPlatformDBDevelopment.RunAsync(context, userManager, roleManager);
         }
-        Console.WriteLine("Seeding data...");
-        var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await SeedQAPlatformDBDevelopment.RunAsync(context, userManager, roleManager);
-    }
 
-    public static async Task UseProductionDataSeedExtension(this IApplicationBuilder app)
-    {
-        using var scope = app.ApplicationServices.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var context = serviceProvider.GetRequiredService<QAPlatformContext>();
-        await context.Database.MigrateAsync();
-        if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
+        public static async Task UseProductionDataSeedExtension(this IApplicationBuilder app)
         {
-            return;
+            using var scope = app.ApplicationServices.CreateScope();
+            var serviceProvider = scope.ServiceProvider;
+            var context = serviceProvider.GetRequiredService<QAPlatformContext>();
+            await context.Database.MigrateAsync();
+            if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
+            {
+                return;
+            }
+            Console.WriteLine("Seeding data...");
+            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            await SeedQAPlatformDBProduction.RunAsync(context, userManager, roleManager);
         }
-        Console.WriteLine("Seeding data...");
-        var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await SeedQAPlatformDBProduction.RunAsync(context, userManager, roleManager);
     }
-}
