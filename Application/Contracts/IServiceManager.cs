@@ -8,6 +8,7 @@ public interface IServiceManager
     IQuestionService QuestionService { get; }
     IAnswerService AnswerService { get; }
     ICommentService CommentService { get; }
+    ITopicService TopicService { get; }
     IAuthenticationService AuthenticationService { get; }
     ITokenService TokenService { get; }
     IUtilityService UtilityService { get; }
