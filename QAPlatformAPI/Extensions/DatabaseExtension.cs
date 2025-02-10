@@ -28,11 +28,6 @@ public static class DatabaseExtension
                 Console.WriteLine($"Connection String: {connectionString}");
                 options.EnableSensitiveDataLogging();
             }
-
-            // TODO! Is this Duplicated, see IdentityCoreExtension ??? Remove ???
-            //services.AddIdentity<IdentityUser, IdentityRole>()
-            //   .AddEntityFrameworkStores<QAPlatformContext>()
-            //   .AddDefaultTokenProviders();
         });
     }
 

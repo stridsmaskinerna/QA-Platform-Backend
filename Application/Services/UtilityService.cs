@@ -15,7 +15,7 @@ public class UtilityService : BaseService, IUtilityService
 
         return Regex.Replace(
             normalizedValue,
-            @"\s+", "_"
+            @"\s+", " "
         );
     }
 }
