@@ -24,7 +24,7 @@ class TopicController : ControllerBase
 
     public TopicController(IServiceManager sm)
     {
-          _sm = sm;
+        _sm = sm;
     }
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]

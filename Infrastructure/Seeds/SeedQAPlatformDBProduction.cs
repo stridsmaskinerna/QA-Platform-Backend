@@ -64,13 +64,13 @@ public static class SeedQAPlatformDBProduction
 
     private static async Task CreateUsers(
         UserManager<User> userManager,
-        string password = "adminPassword"
+        string password = SeedConstants.DEFAULT_PWD
     )
     {
         var admin = new User()
         {
-            UserName = "adminUser",
-            Email = "admin@ltu.se"
+            UserName = SeedConstants.ADMIN_USERNAME,
+            Email = SeedConstants.ADMIN_EMAIL
         };
 
         var result = await userManager.CreateAsync(admin, password);
@@ -85,24 +85,19 @@ public static class SeedQAPlatformDBProduction
     )
     {
         var topics = new List<Topic>();
-        var topicsNames = new[]
-        {
-            "Introduction"
-        };
 
         foreach (var subject in subjects)
         {
-            foreach (var name in topicsNames)
+            var nameOfDefaultSubject = subject.Name;
+
+            var topic = new Topic()
             {
-                var topic = new Topic()
-                {
-                    Subject = subject,
-                    SubjectId = subject.Id,
-                    Name = name,
-                    IsActive = true
-                };
-                topics.Add(topic);
-            }
+                Subject = subject,
+                SubjectId = subject.Id,
+                Name = nameOfDefaultSubject,
+                IsActive = true
+            };
+            topics.Add(topic);
         }
 
         return topics;

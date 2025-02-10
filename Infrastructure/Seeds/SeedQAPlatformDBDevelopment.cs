@@ -125,7 +125,7 @@ public static class SeedQAPlatformDBDevelopment
         List<Subject> subjects,
         int nrOfAdmins = 1,
         int nrOfTeachers = 10,
-        string password = "password"
+        string password = SeedConstants.DEFAULT_PWD
     )
     {
         var userSet = new HashSet<string>();
@@ -151,9 +151,13 @@ public static class SeedQAPlatformDBDevelopment
         for (int i = 0; i < nrOfAdmins; i++)
         {
             var user = users[i];
+            user.UserName = SeedConstants.ADMIN_USERNAME;
+            user.Email = SeedConstants.ADMIN_EMAIL;
+
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
 
+            await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
             await userManager.AddToRoleAsync(user, DomainRoles.ADMIN);
         }

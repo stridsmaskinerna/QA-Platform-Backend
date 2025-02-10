@@ -6,11 +6,14 @@ namespace QAPlatformAPI.Extensions;
 
 public static class JWTSecurityExtension
 {
-    public static void AddJWTSecurityExtension(this WebApplicationBuilder builder)
+    public static void AddJWTSecurityExtension(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        builder.Services.AddDataProtection();
+        services.AddDataProtection();
 
-        builder.Services
+        services
             .AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -20,14 +23,14 @@ public static class JWTSecurityExtension
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                    ValidAudience = configuration["JwtSettings:Audience"],
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration?["secretKey"]
+                        Encoding.UTF8.GetBytes(configuration?["secretKey"]
                         ?? throw new InvalidOperationException("secretKey string not found."))
                     ),
                 }

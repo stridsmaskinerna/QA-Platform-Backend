@@ -8,12 +8,15 @@ public static class CORSExtension
 
     private static readonly string CORS_PROD_POLICY = "cors_prod_policy";
 
-    public static void AddCORSConfigurationExtension(this WebApplicationBuilder builder)
+    public static void AddCORSConfigurationExtension(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins")
+        var allowedOrigins = configuration.GetSection("CORS:AllowedOrigins")
             .Get<string[]>() ?? Array.Empty<string>();
 
-        builder.Services.AddCors(config =>
+        services.AddCors(config =>
         {
             config.AddPolicy(CORS_DEV_POLICY, p => p
                 .WithOrigins(allowedOrigins)

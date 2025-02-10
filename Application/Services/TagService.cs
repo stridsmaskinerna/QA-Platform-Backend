@@ -20,6 +20,8 @@ public class TagService : BaseService, ITagService
         _sm = sm;
     }
 
+    public static string MsgNotFound() => "Tag not in the database";
+
     public async Task<TagStandardDTO> AddAsync(Tag tag)
     {
         return _sm.Mapper.Map<TagStandardDTO>(
@@ -28,10 +30,10 @@ public class TagService : BaseService, ITagService
 
     public async Task DeleteAsync(Guid id)
     {
-        var tagToRemove = await _sm.TagService.GetByIdAsync(id);
-        if (tagToRemove == null)
+        var tag = await _rm.TagRepository.GetByIdAsync(id);
+        if (tag == null)
         {
-            NotFound("Tag not in the database");
+            NotFound(MsgNotFound());
         }
         await _rm.TagRepository.DeleteAsync(id);
     }
@@ -50,10 +52,10 @@ public class TagService : BaseService, ITagService
 
     public async Task<TagStandardDTO> GetByIdAsync(Guid id)
     {
-        var tag = await _sm.TagService.GetByIdAsync(id);
+        var tag = await _rm.TagRepository.GetByIdAsync(id);
         if (tag == null)
         {
-            NotFound("Tag not in the database");
+            NotFound(MsgNotFound());
         }
         return _sm.Mapper.Map<TagStandardDTO>(tag);
     }

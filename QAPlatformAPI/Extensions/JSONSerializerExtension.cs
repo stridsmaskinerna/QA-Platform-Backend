@@ -4,9 +4,9 @@ namespace QAPlatformAPI.Extensions;
 
 public static class JSONSerializerExtension
 {
-    public static void AddJSONSerializerOptionsExtension(this WebApplicationBuilder builder)
+    public static void AddJSONSerializerOptionsExtension(this IServiceCollection services)
     {
-        builder.Services.AddSingleton(new JsonSerializerOptions
+        services.AddSingleton(new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true

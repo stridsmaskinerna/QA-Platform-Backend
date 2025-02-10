@@ -8,7 +8,7 @@ using Moq;
 
 namespace Application.Tests.Services;
 
-public class CommentServiceTests : BaseServiceSetupTests
+public class CommentServiceTests : SetupServiceTests
 {
     private readonly Mock<User> _mockUser;
     private readonly Mock<Answer> _mockAnswer;
@@ -96,7 +96,7 @@ public class CommentServiceTests : BaseServiceSetupTests
                 _commentService.AddAsync(commentCreateDto));
 
             Assert.Equal(
-                _commentService.MsgAddAsyncBadRequest(),
+                CommentService.MsgAddAsyncBadRequest(),
                 exception.Message);
         }
 
@@ -140,7 +140,12 @@ public class CommentServiceTests : BaseServiceSetupTests
                 .ReturnsAsync(commentEntity);
 
             _mockMapper
-                .Setup(m => m.Map(commentPutDto, commentEntity));
+                .Setup(m => m.Map(commentPutDto, commentEntity))
+                .Returns(It.IsAny<Comment>());
+
+            _mockCommentRepository
+                .Setup(r => r.UpdateAsync(It.IsAny<Comment>()))
+                .Returns(Task.CompletedTask);
 
             // Act
             await _commentService.UpdateAsync(commentId, commentPutDto);
@@ -172,7 +177,7 @@ public class CommentServiceTests : BaseServiceSetupTests
                 _commentService.UpdateAsync(commentId, commentPutDto));
 
             Assert.Equal(
-                _commentService.MsgNotFound(commentId),
+                CommentService.MsgNotFound(commentId),
                 exception.Message);
         }
 
@@ -213,7 +218,8 @@ public class CommentServiceTests : BaseServiceSetupTests
                 .ReturnsAsync(commentEntity);
 
             _mockCommentRepository
-                .Setup(r => r.DeleteAsync(commentEntity));
+                .Setup(r => r.DeleteAsync(commentEntity))
+                .Returns(Task.CompletedTask);
 
             // Act
             await _commentService.DeleteAsync(commentId);
@@ -241,7 +247,7 @@ public class CommentServiceTests : BaseServiceSetupTests
                 _commentService.DeleteAsync(commentId));
 
             Assert.Equal(
-                _commentService.MsgNotFound(commentId),
+                CommentService.MsgNotFound(commentId),
                 exception.Message);
         }
 

@@ -8,30 +8,32 @@ namespace QAPlatformAPI.Extensions;
 
 public static class DatabaseExtension
 {
-    public static void AddDatabaseExtension(this WebApplicationBuilder builder)
+    public static void AddDatabaseExtension(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IWebHostEnvironment environment
+    )
     {
 
-        builder.Services.AddDbContext<QAPlatformContext>(options =>
+        services.AddDbContext<QAPlatformContext>(options =>
         {
             var connectionString =
-                builder.Configuration.GetConnectionString("PostgreSQLConnection")
+                configuration.GetConnectionString("PostgreSQLConnection")
                 ?? throw new InvalidOperationException("Connection string not found.");
 
             options.UseNpgsql(connectionString);
 
-            if (builder.Environment.IsDevelopment())
+            if (environment.IsDevelopment())
             {
                 Console.WriteLine($"Connection String: {connectionString}");
-            }
-
-            if (builder.Environment.IsDevelopment())
-            {
                 options.EnableSensitiveDataLogging();
             }
+
+            // TODO! Is this Duplicated, see IdentityCoreExtension ??? Remove ???
+            services.AddIdentity<IdentityUser, IdentityRole>()
+               .AddEntityFrameworkStores<QAPlatformContext>()
+               .AddDefaultTokenProviders();
         });
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-           .AddEntityFrameworkStores<QAPlatformContext>()
-           .AddDefaultTokenProviders();
     }
 
     public static async Task UseDevelopmentDataSeedExtension(this IApplicationBuilder app)

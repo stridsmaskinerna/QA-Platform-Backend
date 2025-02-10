@@ -1,5 +1,3 @@
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: QA Platform build and test workflow
 
 on:
@@ -9,23 +7,34 @@ on:
     branches: [ "main", "development" ]
 
 jobs:
-  build:
-
+  run-tests:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    
+
+    - name: Start Database with Docker Compose
+      run: docker compose -f docker-compose-test.yml up -d qa-platform-db
+
+    - name: Start API Container
+      run: docker compose -f docker-compose-test.yml up -d qa-platform-api
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    
+
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Build
       run: dotnet build --no-restore
-    
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+
+    - name: Run Application Project Unit Tests
+      run: dotnet test Application.Tests --no-build --verbosity normal
+
+    - name: Run Integrations Tests
+      run: dotnet test QAPlatformAPI.IntegrationTests --no-build --verbosity normal
+
+    - name: Stop and clean up containers
+      run: docker compose -f docker-compose-test.yml down

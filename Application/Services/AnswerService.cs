@@ -20,9 +20,9 @@ public class AnswerService : BaseService, IAnswerService
         _sm = sm;
     }
 
-    public string MsgAddAsyncBadRequest() => "Could not create the new answer";
+    public static string MsgAddAsyncBadRequest() => "Could not create the new answer";
 
-    public string MsgNotFound(Guid id) => $"No answer with id {id} exist.";
+    public static string MsgNotFound(Guid id) => $"No answer with id {id} exist.";
 
     public async Task<AnswerDTO> AddAsync(AnswerForCreationDTO answerDTO)
     {

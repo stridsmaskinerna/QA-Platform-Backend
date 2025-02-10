@@ -264,7 +264,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
                     Value = table.Column<string>(type: "text", nullable: false),
                     FilePath = table.Column<string>(type: "text", nullable: true),
                     Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -277,8 +277,7 @@ namespace Infrastructure.Migrations
                         name: "FK_Answers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Answers_Questions_QuestionId",
                         column: x => x.QuestionId,
@@ -342,7 +341,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AnswerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
                     Value = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -358,8 +357,7 @@ namespace Infrastructure.Migrations
                         name: "FK_Comments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(

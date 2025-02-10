@@ -1,17 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Application.Contracts;
 using Domain.Constants;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 ///authentication/login
 
@@ -48,22 +41,7 @@ public class AuthenticationController : ControllerBase
     public async Task<ActionResult<TokenDTO>> RegisterUser(RegistrationDTO registrationDTO)
     {
         await _sm.AuthenticationService.RegisterUser(registrationDTO);
-
         return Ok();
-
-        // catch (ArgumentException ex)
-        // {
-        //     if (ex.Message.Contains("User already exists"))
-        //     {
-        //         return Conflict(new { Message = ex.Message });
-        //     }
-
-        //     return BadRequest(new { Message = ex.Message });
-        // }
-        // catch (Exception ex)
-        // {
-        //     return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-        // }
     }
 
     [Authorize(Roles = DomainRoles.USER)]
