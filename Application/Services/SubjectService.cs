@@ -26,7 +26,8 @@ public class SubjectService : BaseService, ISubjectService
             Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
             foreach (string mail in subject.Teachers)
             {
-                User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                //User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                User? choosenTeacher = _rm.UserRepository.GetUserByMail(mail);
                 if (choosenTeacher != null)
                     sbjObj.Teachers.Add(choosenTeacher);
             }
@@ -84,7 +85,7 @@ public class SubjectService : BaseService, ISubjectService
             sbjObj.Teachers.Clear();
             foreach (string mail in subject.Teachers)
             {
-                User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                User? choosenTeacher = _rm.UserRepository.GetUserByMail(mail);
                 if (choosenTeacher != null)
                     sbjObj.Teachers.Add(choosenTeacher);
             }

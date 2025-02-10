@@ -1,3 +1,4 @@
+using System.Data.Entity;
 using Domain.Contracts;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -20,11 +21,11 @@ public class UserRepository : IUserRepository
         _userManager = userManager;
     }
 
-    public async Task<IEnumerable<User>> GetTeachersBySubjectIdAsync(Guid subjectId)
+    public IEnumerable<User> GetTeachersBySubjectIdAsync(Guid subjectId)
     {
-        return await _userManager.Users
+        return _userManager.Users
             .Where(u => u.Subjects.Any(s => s.Id == subjectId))
-            .ToListAsync();
+            .ToList();
     }
 
     public async Task<User?> ValidateUserCredential(string? email, string? password)
@@ -38,5 +39,13 @@ public class UserRepository : IUserRepository
         };
 
         return user;
+    }
+
+    public User? GetUserByMail(string mail) {
+
+        User? us = _userManager.Users.Where(user => user.Email == mail).FirstOrDefault();
+
+        return us;
+
     }
 }
