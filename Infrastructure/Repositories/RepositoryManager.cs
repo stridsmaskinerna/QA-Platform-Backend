@@ -11,7 +11,8 @@ public class RepositoryManager(
     Lazy<IQuestionRepository> questionRepository,
     Lazy<ISubjectRepository> subjectRepository,
     Lazy<ITagRepository> tagRepository,
-    Lazy<ITopicRepository> topicRepository
+    Lazy<ITopicRepository> topicRepository,
+    Lazy<IUserRepository> userRepository
 ) : IRepositoryManager
 {
     public IAnswerRepository AnswerRepository => answerRepository.Value;
@@ -27,4 +28,6 @@ public class RepositoryManager(
     public ITagRepository TagRepository => tagRepository.Value;
 
     public ITopicRepository TopicRepository => topicRepository.Value;
+
+    public IUserRepository UserRepository => userRepository.Value;
 }

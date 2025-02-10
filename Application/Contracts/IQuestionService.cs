@@ -15,4 +15,5 @@ public interface IQuestionService
     Task<QuestionDTO> AddAsync(QuestionForCreationDTO questionDTO);
     Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO);
     Task DeleteAsync(Guid id);
+    Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id);
 }

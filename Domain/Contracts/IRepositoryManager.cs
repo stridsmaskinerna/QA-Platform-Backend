@@ -11,4 +11,5 @@ public interface IRepositoryManager
     ISubjectRepository SubjectRepository { get; }
     ITagRepository TagRepository { get; }
     ITopicRepository TopicRepository { get; }
+    IUserRepository UserRepository { get; }
 }

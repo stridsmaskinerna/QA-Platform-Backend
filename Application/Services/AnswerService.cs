@@ -20,12 +20,16 @@ public class AnswerService : BaseService, IAnswerService
         _sm = sm;
     }
 
+    public string MsgAddAsyncBadRequest() => "Could not create the new answer";
+
+    public string MsgNotFound(Guid id) => $"No answer with id {id} exist.";
+
     public async Task<AnswerDTO> AddAsync(AnswerForCreationDTO answerDTO)
     {
         var answer = _sm.Mapper.Map<Answer>(answerDTO);
         if (answer == null)
         {
-            BadRequest("Could not create the new answer");
+            BadRequest(MsgAddAsyncBadRequest());
         }
 
         answer.UserId = _sm.TokenService.GetUserId();
@@ -43,7 +47,7 @@ public class AnswerService : BaseService, IAnswerService
         var answer = await _rm.AnswerRepository.GetByIdAsync(id);
         if (answer == null)
         {
-            NotFound($"No answer with id {id} exist.");
+            NotFound(MsgNotFound(id));
         }
 
         var updated = _sm.Mapper.Map(answerDTO, answer);
@@ -56,7 +60,7 @@ public class AnswerService : BaseService, IAnswerService
         var answer = await _rm.AnswerRepository.GetByIdAsync(id);
         if (answer == null)
         {
-            NotFound($"No answer with id {id} exist.");
+            NotFound(MsgNotFound(id));
         }
 
         await _rm.AnswerRepository.DeleteAsync(answer);

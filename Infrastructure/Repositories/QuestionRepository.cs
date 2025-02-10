@@ -214,7 +214,7 @@ public class QuestionRepository : IQuestionRepository
         IQueryable<Question> queryable
     )
     {
-        return queryable.OrderBy(q => q.Created);
+        return queryable.OrderByDescending(q => q.Created);
     }
 
     private IQueryable<Question> ApplyPagination(

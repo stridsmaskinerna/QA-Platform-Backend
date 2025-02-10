@@ -77,11 +77,23 @@ public class QuestionController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<QuestionDetailedDTO>>> GetQuestionDetail(
+    public async Task<ActionResult<QuestionDetailedDTO>> GetQuestionDetail(
         [FromRoute] Guid id
     )
     {
         var question = await _sm.QuestionService.GetByIdAsync(id);
+        return Ok(question);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("public/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<QuestionDetailedDTO>> GetQuestionDetailPublic(
+        [FromRoute] Guid id
+    )
+    {
+        var question = await _sm.QuestionService.GetPublicQuestionByIdAsync(id);
         return Ok(question);
     }
 

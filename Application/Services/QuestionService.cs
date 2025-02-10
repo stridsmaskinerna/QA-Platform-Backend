@@ -6,26 +6,27 @@ using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
 public class QuestionService : BaseService, IQuestionService
 {
     private readonly IRepositoryManager _rm;
-    private readonly UserManager<User> _userManager;
     private readonly IServiceManager _sm;
 
     public QuestionService(
         IRepositoryManager rm,
-        UserManager<User> userManager,
-        IServiceManager sm
+        IServiceManager sm,
+        UserManager<User> userManager
     )
     {
         _rm = rm;
-        _userManager = userManager;
         _sm = sm;
     }
+
+    public string MsgNotFound(Guid id) => $"Question with id {id} does not exist.";
+
+    public string MsgBadRequest() => "Invalid question body";
 
     public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
@@ -54,7 +55,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null)
         {
-            NotFound();
+            NotFound(MsgNotFound(id));
         }
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
@@ -66,16 +67,33 @@ public class QuestionService : BaseService, IQuestionService
         return questionDTO;
     }
 
+    public async Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id)
+    {
+        var question = await _rm.QuestionRepository.GetByIdAsync(id);
+
+        // If question is protected send NotFound
+        // to not provide any information to unauthenticated users.
+        if (question == null || question.IsProtected)
+        {
+            NotFound(MsgNotFound(id));
+        }
+
+        var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
+
+        await UpdatingAnsweredByTeacherField(questionDTO);
+
+        return questionDTO;
+    }
+
     private async Task UpdatingAnsweredByTeacherField(QuestionDetailedDTO questionDTO)
     {
         var answersUsernames = questionDTO.Answers?
             .Select(a => a.UserName)
             .ToList();
 
-        var teachersUsernames = await _userManager.Users
-        .Where(u => u.Subjects.Any(s => s.Id == questionDTO.SubjectId))
-        .Select(u => u.UserName)
-        .ToListAsync();
+        var teachers = await _rm.UserRepository.GetTeachersBySubjectIdAsync(questionDTO.SubjectId);
+
+        var teachersUsernames = teachers.Select(u => u.UserName).ToList();
 
         foreach (var answer in questionDTO.Answers ?? [])
         {
@@ -121,7 +139,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null)
         {
-            NotFound();
+            NotFound(MsgNotFound(id));
         }
 
         await _rm.QuestionRepository.DeleteAsync(id);
@@ -135,7 +153,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null || topic == null)
         {
-            BadRequest("Invalid Question body");
+            BadRequest(MsgBadRequest());
         }
 
         question.UserId = _sm.TokenService.GetUserId();
@@ -157,7 +175,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (question == null)
         {
-            NotFound($"No answer with id {id} exist.");
+            NotFound(MsgNotFound(id));
         }
 
         var normalizedNewTagValues = questionDTO.Tags
