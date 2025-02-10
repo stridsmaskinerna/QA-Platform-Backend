@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
 using Bogus;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Seeds.Prod;
+using Infrastructure.Seeds.Test;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Seeds;
+namespace Infrastructure.Seeds.Dev;
 
-public static class SeedQAPlatformDBDevelopment
+public static class DBSeedDev
 {
     public static async Task RunAsync(
         QAPlatformContext context,
@@ -116,7 +116,7 @@ public static class SeedQAPlatformDBDevelopment
         RoleManager<IdentityRole> roleManager
     )
     {
-        await SeedQAPlatformDBProduction.CreateUserRoles(roleManager);
+        await DBSeedProd.CreateUserRoles(roleManager);
     }
 
     private static async Task<List<User>> CreateUsers(
@@ -125,7 +125,7 @@ public static class SeedQAPlatformDBDevelopment
         List<Subject> subjects,
         int nrOfAdmins = 1,
         int nrOfTeachers = 10,
-        string password = SeedConstants.DEFAULT_PWD
+        string password = SeedConstantsTest.DEFAULT_PWD
     )
     {
         var userSet = new HashSet<string>();
@@ -151,8 +151,8 @@ public static class SeedQAPlatformDBDevelopment
         for (int i = 0; i < nrOfAdmins; i++)
         {
             var user = users[i];
-            user.UserName = SeedConstants.ADMIN_USERNAME;
-            user.Email = SeedConstants.ADMIN_EMAIL;
+            user.UserName = SeedConstantsTest.ADMIN_USERNAME;
+            user.Email = SeedConstantsTest.ADMIN_EMAIL;
 
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
@@ -407,20 +407,20 @@ public static class SeedQAPlatformDBDevelopment
 
     private static bool RandomBool()
     {
-        Random random = new Random();
+        var random = new Random();
         return random.Next(0, 2) == 0;
     }
 
     private static int RandomInt(int min, int max)
     {
-        Random random = new Random();
+        var random = new Random();
         int number = random.Next(min, max);
         return number;
     }
 
     private static bool MostlyTrueBool()
     {
-        Random random = new Random();
+        var random = new Random();
         return random.Next(0, 11) > 2;
     }
 }

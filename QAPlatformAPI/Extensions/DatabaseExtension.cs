@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Infrastructure.Contexts;
-using Infrastructure.Seeds;
+using Infrastructure.Seeds.Dev;
+using Infrastructure.Seeds.Prod;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +45,7 @@ public static class DatabaseExtension
         Console.WriteLine("Seeding data...");
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await SeedQAPlatformDBDevelopment.RunAsync(context, userManager, roleManager);
+        await DBSeedDev.RunAsync(context, userManager, roleManager);
     }
 
     public static async Task UseProductionDataSeedExtension(this IApplicationBuilder app)
@@ -60,6 +61,6 @@ public static class DatabaseExtension
         Console.WriteLine("Seeding data...");
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await SeedQAPlatformDBProduction.RunAsync(context, userManager, roleManager);
+        await DBSeedProd.RunAsync(context, userManager, roleManager);
     }
 }
