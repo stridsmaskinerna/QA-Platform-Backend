@@ -1,8 +1,6 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Domain.DTO.Request;
-using Domain.DTO.Response;
 
 namespace QAPlatformAPI.Integration.Controllers;
 

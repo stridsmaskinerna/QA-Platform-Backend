@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QAPlatformAPI.Extensions;
 
-// Todo check if version 9 is of for DB in infra and startup project.
 public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)

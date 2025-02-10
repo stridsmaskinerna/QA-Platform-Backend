@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Infrastructure.Seeds;
 
 namespace QAPlatformAPI.Integration;
 
@@ -19,8 +20,8 @@ public class IntegrationTestBase : IClassFixture<QAPlatformAPIFactory<Program>>
     }
 
     protected async Task AuthenticateAsync(
-        string email = "admin@ltu.se",
-        string password = "adminPassword"
+        string email = SeedConstants.ADMIN_EMAIL,
+        string password = SeedConstants.DEFAULT_PWD
     )
     {
         if (!string.IsNullOrEmpty(_JWTToken))

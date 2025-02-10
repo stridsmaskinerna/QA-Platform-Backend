@@ -21,24 +21,24 @@ public class TopicService : BaseService, ITopicService
      )
     {
         _rm = rm;
-        _sm = sm;        
+        _sm = sm;
     }
     public async Task<TopicDTO> AddAsync(TopicDTO topicDTO)
     {
-        var topic = _sm.Mapper.Map<Topic>(topicDTO); 
+        var topic = _sm.Mapper.Map<Topic>(topicDTO);
         var addedTopic = await _rm.TopicRepository.AddAsync(topic);
-        return _sm.Mapper.Map<TopicDTO>(addedTopic); 
+        return _sm.Mapper.Map<TopicDTO>(addedTopic);
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var topic = await _rm.TopicRepository.GetByIdAsync(id); 
+        var topic = await _rm.TopicRepository.GetByIdAsync(id);
         if (topic == null)
         {
-            NotFound("Topic not found in the database"); 
+            NotFound("Topic not found in the database");
         }
 
-        await _rm.TopicRepository.DeleteAsync(id); 
+        await _rm.TopicRepository.DeleteAsync(id);
     }
 
     public async Task<IEnumerable<TopicDTO>> GetAllAsync()
@@ -49,10 +49,10 @@ public class TopicService : BaseService, ITopicService
 
     public async Task<TopicDTO> GetByIdAsync(Guid id)
     {
-        var topic = await _rm.TopicRepository.GetByIdAsync(id); 
+        var topic = await _rm.TopicRepository.GetByIdAsync(id);
         if (topic == null)
         {
-            NotFound("Topic not found in the database"); 
+            NotFound("Topic not found in the database");
         }
         return _sm.Mapper.Map<TopicDTO>(topic);
     }
@@ -66,6 +66,6 @@ public class TopicService : BaseService, ITopicService
             return;
         }
         _sm.Mapper.Map(topicDTO, topic);
-        await _rm.TopicRepository.UpdateAsync(topic); 
+        await _rm.TopicRepository.UpdateAsync(topic);
     }
 }

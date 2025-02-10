@@ -64,13 +64,13 @@ public static class SeedQAPlatformDBProduction
 
     private static async Task CreateUsers(
         UserManager<User> userManager,
-        string password = "adminPassword"
+        string password = SeedConstants.DEFAULT_PWD
     )
     {
         var admin = new User()
         {
-            UserName = "adminUser",
-            Email = "admin@ltu.se"
+            UserName = SeedConstants.ADMIN_USERNAME,
+            Email = SeedConstants.ADMIN_EMAIL
         };
 
         var result = await userManager.CreateAsync(admin, password);

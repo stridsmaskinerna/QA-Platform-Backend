@@ -10,31 +10,38 @@ public static class ApplicationServicesExtension
 {
     public static void AddApplicationServicesExtension(this IServiceCollection services)
     {
+        // Context Accessors
         services.AddHttpContextAccessor();
 
+        // Mapper
         services.AddAutoMapper(typeof(ApplicationAssembly).Assembly);
 
+        // Managers
         services.AddScoped<IServiceManager, ServiceManager>();
-        services.AddAsLazy<IBaseService, BaseService>();
-        services.AddAsLazy<IQuestionService, QuestionService>();
+        services.AddScoped<IRepositoryManager, RepositoryManager>();
+
+        // Services
         services.AddAsLazy<IAnswerService, AnswerService>();
         services.AddAsLazy<IAuthenticationService, AuthenticationService>();
-        services.AddAsLazy<ITokenService, TokenService>();
+        services.AddAsLazy<IBaseService, BaseService>();
         services.AddAsLazy<ICommentService, CommentService>();
-        services.AddAsLazy<ITagService, TagService>();
-        services.AddAsLazy<IUtilityService, UtilityService>();
+        services.AddAsLazy<IQuestionService, QuestionService>();
         services.AddAsLazy<ISubjectService, SubjectService>();
+        services.AddAsLazy<ITagService, TagService>();
+        services.AddAsLazy<ITokenService, TokenService>();
+        services.AddAsLazy<ITopicService, TopicService>();
+        services.AddAsLazy<IUtilityService, UtilityService>();
         services.AddAsLazy<IVoteService, VoteService>();
 
-        services.AddScoped<IRepositoryManager, RepositoryManager>();
-        services.AddAsLazy<IQuestionRepository, QuestionRepository>();
+        // Repositories
         services.AddAsLazy<IAnswerRepository, AnswerRepository>();
-        services.AddAsLazy<ICommentRepository, CommentRepository>();
-        services.AddAsLazy<ISubjectRepository, SubjectRepository>();
-        services.AddAsLazy<ITopicRepository, TopicRepository>();
-        services.AddAsLazy<ITagRepository, TagRepository>();
-        services.AddAsLazy<IUserRepository, UserRepository>();
         services.AddAsLazy<IAnswerVoteRepository, AnswerVoteRepository>();
+        services.AddAsLazy<ICommentRepository, CommentRepository>();
+        services.AddAsLazy<IQuestionRepository, QuestionRepository>();
+        services.AddAsLazy<ISubjectRepository, SubjectRepository>();
+        services.AddAsLazy<ITagRepository, TagRepository>();
+        services.AddAsLazy<ITopicRepository, TopicRepository>();
+        services.AddAsLazy<IUserRepository, UserRepository>();
     }
 
     private static void AddAsLazy<IServiceType, ServiceType>(
