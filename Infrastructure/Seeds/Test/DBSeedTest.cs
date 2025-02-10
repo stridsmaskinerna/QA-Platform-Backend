@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Test;
 
+// TODO Update seed data for tests
+// and reuse logic between prod, dev, and test
+// seed when appropriate.
 public static class DBSeedTest
 {
     public static async Task RunAsync(

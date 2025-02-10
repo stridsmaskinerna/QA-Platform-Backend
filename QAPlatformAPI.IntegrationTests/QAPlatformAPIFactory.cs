@@ -14,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QAPlatformAPI.Extensions;
 
+namespace QAPlatformAPI.IntegrationTests;
+
 public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
