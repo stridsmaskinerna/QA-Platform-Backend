@@ -33,6 +33,7 @@ public static class DatabaseExtension
             //services.AddIdentity<IdentityUser, IdentityRole>()
             //   .AddEntityFrameworkStores<QAPlatformContext>()
             //   .AddDefaultTokenProviders();
+
         });
     }
 
