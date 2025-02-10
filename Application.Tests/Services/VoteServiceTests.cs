@@ -7,7 +7,7 @@ using Moq;
 
 namespace Application.Tests.Services;
 
-public class VoteServiceTests : BaseServiceSetupTests
+public class VoteServiceTests : SetupServiceTests
 {
     private readonly Mock<Question> _mockQuestion;
     private readonly Mock<User> _mockUser;
@@ -49,7 +49,7 @@ public class VoteServiceTests : BaseServiceSetupTests
                     () => _voteService.GetVoteAsBoolean(vote));
 
                 Assert.Equal(
-                    _voteService.MsgInvalidVoteType(),
+                    VoteService.MsgInvalidVoteType(),
                     exception.Message);
             }
             else
@@ -81,7 +81,7 @@ public class VoteServiceTests : BaseServiceSetupTests
                 () => _voteService.CastVoteAsync(answerId, voteTypeAsBoolean));
 
             Assert.Equal(
-                _voteService.MsgCastVoteAnswerNotFound(answerId),
+                VoteService.MsgCastVoteAnswerNotFound(answerId),
                 exception.Message);
         }
 
@@ -149,7 +149,7 @@ public class VoteServiceTests : BaseServiceSetupTests
                 () => _voteService.CastVoteAsync(answerId, voteTypeAsBoolean));
 
             Assert.Equal(
-                _voteService.MsgCastVoteUserUnauthorized(),
+                VoteService.MsgCastVoteUserUnauthorized(),
                 exception.Message);
         }
 
@@ -202,7 +202,7 @@ public class VoteServiceTests : BaseServiceSetupTests
         [InlineData(true)]
         [InlineData(false)]
         [InlineData(null)]
-        public async Task ShouldCreateNewVote_WhenNoExistingVote_AndValueIsNotNull(
+        public async Task ShouldCreateNewVote_WhenNoExistingVote_AndNewVoteIsNotNull(
             bool? voteAsBoolean
         )
         {
@@ -227,61 +227,9 @@ public class VoteServiceTests : BaseServiceSetupTests
                 .Setup(r => r.GetAsync(answerId, _mockUser.Object.Id))
                 .ReturnsAsync(default(AnswerVotes));
 
-            // Act
-            await _voteService.CastVoteAsync(answerId, voteAsBoolean);
-
-            // Assert
-            if (voteAsBoolean == null)
-            {
-                _mockAnswerVoteRepository.Verify(
-                    r => r.AddAsync(It.IsAny<AnswerVotes>()),
-                    Times.Never);
-            }
-            else
-            {
-                _mockAnswerVoteRepository.Verify(
-                    r => r.AddAsync(It.IsAny<AnswerVotes>()),
-                    Times.Once);
-            }
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        [InlineData(null)]
-        public async Task ShouldUpdateVote_WhenExistingVote_AndValueIsNotNull(
-            bool? voteAsBoolean
-        )
-        {
-            // Arrange
-            var answerId = Guid.NewGuid();
-
-            var answerEntity = AnswerFactory.CreateAnswerEntity(
-                answerId, _mockQuestion.Object, _mockUser.Object);
-
-            var existingVote = AnswerVoteFactory.CreateAnswerVoteEntity(
-                answerId, _mockUser.Object, answerEntity);
-
-            if (voteAsBoolean != null)
-            {
-                existingVote.Vote = voteAsBoolean.Value;
-            }
-
-            _mockAnswerRepository
-                .Setup(r => r.GetByIdAsync(answerId))
-                .ReturnsAsync(answerEntity);
-
-            _mockTokenService
-                .Setup(t => t.GetUserId())
-                .Returns(_mockUser.Object.Id);
-
-            _mockUserManager
-                .Setup(u => u.FindByIdAsync(_mockUser.Object.Id))
-                .ReturnsAsync(_mockUser.Object);
-
             _mockAnswerVoteRepository
-                .Setup(r => r.GetAsync(answerId, _mockUser.Object.Id))
-                .ReturnsAsync(existingVote);
+                .Setup(r => r.AddAsync(It.IsAny<AnswerVotes>()))
+                .ReturnsAsync(It.IsAny<AnswerVotes>());
 
             // Act
             await _voteService.CastVoteAsync(answerId, voteAsBoolean);
@@ -290,21 +238,13 @@ public class VoteServiceTests : BaseServiceSetupTests
             if (voteAsBoolean == null)
             {
                 _mockAnswerVoteRepository.Verify(
-                    r => r.UpdateAsync(existingVote),
+                    r => r.AddAsync(It.IsAny<AnswerVotes>()),
                     Times.Never);
-            }
-            else if (voteAsBoolean == true)
-            {
-                Assert.True(existingVote.Vote);
-                _mockAnswerVoteRepository.Verify(
-                    r => r.UpdateAsync(existingVote),
-                    Times.Once);
             }
             else
             {
-                Assert.False(existingVote.Vote);
                 _mockAnswerVoteRepository.Verify(
-                    r => r.UpdateAsync(existingVote),
+                    r => r.AddAsync(It.IsAny<AnswerVotes>()),
                     Times.Once);
             }
         }
@@ -312,9 +252,8 @@ public class VoteServiceTests : BaseServiceSetupTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        [InlineData(null)]
-        public async Task ShouldDeleteVote_WhenExistingVote_and_ValueIsNull(
-            bool? voteAsBoolean
+        public async Task ShouldUpdateVote_WhenExistingVote_AndNewVoteIsNotNull(
+            bool voteAsBoolean
         )
         {
             // Arrange
@@ -342,22 +281,61 @@ public class VoteServiceTests : BaseServiceSetupTests
                 .Setup(r => r.GetAsync(answerId, _mockUser.Object.Id))
                 .ReturnsAsync(existingVote);
 
+            _mockAnswerVoteRepository
+                .Setup(r => r.UpdateAsync(It.IsAny<AnswerVotes>()))
+                .Returns(Task.CompletedTask);
+
             // Act
             await _voteService.CastVoteAsync(answerId, voteAsBoolean);
 
             // Assert
-            if (voteAsBoolean == null)
-            {
-                _mockAnswerVoteRepository.Verify(
-                    r => r.DeleteAsync(answerId, _mockUser.Object.Id),
-                   Times.Once);
-            }
-            else
-            {
-                _mockAnswerVoteRepository.Verify(
-                    r => r.DeleteAsync(answerId, _mockUser.Object.Id),
-                   Times.Never);
-            }
+            Assert.Equal(voteAsBoolean, existingVote.Vote);
+            _mockAnswerVoteRepository.Verify(
+                r => r.UpdateAsync(existingVote),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldDeleteVote_WhenExistingVote_and_NewVoteIsNull()
+        {
+            // Arrange
+            bool? voteValue = null;
+
+            var answerId = Guid.NewGuid();
+
+            var answerEntity = AnswerFactory.CreateAnswerEntity(
+                answerId, _mockQuestion.Object, _mockUser.Object);
+
+            var existingVote = AnswerVoteFactory.CreateAnswerVoteEntity(
+                answerId, _mockUser.Object, answerEntity);
+
+            _mockAnswerRepository
+                .Setup(r => r.GetByIdAsync(answerId))
+                .ReturnsAsync(answerEntity);
+
+            _mockTokenService
+                .Setup(t => t.GetUserId())
+                .Returns(_mockUser.Object.Id);
+
+            _mockUserManager
+                .Setup(u => u.FindByIdAsync(_mockUser.Object.Id))
+                .ReturnsAsync(_mockUser.Object);
+
+            _mockAnswerVoteRepository
+                .Setup(r => r.GetAsync(answerId, _mockUser.Object.Id))
+                .ReturnsAsync(existingVote);
+
+            _mockAnswerVoteRepository
+                .Setup(r => r.DeleteAsync(answerId, _mockUser.Object.Id))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await _voteService.CastVoteAsync(answerId, voteValue);
+
+            // Assert
+            _mockAnswerVoteRepository.Verify(
+                r => r.DeleteAsync(answerId, _mockUser.Object.Id),
+               Times.Once);
         }
     }
 }

@@ -1,4 +1,3 @@
-using System.Data.SqlTypes;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -61,17 +60,19 @@ namespace Infrastructure.Repositories
         }
 
         public async Task DeleteUnusedTagsAsync(
-            Tag tag
+            IEnumerable<Tag> tags
         )
         {
-            var isTagUsed = await _dbContext.Questions
-                .AnyAsync(q => q.Tags.Any(t => t.Id == tag.Id));
-
-            if (!isTagUsed)
+            foreach (var tag in tags)
             {
-                _dbContext.Tags.Remove(tag);
-            }
+                var isTagUsed = await _dbContext.Questions
+                    .AnyAsync(q => q.Tags.Any(t => t.Id == tag.Id));
 
+                if (!isTagUsed)
+                {
+                    _dbContext.Tags.Remove(tag);
+                }
+            }
             await _dbContext.SaveChangesAsync();
         }
 

@@ -1,7 +1,4 @@
-using Presentation;
 using QAPlatformAPI.Extensions;
-using QAPlatformAPI.Filters;
-using QAPlatformAPI.Middlewares;
 
 namespace QAPlatformAPI;
 
@@ -17,21 +14,21 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.AddControllerExtension();
+        builder.Services.AddControllerExtension();
 
-        builder.AddCORSConfigurationExtension();
+        builder.Services.AddCORSConfigurationExtension(builder.Configuration);
 
-        builder.AddDatabaseExtension();
+        builder.Services.AddDatabaseExtension(builder.Configuration, builder.Environment);
 
-        builder.AddJWTSecurityExtension();
+        builder.Services.AddJWTSecurityExtension(builder.Configuration);
 
-        builder.AddIdentityCoreExtension();
+        builder.Services.AddIdentityCoreExtension();
 
-        builder.AddJSONSerializerOptionsExtension();
+        builder.Services.AddJSONSerializerOptionsExtension();
 
-        builder.AddApplicationServicesExtension();
+        builder.Services.AddApplicationServicesExtension();
 
-        builder.AddOpenAPIExtension();
+        builder.Services.AddOpenAPIExtension();
 
         return builder.Build();
     }

@@ -6,9 +6,9 @@ namespace QAPlatformAPI.Extensions;
 
 public static class IdentityCoreExtension
 {
-    public static void AddIdentityCoreExtension(this WebApplicationBuilder builder)
+    public static void AddIdentityCoreExtension(this IServiceCollection services)
     {
-        builder.Services.AddIdentityCore<User>(opt =>
+        services.AddIdentityCore<User>(opt =>
         {
             opt.Password.RequireDigit = false;
             opt.Password.RequireLowercase = false;

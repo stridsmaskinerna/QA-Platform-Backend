@@ -1,9 +1,7 @@
-using System.ComponentModel.Design;
 using Application.Contracts;
 using Application.Services;
 using Application.Tests.Utilities;
 using Domain.Constants;
-using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.Exceptions;
@@ -11,13 +9,13 @@ using Moq;
 
 namespace Application.Tests.Services;
 
-public class QuestionServiceTests : BaseServiceSetupTests
+public class QuestionServiceTests : SetupServiceTests
 {
     private readonly Mock<Topic> _mockTopic;
     private readonly Mock<User> _mockUser;
     private readonly Mock<ITokenService> _mockTokenService;
     private readonly QuestionService _questionService;
-    protected readonly Mock<IUtilityService> _mockUtilityService;
+    private readonly Mock<IUtilityService> _mockUtilityService;
 
     public QuestionServiceTests()
     {
@@ -72,7 +70,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 .Returns(_mockUser.Object.Id);
 
             _mockUserRepository
-                .Setup(u => u.GetTeachersBySubjectIdAsync(subjectId))
+                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
                 .ReturnsAsync([]);
 
             // Act
@@ -97,7 +95,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 () => _questionService.GetByIdAsync(questionId));
 
             Assert.Equal(
-                _questionService.MsgNotFound(questionId),
+                QuestionService.MsgNotFound(questionId),
                 exception.Message);
         }
 
@@ -210,6 +208,111 @@ public class QuestionServiceTests : BaseServiceSetupTests
 
     }
 
+    public class GetPublicQuestionsByIdAsync : QuestionServiceTests
+    {
+        [Fact]
+        public async Task ShouldReturnDetailedQuestion_WhenExists()
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            var subjectId = Guid.NewGuid();
+            var answerId = Guid.NewGuid();
+
+            var questionEntity = QuestionFactory.CreateQuestionEntity(
+                questionId, _mockTopic.Object, _mockUser.Object);
+
+            var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+                questionId, _mockTopic.Object.Id);
+
+            _mockQuestionRepository
+                .Setup(q => q.GetByIdAsync(questionId))
+                .ReturnsAsync(questionEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+                .Returns(questionDTO);
+
+            _mockTokenService
+                .Setup(t => t.GetUserId())
+                .Returns(_mockUser.Object.Id);
+
+            _mockUserRepository
+                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
+                .ReturnsAsync([]);
+
+            // Act
+            var result = await _questionService.GetPublicQuestionByIdAsync(questionId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(questionEntity.Id, result.Id);
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenQuestionDoesNotExist()
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            _mockQuestionRepository
+                .Setup(q => q.GetByIdAsync(questionId))
+                .ReturnsAsync(default(Question));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _questionService.GetPublicQuestionByIdAsync(questionId));
+
+            Assert.Equal(
+                QuestionService.MsgNotFound(questionId),
+                exception.Message);
+        }
+
+        [Fact]
+        public async Task ShouldSetAnsweredByTeacher_WhenTeacherAnswers()
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            var answerId = Guid.NewGuid();
+
+            var teacherUser = UserFactory.CreateUser("teacher123", "teacher-userName");
+
+            var questionEntity = QuestionFactory.CreateQuestionEntity(
+                questionId, _mockTopic.Object, _mockUser.Object);
+
+            questionEntity.Answers = [AnswerFactory.CreateAnswerEntity(
+            answerId, questionEntity, teacherUser)];
+
+            var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+                questionId, _mockTopic.Object.Id);
+
+            questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
+            questionEntity.Answers.First(), teacherUser.UserName ?? String.Empty)];
+
+            questionDTO.SubjectId = Guid.NewGuid();
+
+            _mockQuestionRepository
+                .Setup(q => q.GetByIdAsync(questionId))
+                .ReturnsAsync(questionEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+                .Returns(questionDTO);
+
+            _mockUserRepository
+                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
+                .ReturnsAsync([teacherUser]);
+
+            // Act
+            var result = await _questionService.GetByIdAsync(questionId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotNull(result.Answers);
+
+            Assert.Equal(result.Answers, questionDTO.Answers);
+            Assert.True(result.Answers.First().AnsweredByTeacher);
+        }
+    }
+
     public class DeleteAsync : QuestionServiceTests
     {
         [Fact]
@@ -221,8 +324,12 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 questionId, _mockTopic.Object, _mockUser.Object);
 
             _mockQuestionRepository
-                .Setup(q => q.GetByIdAsync(questionId))
+                .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(question);
+
+            _mockQuestionRepository
+                .Setup(r => r.DeleteAsync(questionId))
+                .Returns(Task.CompletedTask);
 
             // Act
             await _questionService.DeleteAsync(questionId);
@@ -246,7 +353,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 () => _questionService.DeleteAsync(questionId));
 
-            Assert.Equal(_questionService.MsgNotFound(questionId), exception.Message);
+            Assert.Equal(QuestionService.MsgNotFound(questionId), exception.Message);
         }
 
         [Fact]
@@ -346,7 +453,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 _questionService.AddAsync(questionDTO));
 
             Assert.Equal(
-                _questionService.MsgBadRequest(),
+                QuestionService.MsgBadRequest(),
                 exception.Message);
         }
 
@@ -404,8 +511,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(question);
 
-            _mockUtilityService.Setup(
-                r => r.NormalizeText(It.IsAny<string>()))
+            _mockUtilityService.Setup(r => r.NormalizeText(It.IsAny<string>()))
                 .Returns(It.IsAny<string>());
 
             _mockQuestionRepository
@@ -413,7 +519,12 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 .ReturnsAsync(question);
 
             _mockQuestionRepository
-                .Setup(r => r.CompleteAsync());
+                .Setup(r => r.CompleteAsync())
+                .Returns(Task.CompletedTask);
+
+            _mockTagRepository
+                .Setup(r => r.DeleteUnusedTagsAsync(It.IsAny<IEnumerable<Tag>>()))
+                .Returns(Task.CompletedTask);
 
             // Act
             await _questionService.UpdateAsync(
@@ -422,6 +533,10 @@ public class QuestionServiceTests : BaseServiceSetupTests
             // Assert
             _mockQuestionRepository.Verify(
                 r => r.CompleteAsync(),
+                Times.Once);
+
+            _mockTagRepository.Verify(
+                r => r.DeleteUnusedTagsAsync(It.IsAny<IEnumerable<Tag>>()),
                 Times.Once);
         }
 
@@ -443,7 +558,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 _questionService.UpdateAsync(questionId, questionDTO));
 
             Assert.Equal(
-                _questionService.MsgNotFound(questionId),
+                QuestionService.MsgNotFound(questionId),
                 exception.Message);
         }
 
@@ -469,7 +584,7 @@ public class QuestionServiceTests : BaseServiceSetupTests
                 Times.Never);
 
             _mockTagRepository.Verify(
-                r => r.DeleteUnusedTagsAsync(It.IsAny<Tag>()),
+                r => r.DeleteUnusedTagsAsync(It.IsAny<IEnumerable<Tag>>()),
                 Times.Never);
         }
     }

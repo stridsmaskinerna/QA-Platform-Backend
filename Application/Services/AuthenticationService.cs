@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Application.Contracts;
 using Domain.Constants;
+using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
@@ -15,25 +16,36 @@ namespace Application.Services;
 public class AuthenticationService : BaseService, IAuthenticationService
 {
     private readonly IConfiguration _configuration;
+    private readonly IRepositoryManager _rm;
     private readonly UserManager<User> _userManager;
 
-    public AuthenticationService(IConfiguration configuration, UserManager<User> usMan)
+    public AuthenticationService(
+        IConfiguration configuration,
+        IRepositoryManager rm,
+        UserManager<User> usMan
+    )
     {
         _configuration = configuration;
+        _rm = rm;
         _userManager = usMan;
     }
+
+    public static string MsgConflictEmail() => "Email taken";
+
+    public static string MsgConflictUserName() => "Username taken";
 
     public async Task<TokenDTO> Authenticate(
         AuthenticationDTO authenticationDTO
     )
     {
-        User? user = await ValidateUserCredential(authenticationDTO.Email, authenticationDTO.Password);
+        User? user = await _rm.UserRepository.ValidateUserCredential(
+            authenticationDTO.Email, authenticationDTO.Password);
+
         if (user == null)
         {
             // Throw Unauthorized Exception handled by ExceptionMiddleware.
             Unauthorized();
         }
-        ;
 
         string? sKey = (_configuration?["secretKey"]) ?? throw new ArgumentNullException("something went wrong");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sKey));
@@ -48,7 +60,7 @@ public class AuthenticationService : BaseService, IAuthenticationService
             new Claim(DomainClaims.USER_ID, user.Id!.ToString()),
         ];
 
-        // ✅ Store each role as a separate claim
+        // Store each role as a separate claim
         foreach (var role in userRoles)
         {
             infoInToken.Add(new Claim(ClaimTypes.Role, role));
@@ -70,19 +82,20 @@ public class AuthenticationService : BaseService, IAuthenticationService
             refreshToken = ""
         };
     }
+
     public async Task RegisterUser(RegistrationDTO registrationDTO)
     {
 
         var userWithEmail = await _userManager.FindByEmailAsync(registrationDTO.Email);
         if (userWithEmail != null)
         {
-            Conflict("Email taken");
+            Conflict(MsgConflictEmail());
         }
 
         var userWithUsername = await _userManager.FindByNameAsync(registrationDTO.UserName);
         if (userWithUsername != null)
         {
-            Conflict("Username taken");
+            Conflict(MsgConflictUserName());
         }
 
         var user = new User
@@ -90,7 +103,6 @@ public class AuthenticationService : BaseService, IAuthenticationService
             UserName = registrationDTO.UserName,
             Email = registrationDTO.Email
         };
-
 
         var result = await _userManager.CreateAsync(user, registrationDTO.Password);
 
@@ -104,14 +116,5 @@ public class AuthenticationService : BaseService, IAuthenticationService
         var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         await _userManager.AddToRoleAsync(user, DomainRoles.USER);
-    }
-    private async Task<User?> ValidateUserCredential(string? email, string? password)
-    {
-        var user = await _userManager.FindByEmailAsync(email!);
-
-        if (user == null || !await _userManager.CheckPasswordAsync(user, password!)) return null;
-
-        return user;
-
     }
 }

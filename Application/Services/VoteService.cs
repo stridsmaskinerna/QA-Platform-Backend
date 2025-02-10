@@ -23,13 +23,13 @@ public class VoteService : BaseService, IVoteService
         _um = um;
     }
 
-    public string MsgInvalidVoteType() =>
+    public static string MsgInvalidVoteType() =>
         $"Invalid vote type, valid types are [{string.Join(", ", VoteType.ALL_TYPES)}]";
 
-    public string MsgCastVoteAnswerNotFound(Guid answerId) =>
+    public static string MsgCastVoteAnswerNotFound(Guid answerId) =>
         $"Answer with provided id {answerId} not found";
 
-    public string MsgCastVoteUserUnauthorized() =>
+    public static string MsgCastVoteUserUnauthorized() =>
         $"Invalid authentication user could not be found";
 
     public bool? GetVoteAsBoolean(string vote)

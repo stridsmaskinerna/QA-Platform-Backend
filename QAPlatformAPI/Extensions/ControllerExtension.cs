@@ -4,9 +4,9 @@ namespace QAPlatformAPI.Extensions;
 
 public static class ControllerExtension
 {
-    public static void AddControllerExtension(this WebApplicationBuilder builder)
+    public static void AddControllerExtension(this IServiceCollection services)
     {
-        builder.Services.AddControllers(configure =>
+        services.AddControllers(configure =>
         {
             configure.ReturnHttpNotAcceptable = true;
         }).AddApplicationPart(typeof(PresentationAssembly).Assembly);

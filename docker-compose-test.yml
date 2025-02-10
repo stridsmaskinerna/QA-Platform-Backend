@@ -9,7 +9,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Testing
     depends_on:
-      - qa-platform-db
+      qa-platform-db:
+        condition: service_healthy
     networks:
       - qa-platform-network-test
 
@@ -19,10 +20,17 @@ services:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpassword
       POSTGRES_DB: qa-platform-db
+    ports:
+      - "5433:5432"
     volumes:
       - qa-platform-volume-test:/var/lib/postgresql/data
     networks:
       - qa-platform-network-test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devuser -d qa-platform-db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   qa-platform-db-admin:
     image: dpage/pgadmin4

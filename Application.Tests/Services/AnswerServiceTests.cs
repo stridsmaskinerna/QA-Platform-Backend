@@ -8,7 +8,7 @@ using Moq;
 
 namespace Application.Tests.Services;
 
-public class AnswerServiceTests : BaseServiceSetupTests
+public class AnswerServiceTests : SetupServiceTests
 {
     private readonly Mock<Question> _mockQuestion;
     private readonly Mock<User> _mockUser;
@@ -52,7 +52,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 .Returns(answerEntity);
 
             _mockTokenService
-                .Setup(t => t.GetUserId())
+                .Setup(s => s.GetUserId())
                 .Returns(_mockUser.Object.Id);
 
             _mockAnswerRepository
@@ -64,7 +64,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 .Returns(answerDtoResponse);
 
             _mockTokenService
-                .Setup(t => t.GetUserName())
+                .Setup(s => s.GetUserName())
                 .Returns(userName);
 
             // Act
@@ -95,7 +95,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 _answerService.AddAsync(answerCreateDto));
 
             Assert.Equal(
-                _answerService.MsgAddAsyncBadRequest(),
+                AnswerService.MsgAddAsyncBadRequest(),
                 exception.Message);
         }
 
@@ -139,7 +139,12 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 .ReturnsAsync(answerEntity);
 
             _mockMapper
-                .Setup(m => m.Map(answerPutDto, answerEntity));
+                .Setup(m => m.Map(answerPutDto, answerEntity))
+                .Returns(It.IsAny<Answer>());
+
+            _mockAnswerRepository
+                .Setup(r => r.CompleteAsync())
+                .Returns(Task.CompletedTask);
 
             // Act
             await _answerService.UpdateAsync(answerId, answerPutDto);
@@ -171,7 +176,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 _answerService.UpdateAsync(answerId, answerPutDto));
 
             Assert.Equal(
-                _answerService.MsgNotFound(answerId),
+                AnswerService.MsgNotFound(answerId),
                 exception.Message);
         }
 
@@ -212,7 +217,8 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 .ReturnsAsync(answerEntity);
 
             _mockAnswerRepository
-                .Setup(r => r.DeleteAsync(answerEntity));
+                .Setup(r => r.DeleteAsync(answerEntity))
+                .Returns(Task.CompletedTask);
 
             // Act
             await _answerService.DeleteAsync(answerId);
@@ -238,7 +244,7 @@ public class AnswerServiceTests : BaseServiceSetupTests
                 _answerService.DeleteAsync(answerId));
 
             Assert.Equal(
-                _answerService.MsgNotFound(answerId),
+                AnswerService.MsgNotFound(answerId),
                 exception.Message);
         }
 

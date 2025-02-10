@@ -24,9 +24,9 @@ public class QuestionService : BaseService, IQuestionService
         _sm = sm;
     }
 
-    public string MsgNotFound(Guid id) => $"Question with id {id} does not exist.";
+    public static string MsgNotFound(Guid id) => $"Question with id {id} does not exist.";
 
-    public string MsgBadRequest() => "Invalid question body";
+    public static string MsgBadRequest() => "Invalid question body";
 
     public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
@@ -193,10 +193,7 @@ public class QuestionService : BaseService, IQuestionService
 
         await _rm.QuestionRepository.CompleteAsync();
 
-        foreach (var tag in tagsToRemove)
-        {
-            await _rm.TagRepository.DeleteUnusedTagsAsync(tag);
-        }
+        await _rm.TagRepository.DeleteUnusedTagsAsync(tagsToRemove);
 
         await AddNewTags(question, questionDTO.Tags);
     }
