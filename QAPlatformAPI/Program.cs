@@ -14,11 +14,11 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddDatabaseExtension(builder.Configuration, builder.Environment);
+
         builder.Services.AddControllerExtension();
 
         builder.Services.AddCORSConfigurationExtension(builder.Configuration);
-
-        builder.Services.AddDatabaseExtension(builder.Configuration, builder.Environment);
 
         builder.Services.AddJWTSecurityExtension(builder.Configuration);
 

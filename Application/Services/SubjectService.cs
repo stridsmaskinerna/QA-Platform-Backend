@@ -21,12 +21,9 @@ public class SubjectService : BaseService, ISubjectService
     }
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
     {
-        Console.WriteLine("prova : ");
         try
         {
-            Subject sbjObj = new();
-            sbjObj.Name = subject.Name;
-            sbjObj.SubjectCode = subject.SubjectCode;
+            Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
             foreach (string mail in subject.Teachers)
             {
                 User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
@@ -83,8 +80,8 @@ public class SubjectService : BaseService, ISubjectService
                 NotFound($"No answer with id {Id} exist.");
             }
 
-            sbjObj.Name = subject.Name;
-            sbjObj.SubjectCode = subject.SubjectCode;
+            _sm.Mapper.Map(subject, sbjObj);
+            sbjObj.Teachers.Clear();
             foreach (string mail in subject.Teachers)
             {
                 User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
