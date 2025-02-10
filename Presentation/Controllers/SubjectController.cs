@@ -20,7 +20,7 @@ namespace Presentation.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[Authorize]
+        [Authorize]
         public async Task<IEnumerable<SubjectDTO>> GetSubjectList()
         {
 
@@ -30,7 +30,7 @@ namespace Presentation.Controllers
         [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[Authorize(Roles = $"{DomainRoles.ADMIN}")]
+        [Authorize(Roles = $"{DomainRoles.ADMIN}")]
         public async Task CreateNewSubject([FromBody] SubjectForCreationDTO newSubject)
         {
 
@@ -42,7 +42,7 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[Authorize(Roles = $"{DomainRoles.ADMIN}")]
+        [Authorize(Roles = $"{DomainRoles.ADMIN}")]
         public async Task DeleteSubjectAsync([FromRoute] Guid Id)
         {
             await _sm.SubjectService.DeleteAsync(Id);
@@ -53,7 +53,7 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[Authorize(Roles = $"{DomainRoles.ADMIN}")]
+        [Authorize(Roles = $"{DomainRoles.ADMIN}")]
         public async Task<ActionResult<IEnumerable<QuestionDTO>>> ModifySubcect([FromRoute] Guid id, [FromBody] SubjectForCreationDTO body)
         {
             await _sm.SubjectService.UpdateAsync(id, body);

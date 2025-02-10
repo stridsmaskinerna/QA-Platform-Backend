@@ -10,6 +10,8 @@ public class SubjectProfileMapper : Profile
     public SubjectProfileMapper()
     {
         CreateMap<Subject, SubjectDTO>().ReverseMap();
-        CreateMap<SubjectForCreationDTO, Subject>().ReverseMap();
+        //CreateMap<SubjectForCreationDTO, Subject>().ReverseMap();
+        CreateMap<SubjectForCreationDTO, Subject>()
+            .ForMember(dest => dest.Teachers, opt => opt.Ignore());
     }
 }
