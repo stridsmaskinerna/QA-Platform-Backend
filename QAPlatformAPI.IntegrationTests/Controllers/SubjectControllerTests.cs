@@ -9,26 +9,32 @@ public class QuestionControllerTests : IntegrationTestBase
     public QuestionControllerTests(
         QAPlatformAPIFactory<Program> factory
     ) : base(factory)
-    {
-        AuthenticateAsync().Wait();
-    }
+    { }
 
-    [Fact]
-    public async Task CreateSubject_ShouldReturn_Created()
+    public class CreateSubject_Admin : QuestionControllerTests
     {
-        await AuthenticateAsync();
-
-        // Arrange
-        var requestBody = new SubjectForCreationDTO
+        public CreateSubject_Admin(
+            QAPlatformAPIFactory<Program> factory
+        ) : base(factory)
         {
-            Name = "Test subject 2.0",
-            SubjectCode = "TestCode"
-        };
+            AuthenticateAsAdminAsync().Wait();
+        }
 
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/subject/create", requestBody);
+        [Fact]
+        public async Task ShouldReturn_Created()
+        {
+            // Arrange
+            var requestBody = new SubjectForCreationDTO
+            {
+                Name = "Test subject 2.0",
+                SubjectCode = "TestCode"
+            };
 
-        // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            // Act
+            var response = await _client.PostAsJsonAsync("/api/subject/create", requestBody);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
     }
 }

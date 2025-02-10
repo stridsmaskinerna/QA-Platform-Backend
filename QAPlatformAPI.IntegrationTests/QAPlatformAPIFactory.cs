@@ -1,6 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Contexts;
-using Infrastructure.Seeds;
+using Infrastructure.Seeds.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -84,7 +84,10 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
         });
     }
 
-    private async Task SeedTestDatabase(IServiceScope scope, string connectionString)
+    private async Task SeedTestDatabase(
+        IServiceScope scope,
+        string connectionString
+    )
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<QAPlatformContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -96,15 +99,19 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
             try
             {
                 Console.WriteLine("Trying to connect to the database...");
+                Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
+
                 await dbContext.Database.EnsureDeletedAsync();
                 await dbContext.Database.MigrateAsync();
-                await SeedQAPlatformDBProduction.RunAsync(dbContext, userManager, roleManager);
+                await DBSeedTest.RunAsync(dbContext, userManager, roleManager);
                 break;
             }
             catch (Exception ex)
             {
                 retries--;
                 Console.WriteLine($"Database connection failed: {ex.Message}. Retrying in 5s...");
+                Console.WriteLine($"[DEBUG] Loaded Connection String: {connectionString}");
+
                 await Task.Delay(5000);
             }
         }

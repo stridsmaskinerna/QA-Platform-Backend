@@ -1,6 +1,6 @@
-namespace Infrastructure.Seeds;
+namespace Infrastructure.Seeds.Prod;
 
-public static class SeedConstants
+public static class SeedConstantsProd
 {
     public const string ADMIN_USERNAME = "adminUser";
 

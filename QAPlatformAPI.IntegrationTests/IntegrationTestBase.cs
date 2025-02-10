@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
-using Infrastructure.Seeds;
+using Infrastructure.Seeds.Test;
 
 namespace QAPlatformAPI.Integration;
 
@@ -19,9 +19,30 @@ public class IntegrationTestBase : IClassFixture<QAPlatformAPIFactory<Program>>
         _client = factory.CreateClient();
     }
 
-    protected async Task AuthenticateAsync(
-        string email = SeedConstants.ADMIN_EMAIL,
-        string password = SeedConstants.DEFAULT_PWD
+    protected async Task AuthenticateAsAdminAsync()
+    {
+        await AuthenticateAsync(
+            SeedConstantsTest.ADMIN_EMAIL,
+            SeedConstantsTest.DEFAULT_PWD);
+    }
+
+    protected async Task AuthenticateAsTeacherAsync()
+    {
+        await AuthenticateAsync(
+            SeedConstantsTest.TEACHER_USERNAME,
+            SeedConstantsTest.DEFAULT_PWD);
+    }
+
+    protected async Task AuthenticateAsUserAsync()
+    {
+        await AuthenticateAsync(
+            SeedConstantsTest.ADMIN_EMAIL,
+            SeedConstantsTest.DEFAULT_PWD);
+    }
+
+    private async Task AuthenticateAsync(
+        string email,
+        string password
     )
     {
         if (!string.IsNullOrEmpty(_JWTToken))

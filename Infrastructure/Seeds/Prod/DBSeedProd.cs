@@ -4,9 +4,9 @@ using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Seeds;
+namespace Infrastructure.Seeds.Prod;
 
-public static class SeedQAPlatformDBProduction
+public static class DBSeedProd
 {
     public static async Task RunAsync(
         QAPlatformContext context,
@@ -64,13 +64,13 @@ public static class SeedQAPlatformDBProduction
 
     private static async Task CreateUsers(
         UserManager<User> userManager,
-        string password = SeedConstants.DEFAULT_PWD
+        string password = SeedConstantsProd.DEFAULT_PWD
     )
     {
         var admin = new User()
         {
-            UserName = SeedConstants.ADMIN_USERNAME,
-            Email = SeedConstants.ADMIN_EMAIL
+            UserName = SeedConstantsProd.ADMIN_USERNAME,
+            Email = SeedConstantsProd.ADMIN_EMAIL
         };
 
         var result = await userManager.CreateAsync(admin, password);
