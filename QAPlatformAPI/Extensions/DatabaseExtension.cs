@@ -30,9 +30,9 @@ public static class DatabaseExtension
             }
 
             // TODO! Is this Duplicated, see IdentityCoreExtension ??? Remove ???
-            services.AddIdentity<IdentityUser, IdentityRole>()
-               .AddEntityFrameworkStores<QAPlatformContext>()
-               .AddDefaultTokenProviders();
+            //services.AddIdentity<IdentityUser, IdentityRole>()
+            //   .AddEntityFrameworkStores<QAPlatformContext>()
+            //   .AddDefaultTokenProviders();
         });
     }
 
