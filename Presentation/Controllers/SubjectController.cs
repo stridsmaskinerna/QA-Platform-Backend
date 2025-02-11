@@ -20,7 +20,7 @@ public class SubjectController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Authorize]
+    //[Authorize]
     public async Task<IEnumerable<SubjectDTO>> GetSubjectList()
     {
 

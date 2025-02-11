@@ -11,13 +11,11 @@ public class SubjectService : BaseService, ISubjectService
 {
     private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
-    private QAPlatformContext _dbContext;
 
-    public SubjectService(IRepositoryManager rm, IServiceManager sm, QAPlatformContext dbContext)
+    public SubjectService(IRepositoryManager rm, IServiceManager sm)
     {
         _rm = rm;
         _sm = sm;
-        _dbContext = dbContext;
     }
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
     {
