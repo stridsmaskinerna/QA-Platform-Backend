@@ -15,7 +15,17 @@ namespace Infrastructure.Repositories
         }
         public async Task<IEnumerable<Subject>> GetAllAsync()
         {
-            return await _dbContext.Subjects.Include(us => us.Teachers).Include(us => us.Topics).ToListAsync();
+            return await _dbContext.Subjects
+                                     .Include(us => us.Teachers)
+                                     .Select(us => new Subject
+                                     {
+                                         Id = us.Id,
+                                         Name = us.Name,
+                                         SubjectCode = us.SubjectCode,
+                                         Teachers = us.Teachers,
+                                         Topics = us.Topics.Where(t => t.IsActive).ToList()
+                                     }).ToListAsync();
+
         }
 
 
