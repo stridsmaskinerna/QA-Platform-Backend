@@ -1,3 +1,4 @@
+using Domain.Contracts;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;

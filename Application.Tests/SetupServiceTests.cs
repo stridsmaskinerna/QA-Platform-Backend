@@ -2,11 +2,10 @@ using Application.Contracts;
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities;
-using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Application.Tests.Utilities;
+namespace Application.Tests;
 
 public class SetupServiceTests
 {
@@ -40,8 +39,6 @@ public class SetupServiceTests
         // Mock General services
         _mockMapper = new Mock<IMapper>(MockBehavior.Strict);
 
-        // TODO Create a UserRepository wrapper around UserManager<User> and
-        // then mock those methods when testing service classes 
         _mockUserManager = new Mock<UserManager<User>>(
             Mock.Of<IUserStore<User>>(),
             null!, null!, null!, null!, null!, null!, null!, null!

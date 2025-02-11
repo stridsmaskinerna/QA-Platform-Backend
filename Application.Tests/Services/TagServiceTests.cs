@@ -1,9 +1,9 @@
 using Application.Services;
-using Application.Tests.Utilities;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.Exceptions;
 using Moq;
+using TestUtility.Factories;
 
 namespace Application.Tests.Services;
 

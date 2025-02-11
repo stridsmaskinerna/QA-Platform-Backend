@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Infrastructure.Repositories;
+namespace Domain.Contracts;
 
 public interface ITagRepository
 {

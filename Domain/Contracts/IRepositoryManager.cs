@@ -1,5 +1,3 @@
-using Infrastructure.Repositories;
-
 namespace Domain.Contracts;
 
 public interface IRepositoryManager

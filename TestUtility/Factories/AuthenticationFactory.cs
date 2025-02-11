@@ -1,6 +1,6 @@
 using Domain.DTO.Request;
 
-namespace Application.Tests.Utilities;
+namespace TestUtility.Factories;
 
 public static class AuthenticationFactory
 {

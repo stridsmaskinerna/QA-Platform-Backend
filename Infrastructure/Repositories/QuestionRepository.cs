@@ -1,5 +1,6 @@
 using System.Data;
 using Domain.Constants;
+using Domain.Contracts;
 using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -66,6 +67,43 @@ public class QuestionRepository : IQuestionRepository
     public async Task CompleteAsync()
     {
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetTeacherQuestionsAsync(
+        PaginationDTO paginationDTO,
+        Guid subjectId,
+        User teacher
+    )
+    {
+        var totalItemCount = await _dbContext.Questions.CountAsync();
+
+        var query = _dbContext.Questions.AsQueryable();
+
+        query = query
+            .Include(q => q.Topic)
+            .ThenInclude(t => t.Subject)
+            .ThenInclude(s => s.Teachers)
+            .Include(q => q.Tags)
+            .Include(q => q.Answers)
+            .Include(q => q.User);
+
+        query = query
+            .Pipe(q => ApplyUserFilter(q, teacher))
+            .Pipe(ApplySorting)
+            .Pipe(q => ApplyPagination(q, paginationDTO));
+
+        return (
+            Questions: await query.ToListAsync(),
+            TotalItemCount: totalItemCount
+        );
+    }
+
+    private IQueryable<Question> ApplyUserFilter(
+        IQueryable<Question> queryable,
+        User teacher
+    )
+    {
+        return queryable.Where(q => q.Topic.Subject.Teachers.Contains(teacher));
     }
 
     public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
@@ -135,7 +173,6 @@ public class QuestionRepository : IQuestionRepository
 
         return queryable;
     }
-
 
     private IQueryable<Question> ApplyResolvedFilter(
         IQueryable<Question> queryable,
@@ -226,5 +263,4 @@ public class QuestionRepository : IQuestionRepository
             .Skip(paginationDTO.Limit * (paginationDTO.PageNr - 1))
             .Take(paginationDTO.Limit);
     }
-
 }
