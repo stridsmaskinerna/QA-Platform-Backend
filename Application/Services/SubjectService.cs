@@ -11,13 +11,11 @@ public class SubjectService : BaseService, ISubjectService
 {
     private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
-    private QAPlatformContext _dbContext;
 
-    public SubjectService(IRepositoryManager rm, IServiceManager sm, QAPlatformContext dbContext)
+    public SubjectService(IRepositoryManager rm, IServiceManager sm)
     {
         _rm = rm;
         _sm = sm;
-        _dbContext = dbContext;
     }
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
     {
@@ -26,7 +24,8 @@ public class SubjectService : BaseService, ISubjectService
             Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
             foreach (string mail in subject.Teachers)
             {
-                User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                //User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                User? choosenTeacher = _rm.UserRepository.GetUserByMail(mail);
                 if (choosenTeacher != null)
                     sbjObj.Teachers.Add(choosenTeacher);
             }
@@ -84,7 +83,7 @@ public class SubjectService : BaseService, ISubjectService
             sbjObj.Teachers.Clear();
             foreach (string mail in subject.Teachers)
             {
-                User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+                User? choosenTeacher = _rm.UserRepository.GetUserByMail(mail);
                 if (choosenTeacher != null)
                     sbjObj.Teachers.Add(choosenTeacher);
             }

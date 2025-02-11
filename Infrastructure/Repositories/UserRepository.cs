@@ -1,3 +1,4 @@
+using System.Data.Entity;
 using Domain.Contracts;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -38,5 +39,14 @@ public class UserRepository : IUserRepository
         };
 
         return user;
+    }
+
+    public User? GetUserByMail(string mail)
+    {
+
+        User? us = _userManager.Users.Where(user => user.Email == mail).FirstOrDefault();
+
+        return us;
+
     }
 }
