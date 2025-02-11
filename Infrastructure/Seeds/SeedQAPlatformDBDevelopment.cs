@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Bogus;
 using Domain.Constants;
 using Domain.Entities;
@@ -41,8 +43,6 @@ public static class SeedQAPlatformDBDevelopment
 
         await context.SaveChangesAsync();
     }
-
-
 
     private static List<Subject> CreateSubjects()
     {
@@ -231,34 +231,50 @@ public static class SeedQAPlatformDBDevelopment
 
     private static List<Tag> CreateTags()
     {
-        var tags = new List<Tag>();
+        var faker = new Faker();
+        var generatedTags = new HashSet<string>();
 
-        var tagValues = new List<string>
+        var singleWords = new[]
         {
-            "Admissions",
-            "Scholarships",
-            "Exams",
-            "Assignments",
-            "Research",
-            "Courses",
-            "StudentLife",
-            "Housing",
-            "Clubs",
-            "Internships"
+            "Admissions", "Scholarships", "Exams", "Assignments", "Research", "Courses",
+            "StudentLife", "Housing", "Clubs", "Internships", "Education", "Technology",
+            "Finance", "Marketing", "Engineering", "Mathematics", "Leadership",
+            "Innovation", "Programming", "Entrepreneurship", "Science", "Biology", "Physics",
+            "Chemistry", "Healthcare", "Economics", "Psychology", "Networking", "Security",
+            "Database", "Statistics"
         };
 
-        var normailzedTagValues = tagValues.Select(value => value.ToUpperInvariant()).ToList();
-
-        foreach (var tagName in normailzedTagValues)
+        var firstWords = new[]
         {
-            var tag = new Tag()
-            {
-                Value = tagName
-            };
-            tags.Add(tag);
+            "Data", "Cloud", "Business", "Artificial", "Cyber", "Web", "Digital",
+            "Software", "User", "Social", "Machine", "Blockchain", "Deep", "Virtual"
+        };
+
+        var secondWords = new[]
+        {
+            "Security", "Marketing", "Learning", "Development", "Automation",
+            "Strategy", "Trends", "Intelligence", "Research", "Computing", "Analysis"
+        };
+
+        foreach (var word in singleWords)
+        {
+            generatedTags.Add(word.ToUpperInvariant());
         }
 
-        return tags;
+        foreach (var word1 in firstWords)
+        {
+            foreach (var word2 in secondWords)
+            {
+                generatedTags.Add($"{word1} {word2}".ToUpperInvariant());
+            }
+        }
+
+        var random = new Random();
+
+        return generatedTags
+            .OrderBy(_ => random.Next())
+            .Select(tag => new Tag { Value = tag })
+            .ToList();
     }
 
     private static List<Question> CreateQuestions(
@@ -277,11 +293,12 @@ public static class SeedQAPlatformDBDevelopment
             {
                 //To make questions not have that many tags
                 var rndTags = new HashSet<Tag>();
-                for (int j = 0; j < 5; j++)
+                var nrOfTags = RandomInt(0, 8);
+
+                for (int j = 0; j < nrOfTags; j++)
                 {
                     rndTags.Add(tags[RandomInt(0, tags.Count)]);
                 }
-
 
                 var idx = RandomInt(0, Dummydata.StudentQuestions.Length);
                 var question = new Faker<Question>("en").Rules((f, q) =>
@@ -361,7 +378,10 @@ public static class SeedQAPlatformDBDevelopment
         return comments;
     }
 
-    private static List<AnswerVotes> CreateAnswerVotes(List<User> users, List<Answer> answers)
+    private static List<AnswerVotes> CreateAnswerVotes(
+        List<User> users,
+        List<Answer> answers
+    )
     {
         var answerVotes = new List<AnswerVotes>();
 
