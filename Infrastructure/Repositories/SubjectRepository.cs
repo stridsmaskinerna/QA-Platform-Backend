@@ -15,18 +15,28 @@ namespace Infrastructure.Repositories
         }
         public async Task<IEnumerable<Subject>> GetAllAsync()
         {
-            return await _dbContext.Subjects.Include(us => us.Teachers).ToListAsync();
+            return await _dbContext.Subjects
+                                     .Include(us => us.Teachers)
+                                     .Select(us => new Subject
+                                     {
+                                         Id = us.Id,
+                                         Name = us.Name,
+                                         SubjectCode = us.SubjectCode,
+                                         Teachers = us.Teachers,
+                                         Topics = us.Topics.Where(t => t.IsActive).ToList()
+                                     }).ToListAsync();
+
         }
 
 
         public async Task<Subject?> GetByIdAsync(Guid id)
         {
-            return await _dbContext.Subjects.Include(us => us.Teachers).FirstOrDefaultAsync(s => s.Id == id);
+            return await _dbContext.Subjects.Include(us => us.Teachers).Include(us => us.Topics).FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<Subject?> GetByNameAsync(string name)
         {
-            return await _dbContext.Subjects.Include(us => us.Teachers).FirstOrDefaultAsync(s => s.Name == name);
+            return await _dbContext.Subjects.Include(us => us.Teachers).Include(us => us.Topics).FirstOrDefaultAsync(s => s.Name == name);
         }
 
         public async Task<Subject?> GetByCodeAsync(string code)
