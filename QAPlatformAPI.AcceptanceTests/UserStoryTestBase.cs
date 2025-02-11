@@ -16,8 +16,8 @@ public abstract class UserStoryTestBase : IntegrationTestBase
     /// <summary>
     /// Used to call test methods dynamically from test classes.
     /// Do support test methods with attributes
-    ///     1) Facts
-    ///     2) Theories with inlinedata attributes.
+    ///     1) Fact attributes.
+    ///     2) Theory attributes with inlinedata attributes.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
