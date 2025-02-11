@@ -21,7 +21,7 @@ public static class CORSExtension
             config.AddPolicy(CORS_DEV_POLICY, p => p
                 .WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
-                .AllowAnyHeader() // ✅ Allows `Authorization` header
+                .AllowAnyHeader() // Allows `Authorization` header
                 .WithExposedHeaders([
                     CustomHeaders.Pagination
                 ])
@@ -30,7 +30,7 @@ public static class CORSExtension
             config.AddPolicy(CORS_PROD_POLICY, p => p
                 .WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
-                .AllowAnyHeader() // ✅ Allows `Authorization` header
+                .AllowAnyHeader() // Allows `Authorization` header
                 .WithExposedHeaders([
                     CustomHeaders.Pagination
                 ])

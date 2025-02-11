@@ -1,5 +1,3 @@
-
-using AutoMapper;
 using Domain.Contracts;
 
 namespace Infrastructure.Repositories;
