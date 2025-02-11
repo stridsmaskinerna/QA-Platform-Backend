@@ -1,11 +1,11 @@
 using System.Reflection;
 using QAPlatformAPI.IntegrationTests;
 
-namespace QAPlatformAPI.AcceptanceTests.UserStories;
+namespace QAPlatformAPI.AcceptanceTests;
 
 /// <summary>
 /// Use class method RunTestsAsync to invoke
-/// integration tests dynamically from acceptance tests.
+/// test methods dynamically from test classes.
 /// </summary>
 public abstract class UserStoryTestBase : IntegrationTestBase
 {
@@ -48,8 +48,8 @@ public abstract class UserStoryTestBase : IntegrationTestBase
             var theoryAttribute = method.GetCustomAttribute<TheoryAttribute>();
 
             // Check if test is marked as Skipped
-            if ((factAttribute != null && !string.IsNullOrEmpty(factAttribute.Skip)) ||
-                (theoryAttribute != null && !string.IsNullOrEmpty(theoryAttribute.Skip)))
+            if (factAttribute != null && !string.IsNullOrEmpty(factAttribute.Skip) ||
+                theoryAttribute != null && !string.IsNullOrEmpty(theoryAttribute.Skip))
             {
                 Console.WriteLine($"Skipping test: {method.Name} - Reason: {factAttribute?.Skip ?? theoryAttribute?.Skip}");
                 continue;
