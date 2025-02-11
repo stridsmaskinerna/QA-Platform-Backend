@@ -1,17 +1,18 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Domain.Constants;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Infrastructure.Seeds.Test;
 
-namespace QAPlatformAPI.Integration;
+namespace QAPlatformAPI.IntegrationTests;
 
 public class IntegrationTestBase : IClassFixture<QAPlatformAPIFactory<Program>>
 {
     protected readonly HttpClient _client;
     protected readonly QAPlatformAPIFactory<Program> _factory;
-    protected string _JWTToken = string.Empty;
+    private (string Token, string Role) _tokenContainer = (string.Empty, string.Empty);
 
     public IntegrationTestBase(QAPlatformAPIFactory<Program> factory)
     {
@@ -23,29 +24,36 @@ public class IntegrationTestBase : IClassFixture<QAPlatformAPIFactory<Program>>
     {
         await AuthenticateAsync(
             SeedConstantsTest.ADMIN_EMAIL,
-            SeedConstantsTest.DEFAULT_PWD);
+            SeedConstantsTest.DEFAULT_PWD,
+            DomainRoles.ADMIN);
     }
 
     protected async Task AuthenticateAsTeacherAsync()
     {
         await AuthenticateAsync(
-            SeedConstantsTest.TEACHER_USERNAME,
-            SeedConstantsTest.DEFAULT_PWD);
+            SeedConstantsTest.TEACHER_EMAIL,
+            SeedConstantsTest.DEFAULT_PWD,
+            DomainRoles.TEACHER);
     }
 
     protected async Task AuthenticateAsUserAsync()
     {
         await AuthenticateAsync(
-            SeedConstantsTest.ADMIN_EMAIL,
-            SeedConstantsTest.DEFAULT_PWD);
+            SeedConstantsTest.USER_EMAIL,
+            SeedConstantsTest.DEFAULT_PWD,
+            DomainRoles.USER);
     }
 
     private async Task AuthenticateAsync(
         string email,
-        string password
+        string password,
+        string role
     )
     {
-        if (!string.IsNullOrEmpty(_JWTToken))
+        if (
+            !string.IsNullOrEmpty(_tokenContainer.Token) &&
+            _tokenContainer.Role == role
+        )
         {
             return;
         }
@@ -70,10 +78,10 @@ public class IntegrationTestBase : IClassFixture<QAPlatformAPIFactory<Program>>
             throw new InvalidOperationException("Failed to retrieve a valid JWT token.");
         }
 
-        _JWTToken = tokenResponse.accessToken;
+        _tokenContainer = (Token: tokenResponse.accessToken, Role: role);
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            _JWTToken);
+            _tokenContainer.Token);
     }
 }

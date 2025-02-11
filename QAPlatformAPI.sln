@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Tests", "Applic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAPlatformAPI.IntegrationTests", "QAPlatformAPI.IntegrationTests\QAPlatformAPI.IntegrationTests.csproj", "{3EFB94E7-3669-4109-B5DD-22A268F3C791}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DFC1D3E5-7E2D-45AE-A00E-007A8A4BD9F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAPlatformAPI.AcceptanceTests", "QAPlatformAPI.AcceptanceTests\QAPlatformAPI.AcceptanceTests.csproj", "{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ABB762A7-4C20-45A2-B331-E1F17F258D97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,8 +57,17 @@ Global
 		{3EFB94E7-3669-4109-B5DD-22A268F3C791}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EFB94E7-3669-4109-B5DD-22A268F3C791}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EFB94E7-3669-4109-B5DD-22A268F3C791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7C0200DD-1D22-4FAD-B4B6-F2B83EF179CF} = {DFC1D3E5-7E2D-45AE-A00E-007A8A4BD9F5}
+		{3EFB94E7-3669-4109-B5DD-22A268F3C791} = {DFC1D3E5-7E2D-45AE-A00E-007A8A4BD9F5}
+		{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB} = {DFC1D3E5-7E2D-45AE-A00E-007A8A4BD9F5}
 	EndGlobalSection
 EndGlobal
