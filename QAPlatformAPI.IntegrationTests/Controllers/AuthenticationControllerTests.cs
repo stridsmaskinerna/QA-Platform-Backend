@@ -19,15 +19,22 @@ public class AuthenticationControllerTests : IntegrationTestBase
             base(factory)
         { }
 
-        [Fact]
-        public async Task ShouldReturn_Ok_WhenValidRegistrationData()
+        [Theory]
+        [InlineData("12newTestUser", "password")]
+        [InlineData("123newTestUser", "PASSWORD")]
+        [InlineData("1234newTestUser", "12345678")]
+        [InlineData("12335newTestUser", "00000000")]
+        public async Task ShouldReturn_Ok_WhenValidRegistrationData(
+            string userName,
+            string password
+        )
         {
             // Arrange
             var requestBody = new RegistrationDTO
             {
-                Email = "123TestUser@ltu.se",
-                UserName = "123newTestUser",
-                Password = "password"
+                Email = $"{userName}@ltu.se",
+                UserName = userName,
+                Password = password
             };
 
             // Act
@@ -55,15 +62,21 @@ public class AuthenticationControllerTests : IntegrationTestBase
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
-        [Fact]
-        public async Task ShouldReturn_BadRequest_WhenInvalidPassword()
+        [Theory]
+        [InlineData("p")]
+        [InlineData("pa")]
+        [InlineData("pass")]
+        [InlineData("passwor")]
+        public async Task ShouldReturn_BadRequest_WhenInvalidPassword(
+            string password
+        )
         {
             // Arrange
             var requestBody = new RegistrationDTO
             {
                 Email = "321TestUser@mail.com",
                 UserName = "321newTestUser",
-                Password = "p"
+                Password = password
             };
 
             // Act

@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DFC1D3E5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAPlatformAPI.AcceptanceTests", "QAPlatformAPI.AcceptanceTests\QAPlatformAPI.AcceptanceTests.csproj", "{7E3AB2B1-0DE5-4942-A40C-8C759DCAF3FB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ABB762A7-4C20-45A2-B331-E1F17F258D97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

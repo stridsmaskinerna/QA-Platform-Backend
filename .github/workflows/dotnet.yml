@@ -36,5 +36,8 @@ jobs:
     - name: Run Integrations Tests
       run: dotnet test QAPlatformAPI.IntegrationTests --no-build --verbosity normal
 
+    - name: Run Acceptance Tests
+      run: dotnet test QAPlatformAPI.AcceptanceTests --no-build --verbosity normal
+
     - name: Stop and clean up containers
       run: docker compose -f docker-compose-test.yml down

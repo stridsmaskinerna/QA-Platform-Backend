@@ -1,3 +1,4 @@
+using QAPlatformAPI.AcceptanceTests.Attributes;
 using QAPlatformAPI.IntegrationTests;
 using QAPlatformAPI.IntegrationTests.Controllers;
 
@@ -6,7 +7,7 @@ namespace QAPlatformAPI.AcceptanceTests.UserStories;
 public class Admin : UserStoryTestBase
 {
     private const string _ADMIN_ESSE_1 = """
-    As an administrator, I want to set up course codes before any questions
+    ADMIN.ESSE.1: As an administrator, I want to set up course codes before any questions
     can be posted, so that structure is clearer and no questions can be asked
     without connection to a course
     """;
@@ -21,8 +22,7 @@ public class Admin : UserStoryTestBase
             base(factory)
         { }
 
-        [Fact]
-        [Trait(nameof(_ADMIN_ESSE_1), _ADMIN_ESSE_1)]
+        [UserStory(_ADMIN_ESSE_1)]
         public async Task ADMIN_ESSE_1()
         {
             await RunTestsAsync<QuestionControllerTests.CreateSubject>();
