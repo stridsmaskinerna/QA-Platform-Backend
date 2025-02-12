@@ -58,33 +58,22 @@ public class SubjectService : BaseService, ISubjectService
 
     public async Task UpdateAsync(Guid Id, SubjectForCreationDTO subject)
     {
-        // Todo. Do not use try catch. Exception is handled by
-        // exception middleware.
-        try
+        var sbjObj = await _rm.SubjectRepository.GetByIdAsync(Id);
+
+        if (sbjObj == null)
         {
-
-            var sbjObj = await _rm.SubjectRepository.GetByIdAsync(Id);
-
-            if (sbjObj == null)
-            {
-                NotFound($"No answer with id {Id} exist.");
-            }
-
-            _sm.Mapper.Map(subject, sbjObj);
-            sbjObj.Teachers.Clear();
-            foreach (string mail in subject.Teachers)
-            {
-                User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
-                if (choosenTeacher != null)
-                    sbjObj.Teachers.Add(choosenTeacher);
-            }
-
-            await _rm.SubjectRepository.UpdateAsync(sbjObj);
+            NotFound($"No answer with id {Id} exist.");
         }
-        catch (Exception ex)
+
+        _sm.Mapper.Map(subject, sbjObj);
+        sbjObj.Teachers.Clear();
+        foreach (string mail in subject.Teachers)
         {
-            Console.WriteLine(ex.Message);
-            return;
+            User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
+            if (choosenTeacher != null)
+                sbjObj.Teachers.Add(choosenTeacher);
         }
+
+        await _rm.SubjectRepository.UpdateAsync(sbjObj);
     }
 }
