@@ -8,6 +8,8 @@ using Domain.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Filters;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Presentation.Controllers;
 
@@ -31,10 +33,11 @@ public class SubjectController : ControllerBase
     }
 
     [HttpGet("{id}/questions")]
+    [Authorize(Roles = DomainRoles.TEACHER)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Authorize(Roles = DomainRoles.TEACHER)]
+    [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetTeacherSubjectList(
         [FromRoute] Guid id,
         [FromQuery] PaginationDTO paginationDTO

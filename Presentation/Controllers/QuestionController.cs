@@ -8,6 +8,8 @@ using Domain.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Filters;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Presentation.Controllers;
 
@@ -26,6 +28,7 @@ public class QuestionController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetQuestions(
         [FromQuery] PaginationDTO paginationDTO,
         [FromQuery] QuestionSearchDTO searchDTO
@@ -49,9 +52,10 @@ public class QuestionController : ControllerBase
         return Ok(questions);
     }
 
-    [AllowAnonymous]
     [HttpGet("public")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetPublicQuestions(
         [FromQuery] PaginationDTO paginationDTO,
         [FromQuery] QuestionSearchDTO searchDTO
