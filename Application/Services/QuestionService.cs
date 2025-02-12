@@ -49,6 +49,36 @@ public class QuestionService : BaseService, IQuestionService
         );
     }
 
+    public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetTeacherQuestionsAsync(
+        PaginationDTO paginationDTO,
+        Guid subjectId
+    )
+    {
+        var userId = _sm.TokenService.GetUserId();
+
+        var teachers = await _rm.UserRepository.GetTeachersBySubjectIdAsync(subjectId);
+
+        var teacher = teachers
+            .Where(t => t.Id == userId)
+            .FirstOrDefault();
+
+        if (teacher == null)
+        {
+            BadRequest($"User is not teachers for subject with id {subjectId}.");
+        }
+
+        var questionWithItemCount = await _rm.QuestionRepository.GetTeacherQuestionsAsync(
+            paginationDTO, subjectId, teacher);
+
+        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
+            questionWithItemCount.Questions);
+
+        return (
+            Questions: questionDTOList,
+            TotalItemCount: questionWithItemCount.TotalItemCount
+        );
+    }
+
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
         var question = await _rm.QuestionRepository.GetByIdAsync(id);

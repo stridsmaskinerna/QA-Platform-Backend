@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Application.Tests.Utilities;
+namespace TestUtility.Factories;
 
 public static class UserFactory
 {

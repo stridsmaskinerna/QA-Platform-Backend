@@ -1,7 +1,7 @@
 using Domain.DTO.Response;
 using Domain.Entities;
 
-namespace Application.Tests.Utilities;
+namespace TestUtility.Factories;
 
 public static class TagFactory
 {

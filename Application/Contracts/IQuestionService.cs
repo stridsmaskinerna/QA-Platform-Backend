@@ -16,4 +16,5 @@ public interface IQuestionService
     Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO);
     Task DeleteAsync(Guid id);
     Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id);
+    Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetTeacherQuestionsAsync(PaginationDTO paginationDTO, Guid subjectId);
 }

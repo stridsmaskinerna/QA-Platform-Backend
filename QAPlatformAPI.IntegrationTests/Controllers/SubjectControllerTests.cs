@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Domain.DTO.Request;
+using TestUtility.Factories;
 
 namespace QAPlatformAPI.IntegrationTests.Controllers;
 
@@ -24,11 +25,10 @@ public class QuestionControllerTests : IntegrationTestBase
         {
             // Arrange
             await AuthenticateAsAdminAsync();
-            var requestBody = new SubjectForCreationDTO
-            {
-                Name = "Test subject 2.0",
-                SubjectCode = "TestCode"
-            };
+            var requestBody = SubjectFactory.CreateSubjectForCreationDTO(
+                "Test subject 2.0",
+                "TestCode"
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -42,11 +42,10 @@ public class QuestionControllerTests : IntegrationTestBase
         {
             // Arrange
             await AuthenticateAsTeacherAsync();
-            var requestBody = new SubjectForCreationDTO
-            {
-                Name = "Test subject 2.0",
-                SubjectCode = "TestCode"
-            };
+            var requestBody = SubjectFactory.CreateSubjectForCreationDTO(
+                "Test subject 2.0",
+                "TestCode"
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -60,11 +59,10 @@ public class QuestionControllerTests : IntegrationTestBase
         {
             // Arrange
             await AuthenticateAsUserAsync();
-            var requestBody = new SubjectForCreationDTO
-            {
-                Name = "Test subject 2.0",
-                SubjectCode = "TestCode"
-            };
+            var requestBody = SubjectFactory.CreateSubjectForCreationDTO(
+                "Test subject 2.0",
+                "TestCode"
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);

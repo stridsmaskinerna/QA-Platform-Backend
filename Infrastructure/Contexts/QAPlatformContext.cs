@@ -23,6 +23,8 @@ public class QAPlatformContext : IdentityDbContext<User, IdentityRole, string>
 
     public DbSet<AnswerVotes> AnswerVotes => Set<AnswerVotes>();
 
+    public override DbSet<User> Users => Set<User>();
+
     public QAPlatformContext() { }
 
     public QAPlatformContext(DbContextOptions<QAPlatformContext> options)

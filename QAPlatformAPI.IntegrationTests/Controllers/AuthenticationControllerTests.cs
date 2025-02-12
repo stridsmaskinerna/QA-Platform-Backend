@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using Domain.DTO.Request;
 using Infrastructure.Seeds.Test;
+using TestUtility.Factories;
 
 namespace QAPlatformAPI.IntegrationTests.Controllers;
 
@@ -30,12 +30,11 @@ public class AuthenticationControllerTests : IntegrationTestBase
         )
         {
             // Arrange
-            var requestBody = new RegistrationDTO
-            {
-                Email = $"{userName}@ltu.se",
-                UserName = userName,
-                Password = password
-            };
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                userName,
+                $"{userName}@ltu.se",
+                password
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -48,12 +47,11 @@ public class AuthenticationControllerTests : IntegrationTestBase
         public async Task ShouldReturn_BadRequest_WhenInvalidMail()
         {
             // Arrange
-            var requestBody = new RegistrationDTO
-            {
-                Email = "321TestUser@mail.com",
-                UserName = "321newTestUser",
-                Password = "password"
-            };
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                "InavalidMailUser",
+                "InavalidMailUser@mail.com",
+                "password"
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -72,12 +70,11 @@ public class AuthenticationControllerTests : IntegrationTestBase
         )
         {
             // Arrange
-            var requestBody = new RegistrationDTO
-            {
-                Email = "321TestUser@mail.com",
-                UserName = "321newTestUser",
-                Password = password
-            };
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                "InvalidPasswordUser",
+                "InvalidPasswordUser@mail.com",
+                password
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -90,12 +87,11 @@ public class AuthenticationControllerTests : IntegrationTestBase
         public async Task ShouldReturn_Conflict_WhenRegistrationDataIsConflict()
         {
             // Arrange
-            var requestBody = new RegistrationDTO
-            {
-                Email = SeedConstantsTest.USER_EMAIL,
-                UserName = SeedConstantsTest.USER_USERNAME,
-                Password = SeedConstantsTest.DEFAULT_PWD
-            };
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                SeedConstantsTest.USER_USERNAME,
+                SeedConstantsTest.USER_EMAIL,
+                SeedConstantsTest.DEFAULT_PWD
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -117,12 +113,11 @@ public class AuthenticationControllerTests : IntegrationTestBase
         public async Task ShouldReturn_Ok_WhenValidRegistrationData()
         {
             // Arrange
-            var requestBody = new RegistrationDTO
-            {
-                Email = SeedConstantsTest.USER_EMAIL,
-                UserName = SeedConstantsTest.USER_USERNAME,
-                Password = SeedConstantsTest.DEFAULT_PWD
-            };
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                SeedConstantsTest.USER_USERNAME,
+                SeedConstantsTest.USER_EMAIL,
+                SeedConstantsTest.DEFAULT_PWD
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
@@ -135,12 +130,11 @@ public class AuthenticationControllerTests : IntegrationTestBase
         public async Task ShouldReturn_Unauthorized_WhenInvalidRegistrationData()
         {
             // Arrange
-            var requestBody = new RegistrationDTO
-            {
-                Email = "UnknownTestUser@mail.com",
-                UserName = "UnknownnewUser",
-                Password = "password"
-            };
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                "UnknownnewUser",
+                "UnknownTestUser@mail.com",
+                "password"
+            );
 
             // Act
             var response = await _client.PostAsJsonAsync(_endpoint, requestBody);

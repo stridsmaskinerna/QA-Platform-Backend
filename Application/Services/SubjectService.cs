@@ -3,7 +3,6 @@ using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
-using Infrastructure.Contexts;
 
 namespace Application.Services;
 
@@ -19,26 +18,16 @@ public class SubjectService : BaseService, ISubjectService
     }
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
     {
-        try
+        Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
+        foreach (string mail in subject.Teachers)
         {
-            Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
-            foreach (string mail in subject.Teachers)
-            {
-                //User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
-                User? choosenTeacher = _rm.UserRepository.GetUserByMail(mail);
-                if (choosenTeacher != null)
-                    sbjObj.Teachers.Add(choosenTeacher);
-            }
-            sbjObj.Topics = [];
-            return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.AddAsync(sbjObj));
-
+            //User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
+            User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
+            if (choosenTeacher != null)
+                sbjObj.Teachers.Add(choosenTeacher);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            throw;
-        }
-
+        sbjObj.Topics = [];
+        return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.AddAsync(sbjObj));
     }
 
 
@@ -69,6 +58,8 @@ public class SubjectService : BaseService, ISubjectService
 
     public async Task UpdateAsync(Guid Id, SubjectForCreationDTO subject)
     {
+        // Todo. Do not use try catch. Exception is handled by
+        // exception middleware.
         try
         {
 
@@ -83,7 +74,7 @@ public class SubjectService : BaseService, ISubjectService
             sbjObj.Teachers.Clear();
             foreach (string mail in subject.Teachers)
             {
-                User? choosenTeacher = _rm.UserRepository.GetUserByMail(mail);
+                User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
                 if (choosenTeacher != null)
                     sbjObj.Teachers.Add(choosenTeacher);
             }

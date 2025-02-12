@@ -1,6 +1,6 @@
-using System.Data.Entity;
 using Domain.Contracts;
 using Domain.Entities;
+using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,26 +12,30 @@ namespace Infrastructure.Repositories;
 /// </summary>
 public class UserRepository : IUserRepository
 {
-    private readonly UserManager<User> _userManager;
+    private UserManager<User> _userManager;
+    private readonly QAPlatformContext _dbContext;
 
     public UserRepository(
+        QAPlatformContext dbContext,
         UserManager<User> userManager
     )
     {
+        _dbContext = dbContext;
         _userManager = userManager;
     }
 
     public async Task<IEnumerable<User>> GetTeachersBySubjectIdAsync(Guid subjectId)
     {
-        return await _userManager.Users
+        var teachers = await _dbContext.Users
             .Where(u => u.Subjects.Any(s => s.Id == subjectId))
             .ToListAsync();
+
+        return teachers;
     }
 
     public async Task<User?> ValidateUserCredential(string? email, string? password)
     {
         var user = await _userManager.FindByEmailAsync(email!);
-
         if (user == null ||
             !await _userManager.CheckPasswordAsync(user, password!))
         {
@@ -41,12 +45,10 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public User? GetUserByMail(string mail)
+    public async Task<User?> GetUserByMailAsync(string mail)
     {
-
-        User? us = _userManager.Users.Where(user => user.Email == mail).FirstOrDefault();
-
-        return us;
-
+        return await _dbContext.Users
+            .Where(user => user.Email == mail)
+            .FirstOrDefaultAsync();
     }
 }

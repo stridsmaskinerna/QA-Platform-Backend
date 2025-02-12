@@ -1,18 +1,21 @@
+using Application.Contracts;
 using Application.Services;
-using Application.Tests.Utilities;
 using Domain.Constants;
+using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.Entities;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using TestUtility.Factories;
 
 namespace Application.Tests.Services;
 
 public class AuthenticationServiceTests : SetupServiceTests
 {
     private readonly Mock<IConfiguration> _mockConfiguration;
+
     private readonly AuthenticationService _authenticationService;
 
     public AuthenticationServiceTests()
@@ -75,7 +78,7 @@ public class AuthenticationServiceTests : SetupServiceTests
         {
             // Arrange
             _mockUserRepository
-                .Setup(r => r.ValidateUserCredential(_authDto.Email, _authDto.Password))
+                .Setup(s => s.ValidateUserCredential(_authDto.Email, _authDto.Password))
                 .ReturnsAsync(default(User));
 
             // Act & Assert
