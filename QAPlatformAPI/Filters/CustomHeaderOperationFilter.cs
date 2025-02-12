@@ -4,27 +4,39 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Domain.Constants;
 using Domain.DTO.Header;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
+using Presentation.Controllers;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class CustomHeadersOperationFilter : IOperationFilter
 {
+    private static readonly HashSet<(string Controller, string Action)> TargetEndpoints =
+    [
+        (nameof(QuestionController).Replace("Controller", ""), nameof(QuestionController.GetQuestions)),
+        (nameof(QuestionController).Replace("Controller", ""), nameof(QuestionController.GetPublicQuestions)),
+        (nameof(SubjectController).Replace("Controller", ""), nameof(SubjectController.GetTeacherSubjectList))
+    ];
+
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (operation.Responses.ContainsKey($"{StatusCodes.Status200OK}"))
+        if (operation.Responses.ContainsKey($"{StatusCodes.Status200OK}") &&
+            context.ApiDescription.ActionDescriptor is
+            ControllerActionDescriptor actionDescriptor)
         {
-            ApplyHeadersWith200StatusCode(operation);
-        }
-    }
+            var controllerName = actionDescriptor.ControllerName;
+            var actionName = actionDescriptor.ActionName;
 
-    private void ApplyHeadersWith200StatusCode(OpenApiOperation operation)
-    {
-        operation.Responses[$"{StatusCodes.Status200OK}"].Headers = new Dictionary<string, OpenApiHeader>()
-        {
+            if (TargetEndpoints.Contains((controllerName, actionName)))
             {
-                CustomHeaders.Pagination, PaginationHeaderSpec()
+                operation.Responses[$"{StatusCodes.Status200OK}"].Headers = new Dictionary<string, OpenApiHeader>()
+                {
+                    {
+                        CustomHeaders.Pagination, PaginationHeaderSpec()
+                    }
+                };
             }
-        };
+        }
     }
 
     private OpenApiHeader PaginationHeaderSpec()
