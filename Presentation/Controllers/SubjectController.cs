@@ -8,6 +8,8 @@ using Domain.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Filters;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Presentation.Controllers;
 
@@ -21,9 +23,9 @@ public class SubjectController : ControllerBase
     public SubjectController(IServiceManager sm) => _sm = sm;
 
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[Authorize]
     public async Task<ActionResult<IEnumerable<SubjectDTO>>> GetSubjectList()
     {
         var subjects = await _sm.SubjectService.GetAllAsync();
@@ -31,10 +33,11 @@ public class SubjectController : ControllerBase
     }
 
     [HttpGet("{id}/questions")]
+    [Authorize(Roles = DomainRoles.TEACHER)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Authorize(Roles = DomainRoles.TEACHER)]
+    [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
     public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetTeacherSubjectList(
         [FromRoute] Guid id,
         [FromQuery] PaginationDTO paginationDTO
@@ -58,11 +61,10 @@ public class SubjectController : ControllerBase
         return Ok(questions);
     }
 
-    // TODO. Do not use "create" only controller endpoint /api/subjects
-    [HttpPost("create")]
+    [HttpPost]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     public async Task<ActionResult<SubjectDTO>> CreateNewSubject([FromBody] SubjectForCreationDTO newSubject)
     {
 
@@ -70,12 +72,11 @@ public class SubjectController : ControllerBase
         return Created(String.Empty, subjectDTO);
     }
 
-    // TODO. Do not use "delete/{id}" only "{id}"
-    [HttpDelete("delete/{id}")]
+    [HttpDelete("{id}")]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     public async Task<IActionResult> DeleteSubjectAsync([FromRoute] Guid id)
     {
         await _sm.SubjectService.DeleteAsync(id);
@@ -83,10 +84,10 @@ public class SubjectController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     public async Task<IActionResult> ModifySubject([FromRoute] Guid id, [FromBody] SubjectForCreationDTO body)
     {
         await _sm.SubjectService.UpdateAsync(id, body);

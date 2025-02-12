@@ -1,5 +1,3 @@
-using QAPlatformAPI.Filters;
-
 namespace QAPlatformAPI.Extensions;
 
 public static class OpenAPIExtension
@@ -8,9 +6,9 @@ public static class OpenAPIExtension
     {
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(opt =>
+        services.AddSwaggerGen(options =>
         {
-            opt.OperationFilter<CustomHeadersOperationFilter>();
+            options.EnableAnnotations();
         });
     }
 
