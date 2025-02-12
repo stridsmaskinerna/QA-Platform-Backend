@@ -14,7 +14,7 @@ public class QuestionControllerTests : IntegrationTestBase
 
     public class CreateSubject : QuestionControllerTests
     {
-        private const string _endpoint = "/api/subject/create";
+        private const string _endpoint = "/api/subject";
 
         public CreateSubject(QAPlatformAPIFactory<Program> factory) :
             base(factory)
