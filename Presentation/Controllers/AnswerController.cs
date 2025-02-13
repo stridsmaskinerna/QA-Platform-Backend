@@ -58,4 +58,15 @@ public class AnswerController : ControllerBase
         await _sm.AnswerService.DeleteAsync(id);
         return Ok();
     }
+
+    [HttpPut("{id}/visibility")]
+    [Authorize(Roles = DomainRoles.TEACHER)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ManageAnswerVisibility(Guid id)
+    {
+        await _sm.AnswerService.ManageVisibilityAsync(id);
+        return Ok();
+    }
 }

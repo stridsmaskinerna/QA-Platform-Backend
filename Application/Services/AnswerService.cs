@@ -65,4 +65,14 @@ public class AnswerService : BaseService, IAnswerService
 
         await _rm.AnswerRepository.DeleteAsync(answer);
     }
+
+    public async Task ManageVisibilityAsync(Guid id) {
+        var answer = await _rm.AnswerRepository.GetByIdAsync(id);
+        if (answer == null)
+        {
+            NotFound(MsgNotFound(id));
+        }
+        answer.IsHidden = !answer.IsHidden;
+        await _rm.AnswerRepository.UpdateAsync(answer);
+    }
 }
