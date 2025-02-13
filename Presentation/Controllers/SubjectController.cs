@@ -14,7 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/subject")]
+[Route("api/subjects")]
 [Produces("application/json")]
 public class SubjectController : ControllerBase
 {
@@ -29,6 +29,16 @@ public class SubjectController : ControllerBase
     public async Task<ActionResult<IEnumerable<SubjectDTO>>> GetSubjectList()
     {
         var subjects = await _sm.SubjectService.GetAllAsync();
+        return Ok(subjects);
+    }
+
+    [HttpGet("teacher")]
+    [Authorize(Roles = DomainRoles.TEACHER)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<SubjectDTO>>> GetTeacherSubjectList()
+    {
+        var subjects = await _sm.SubjectService.GetTeacherSubjectsAsync();
         return Ok(subjects);
     }
 

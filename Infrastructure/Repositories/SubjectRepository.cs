@@ -29,6 +29,22 @@ namespace Infrastructure.Repositories
 
         }
 
+        public async Task<IEnumerable<Subject>> GetTeachersSubjectsAsync(
+            string teacherId
+        )
+        {
+            return await _dbContext.Subjects
+                .Include(s => s.Teachers)
+                .Where(s => s.Teachers.Any(t => t.Id == teacherId))
+                .Select(us => new Subject
+                {
+                    Id = us.Id,
+                    Name = us.Name,
+                    SubjectCode = us.SubjectCode,
+                    Teachers = us.Teachers,
+                    Topics = us.Topics.Where(t => t.IsActive).ToList()
+                }).ToListAsync();
+        }
 
         public async Task<Subject?> GetByIdAsync(Guid id)
         {
@@ -67,12 +83,5 @@ namespace Infrastructure.Repositories
                 await _dbContext.SaveChangesAsync();
             }
         }
-
-        //public async Task<List<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId)
-        //{
-        //    return await _dbContext.Topics
-        //        .Where(t => t.SubjectId == subjectId)
-        //        .ToListAsync();
-        //}
     }
 }

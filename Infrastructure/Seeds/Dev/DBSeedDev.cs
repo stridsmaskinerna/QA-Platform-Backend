@@ -104,7 +104,7 @@ public static class DBSeedDev
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = $"General";
+            s.Name = SeedConstantDev.general;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
@@ -173,13 +173,16 @@ public static class DBSeedDev
 
             for (int j = 0; j < subjects.Count; j++)
             {
-                if (RandomInt(0, 11) > 7)
+                if (subjects[j].Name == SeedConstantDev.general)
+                {
+                    continue;
+                }
+
+                if (RandomInt(0, 11) > 8)
                 {
                     user.Subjects.Add(subjects[j]);
                 }
             }
-
-
         }
 
         for (int i = nrOfAdmins + nrOfTeachers; i < users.Count; i++)
