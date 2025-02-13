@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using Domain.DTO.Request;
 using TestUtility.Factories;
 
 namespace QAPlatformAPI.IntegrationTests.Controllers;
@@ -14,7 +13,7 @@ public class QuestionControllerTests : IntegrationTestBase
 
     public class CreateSubject : QuestionControllerTests
     {
-        private const string _endpoint = "/api/subject";
+        private const string _endpoint = "/api/subjects";
 
         public CreateSubject(QAPlatformAPIFactory<Program> factory) :
             base(factory)
