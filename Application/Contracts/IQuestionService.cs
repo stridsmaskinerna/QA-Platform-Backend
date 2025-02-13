@@ -17,4 +17,5 @@ public interface IQuestionService
     Task DeleteAsync(Guid id);
     Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id);
     Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetTeacherQuestionsAsync(PaginationDTO paginationDTO, Guid subjectId);
+    Task ManageQuestionVisibilityAsync(Guid id);
 }
