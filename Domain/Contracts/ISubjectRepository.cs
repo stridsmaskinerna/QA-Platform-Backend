@@ -11,6 +11,6 @@ public interface ISubjectRepository
     Task<Subject> AddAsync(Subject subject);
     Task UpdateAsync(Subject subject);
     Task DeleteAsync(Guid id);
+    Task<IEnumerable<Subject>> GetTeachersSubjectsAsync(string teacherId);
 
-    // Task<List<Topic>> GetTopicsBySubjectIdAsync(Guid subjectId);
 }
