@@ -153,4 +153,15 @@ public class QuestionController : ControllerBase
         await _sm.VoteService.CastVoteAsync(answerId, voteAsBoolean);
         return Ok();
     }
+
+    [HttpPut("{id}/visibility")]
+    [Authorize(Roles = DomainRoles.TEACHER)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ManageQuestionVisibility([FromRoute] Guid id)
+    {
+        await _sm.QuestionService.ManageQuestionVisibilityAsync(id);
+        return Ok();
+    }
 }

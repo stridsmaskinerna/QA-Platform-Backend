@@ -7,5 +7,6 @@ public interface IAnswerService
 {
     Task<AnswerDTO> AddAsync(AnswerForCreationDTO answerDTO);
     Task DeleteAsync(Guid id);
+    Task ManageVisibilityAsync(Guid id);
     Task UpdateAsync(Guid id, AnswerForPutDTO answerDTO);
 }
