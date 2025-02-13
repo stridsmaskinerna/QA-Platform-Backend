@@ -49,6 +49,17 @@ public class QuestionService : BaseService, IQuestionService
         );
     }
 
+    public async Task ManageQuestionVisibilityAsync(Guid id)
+    {
+        var question = await _rm.QuestionRepository.GetByIdAsync(id);
+        if (question == null)
+        {
+            NotFound(MsgNotFound(id));
+        }
+        question.IsHidden = !question.IsHidden;
+        await _rm.QuestionRepository.UpdateAsync(question);
+    }
+
     public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetTeacherQuestionsAsync(
         PaginationDTO paginationDTO,
         Guid subjectId
