@@ -48,7 +48,7 @@ public class QuestionService : BaseService, IQuestionService
         var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
             Questions);
 
-        if (userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
+        if (userId is not null && userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
         {
             await UpdateQuestionDTOIsHideableField(questionDTOs, userId);
             //Filter out all question that are hidden and not hideable
@@ -60,13 +60,8 @@ public class QuestionService : BaseService, IQuestionService
         );
     }
 
-    private async Task UpdateQuestionDTOIsHideableField(IEnumerable<QuestionDTO> DTOList, string? userId)
+    private async Task UpdateQuestionDTOIsHideableField(IEnumerable<QuestionDTO> DTOList, string userId)
     {
-        if (userId is null)
-        {
-            Unauthorized();
-        }
-
         var teachersSubjectIds = (await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId)).Select(s => s.Id);
 
         foreach (var dto in DTOList)

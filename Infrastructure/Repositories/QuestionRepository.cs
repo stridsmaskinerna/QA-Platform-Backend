@@ -150,7 +150,6 @@ public class QuestionRepository : IQuestionRepository
         {
             return queryable.Where(q => !q.IsProtected);
         }
-
         return queryable;
     }
 
