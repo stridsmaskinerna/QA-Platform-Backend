@@ -156,7 +156,7 @@ public class QuestionRepository : IQuestionRepository
 
     private IQueryable<Question> ApplyIsHiddenFilter(IQueryable<Question> q, List<string>? userRoles)
     {
-        if (userRoles is not null && !userRoles.Contains(DomainRoles.TEACHER))
+        if (userRoles is null || !userRoles.Contains(DomainRoles.TEACHER))
         {
             return q.Where(q => !q.IsHidden);
         }
