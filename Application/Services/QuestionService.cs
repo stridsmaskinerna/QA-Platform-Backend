@@ -35,19 +35,31 @@ public class QuestionService : BaseService, IQuestionService
     )
     {
         string? userId = null;
-        if (!onlyPublic) userId = _sm.TokenService.GetUserId();
+        List<string>? userRoles = null;
+        if (!onlyPublic)
+        {
+            userId = _sm.TokenService.GetUserId();
+            userRoles = _sm.TokenService.GetUserRoles();
+        }
+        var (Questions, TotalItemCount) = await _rm.QuestionRepository.GetItemsAsync(
+            paginationDTO, searchDTO, onlyPublic, userId, userRoles);
 
-        var questionWithItemCount = await _rm.QuestionRepository.GetItemsAsync(
-            paginationDTO, searchDTO, onlyPublic, userId);
+        var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
+            Questions);
 
-        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
-            questionWithItemCount.Questions);
+        if (userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
+        {
+            await SetIsHideable(questionDTOs, userId);
+            //Filter out all question that are hidden and not hideable
+            questionDTOs = questionDTOs.Where(q => !q.IsHidden || q.IsHideable).ToList();
+        }
 
         return (
-            Questions: questionDTOList,
-            TotalItemCount: questionWithItemCount.TotalItemCount
+            Questions: questionDTOs, TotalItemCount
         );
     }
+
+
 
     public async Task ManageQuestionVisibilityAsync(Guid id)
     {
@@ -262,6 +274,21 @@ public class QuestionService : BaseService, IQuestionService
             {
                 question.Tags.Add(tag);
             }
+        }
+    }
+
+    private async Task SetIsHideable(IEnumerable<QuestionDTO> questionDTOs, string? userId)
+    {
+        if (userId is null)
+        {
+            Unauthorized();
+        }
+
+        var teachersSubjectIds = (await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId)).Select(s => s.Id);
+
+        foreach (var dto in questionDTOs)
+        {
+            dto.IsHideable = teachersSubjectIds.Contains(dto.SubjectId);
         }
     }
 }
