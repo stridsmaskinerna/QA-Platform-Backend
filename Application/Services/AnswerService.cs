@@ -66,7 +66,8 @@ public class AnswerService : BaseService, IAnswerService
         await _rm.AnswerRepository.DeleteAsync(answer);
     }
 
-    public async Task ManageVisibilityAsync(Guid id) {
+    public async Task ManageVisibilityAsync(Guid id)
+    {
         var answer = await _rm.AnswerRepository.GetByIdAsync(id);
         if (answer == null)
         {
