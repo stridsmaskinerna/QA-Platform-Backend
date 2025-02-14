@@ -87,6 +87,7 @@ public class QuestionRepository : IQuestionRepository
             .Include(q => q.Answers)
             .Include(q => q.User);
 
+        // TODO Apply subject filter here also
         query = query
             .Pipe(q => ApplyUserFilter(q, teacher))
             .Pipe(ApplySorting)
@@ -98,6 +99,7 @@ public class QuestionRepository : IQuestionRepository
         );
     }
 
+    // TODO Apply subject filter here also
     private IQueryable<Question> ApplyUserFilter(
         IQueryable<Question> queryable,
         User teacher
