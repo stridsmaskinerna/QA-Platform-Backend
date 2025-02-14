@@ -105,6 +105,12 @@ public class QuestionService : BaseService, IQuestionService
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
             questionWithItemCount.Questions);
 
+        foreach (var dto in questionDTOList)
+        {
+            dto.IsHideable = true;
+        }
+
+
         return (
             Questions: questionDTOList,
             TotalItemCount: questionWithItemCount.TotalItemCount
