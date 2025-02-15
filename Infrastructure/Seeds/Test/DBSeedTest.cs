@@ -2,16 +2,14 @@ using Bogus;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
-using Infrastructure.Seeds.Prod;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Test;
 
-// TODO Update seed data for tests
-// and reuse logic between prod, dev, and test
-// seed when appropriate.
 public static class DBSeedTest
 {
+    private static readonly IBaseSeeder _seeder = new BaseSeeder();
+
     public static async Task RunAsync(
         QAPlatformContext context,
         UserManager<User> userManager,
@@ -21,18 +19,32 @@ public static class DBSeedTest
         var subjects = CreateSubjects();
         await context.AddRangeAsync(subjects);
 
-        await CreateUserRoles(roleManager);
+        await _seeder.CreateUserRoles(roleManager);
 
-        await CreateTestAdmin(userManager);
-
-        await CreateTestTeacher(userManager);
-
-        await CreateTestUser(userManager);
-
-        var topics = CreateTopics(subjects);
+        var topics = _seeder.CreateTopics(subjects);
         await context.AddRangeAsync(topics);
 
+        var tags = _seeder.CreateTags();
+        await context.AddRangeAsync(tags);
+
+        var users = await CreateUsers(subjects, userManager);
+
+        var questions = _seeder.CreateQuestions(10, topics, tags, users);
+        await context.AddRangeAsync(questions);
+
         await context.SaveChangesAsync();
+    }
+
+    private static async Task<List<User>> CreateUsers(
+        List<Subject> subjects,
+        UserManager<User> userManager
+    )
+    {
+        return [
+            await CreateTestAdmin(userManager),
+            await CreateTestTeacher(subjects, userManager),
+            await CreateTestUser(userManager)
+        ];
     }
 
     private static List<Subject> CreateSubjects()
@@ -41,22 +53,22 @@ public static class DBSeedTest
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = $"General";
+            s.Name = SeedConstant.general;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
 
+        var testSubject = new Faker<Subject>().Rules((f, s) =>
+        {
+            s.Name = SeedConstantsTest.A_SEEDED_TEST_SUBJECT;
+            s.SubjectCode = "TEST_SUBJECT_ID";
+        });
+        subjects.Add(testSubject);
+
         return [.. subjects];
     }
 
-    internal static async Task CreateUserRoles(
-        RoleManager<IdentityRole> roleManager
-    )
-    {
-        await DBSeedProd.CreateUserRoles(roleManager);
-    }
-
-    private static async Task CreateTestAdmin(
+    private static async Task<User> CreateTestAdmin(
         UserManager<User> userManager,
         string password = SeedConstantsTest.DEFAULT_PWD
     )
@@ -68,13 +80,16 @@ public static class DBSeedTest
         };
 
         var result = await userManager.CreateAsync(testAdmin, password);
-        if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+        if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
         await userManager.AddToRoleAsync(testAdmin, DomainRoles.USER);
         await userManager.AddToRoleAsync(testAdmin, DomainRoles.TEACHER);
         await userManager.AddToRoleAsync(testAdmin, DomainRoles.ADMIN);
+
+        return testAdmin;
     }
 
-    private static async Task CreateTestTeacher(
+    private static async Task<User> CreateTestTeacher(
+        List<Subject> subjects,
         UserManager<User> userManager,
         string password = SeedConstantsTest.DEFAULT_PWD
     )
@@ -90,9 +105,21 @@ public static class DBSeedTest
         if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
         await userManager.AddToRoleAsync(testTeacher, DomainRoles.USER);
         await userManager.AddToRoleAsync(testTeacher, DomainRoles.TEACHER);
+
+        for (int j = 0; j < subjects.Count; j++)
+        {
+            if (subjects[j].Name == SeedConstant.general)
+            {
+                continue;
+            }
+
+            testTeacher.Subjects.Add(subjects[j]);
+        }
+
+        return testTeacher;
     }
 
-    private static async Task CreateTestUser(
+    private static async Task<User> CreateTestUser(
         UserManager<User> userManager,
         string password = SeedConstantsTest.DEFAULT_PWD
     )
@@ -106,28 +133,7 @@ public static class DBSeedTest
         var result = await userManager.CreateAsync(testUser, password);
         if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
         await userManager.AddToRoleAsync(testUser, DomainRoles.USER);
-    }
 
-    private static List<Topic> CreateTopics(
-        List<Subject> subjects
-    )
-    {
-        var topics = new List<Topic>();
-
-        foreach (var subject in subjects)
-        {
-            var nameOfDefaultSubject = subject.Name;
-
-            var topic = new Topic()
-            {
-                Subject = subject,
-                SubjectId = subject.Id,
-                Name = nameOfDefaultSubject,
-                IsActive = true
-            };
-            topics.Add(topic);
-        }
-
-        return topics;
+        return testUser;
     }
 }

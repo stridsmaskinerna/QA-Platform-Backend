@@ -87,9 +87,9 @@ public class QuestionRepository : IQuestionRepository
             .Include(q => q.Answers)
             .Include(q => q.User);
 
-        // TODO Apply subject filter here also
         query = query
             .Pipe(q => ApplyUserFilter(q, teacher))
+            .Pipe(q => ApplySubjectFilter(q, subjectId))
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
@@ -97,15 +97,6 @@ public class QuestionRepository : IQuestionRepository
             Questions: await query.ToListAsync(),
             TotalItemCount: totalItemCount
         );
-    }
-
-    // TODO Apply subject filter here also
-    private IQueryable<Question> ApplyUserFilter(
-        IQueryable<Question> queryable,
-        User teacher
-    )
-    {
-        return queryable.Where(q => q.Topic.Subject.Teachers.Contains(teacher));
     }
 
     public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
@@ -130,7 +121,8 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(q => ApplyPublicFilter(q, onlyPublic))
             .Pipe(q => ApplyUserInteractionTypeFilter(q, searchDTO, userId))
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
-            .Pipe(q => ApplySubjectAndTopiFilter(q, searchDTO))
+            .Pipe(q => ApplySubjectFilter(q, searchDTO.SubjectId))
+            .Pipe(q => ApplyTopicFilter(q, searchDTO.TopicId))
             .Pipe(q => ApplySearchFilter(q, searchDTO))
             .Pipe(q => ApplySorting(q))
             .Pipe(q => ApplyPagination(q, paginationDTO));
@@ -139,6 +131,27 @@ public class QuestionRepository : IQuestionRepository
             Questions: await query.ToListAsync(),
             TotalItemCount: totalItemCount
         );
+    }
+
+    private IQueryable<Question> ApplyPublicFilter(
+        IQueryable<Question> queryable,
+        bool onlyPublic
+    )
+    {
+        if (onlyPublic)
+        {
+            return queryable.Where(q => !q.IsProtected);
+        }
+
+        return queryable;
+    }
+
+    private IQueryable<Question> ApplyUserFilter(
+        IQueryable<Question> queryable,
+        User teacher
+    )
+    {
+        return queryable.Where(q => q.Topic.Subject.Teachers.Contains(teacher));
     }
 
     private IQueryable<Question> ApplyUserInteractionTypeFilter(
@@ -163,19 +176,6 @@ public class QuestionRepository : IQuestionRepository
         return queryable;
     }
 
-    private IQueryable<Question> ApplyPublicFilter(
-        IQueryable<Question> queryable,
-        bool onlyPublic
-    )
-    {
-        if (onlyPublic)
-        {
-            return queryable.Where(q => !q.IsProtected);
-        }
-
-        return queryable;
-    }
-
     private IQueryable<Question> ApplyResolvedFilter(
         IQueryable<Question> queryable,
         QuestionSearchDTO searchDTO
@@ -191,19 +191,27 @@ public class QuestionRepository : IQuestionRepository
             : queryable.Where(q => !q.IsResolved);
     }
 
-    private IQueryable<Question> ApplySubjectAndTopiFilter(
+    private IQueryable<Question> ApplySubjectFilter(
         IQueryable<Question> queryable,
-        QuestionSearchDTO searchDTO
+        Guid? subjectId
     )
     {
-        if (searchDTO.SubjectId is not null)
+        if (subjectId is not null)
         {
-            queryable = queryable.Where(q => q.Topic.Subject.Id == searchDTO.SubjectId);
+            queryable = queryable.Where(q => q.Topic.Subject.Id == subjectId);
         }
 
-        if (searchDTO.TopicId is not null)
+        return queryable;
+    }
+
+    private IQueryable<Question> ApplyTopicFilter(
+        IQueryable<Question> queryable,
+        Guid? topicId
+    )
+    {
+        if (topicId is not null)
         {
-            queryable = queryable.Where(q => q.Topic.Id == searchDTO.TopicId);
+            queryable = queryable.Where(q => q.Topic.Id == topicId);
         }
 
         return queryable;

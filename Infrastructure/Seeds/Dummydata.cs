@@ -1,4 +1,4 @@
-namespace Infrastructure.Seeds.Dev;
+namespace Infrastructure.Seeds;
 
 static class Dummydata
 {

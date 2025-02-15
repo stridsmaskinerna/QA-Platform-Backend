@@ -15,4 +15,6 @@ public static class SeedConstantsTest
     public const string USER_EMAIL = "testUser@ltu.se";
 
     public const string DEFAULT_PWD = "password";
+
+    public const string A_SEEDED_TEST_SUBJECT = "ASeededTestSubject";
 }
