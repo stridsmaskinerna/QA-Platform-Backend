@@ -16,9 +16,10 @@ namespace Presentation.Controllers;
 
 
 [ApiController]
+[Authorize(Roles = $"{DomainRoles.TEACHER}")]
 [Route("api/topics")]
 [Produces("application/json")]
-class TopicController : ControllerBase
+public class TopicController : ControllerBase
 {
     private readonly IServiceManager _sm;
 
@@ -26,6 +27,7 @@ class TopicController : ControllerBase
     {
         _sm = sm;
     }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

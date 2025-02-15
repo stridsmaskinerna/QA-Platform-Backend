@@ -10,8 +10,7 @@ namespace Application.ProfilesMaps
     {
         public TopicProfileMapper()
         {
-            CreateMap<Topic, TopicDTO>();
-
+            CreateMap<Topic, TopicDTO>().ReverseMap();
         }
     }
 }
