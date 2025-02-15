@@ -1,6 +1,8 @@
+using Application.Contracts;
 using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Domain.Exceptions;
 using Moq;
 using TestUtility.Factories;
 
@@ -188,6 +190,66 @@ public class SubjectServiceTests : SetupServiceTests
             _mockUserRepository.Verify(
                 r => r.GetUserByMailAsync(subjectDto.Teachers.First()),
                 Times.Exactly(teachers.Count));
+        }
+    }
+
+    public class DeleteAsync : SubjectServiceTests
+    {
+        [Fact]
+        public async Task ShouldCallRepositoryDelete_WhenSubjectExist()
+        {
+            // Arrange
+            var subjectId = Guid.NewGuid();
+
+            _mockSubjectRepository
+                .Setup(r => r.DeleteAsync(subjectId))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await _subjectService.DeleteAsync(subjectId);
+
+            // Assert
+            _mockSubjectRepository.Verify(
+                r => r.DeleteAsync(subjectId),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenSubjectDoesNotExist()
+        {
+            // Arrange
+            var subjectId = Guid.NewGuid();
+
+            _mockSubjectRepository
+                .Setup(r => r.GetByIdAsync(subjectId))
+                .ReturnsAsync(default(Subject));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _subjectService.DeleteAsync(subjectId));
+        }
+
+        [Fact]
+        public async Task ShouldNotCallRepositoryDelete_WhenSubjectDoesNotExist()
+        {
+            // Arrange
+            var subjectId = Guid.NewGuid();
+
+            _mockSubjectRepository
+                .Setup(r => r.GetByIdAsync(subjectId))
+                .ReturnsAsync(default(Subject));
+
+            _mockSubjectRepository
+                .Setup(r => r.DeleteAsync(subjectId))
+                .Returns(Task.CompletedTask);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _subjectService.DeleteAsync(subjectId));
+
+            _mockSubjectRepository.Verify(
+                r => r.DeleteAsync(subjectId),
+                Times.Never);
         }
     }
 }

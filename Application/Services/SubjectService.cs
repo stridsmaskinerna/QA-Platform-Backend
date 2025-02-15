@@ -33,6 +33,13 @@ public class SubjectService : BaseService, ISubjectService
 
     public async Task DeleteAsync(Guid id)
     {
+        var subject = await _rm.SubjectRepository.GetByIdAsync(id);
+
+        if (subject == null)
+        {
+            NotFound();
+        }
+
         await _rm.SubjectRepository.DeleteAsync(id);
     }
 
