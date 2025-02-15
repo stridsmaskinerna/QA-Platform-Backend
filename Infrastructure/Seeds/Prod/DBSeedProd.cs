@@ -58,7 +58,7 @@ public static class DBSeedProd
             var role = new IdentityRole { Name = roleName };
             var result = await roleManager.CreateAsync(role);
 
-            if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
         }
     }
 
@@ -74,7 +74,7 @@ public static class DBSeedProd
         };
 
         var result = await userManager.CreateAsync(admin, password);
-        if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+        if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
         await userManager.AddToRoleAsync(admin, DomainRoles.USER);
         await userManager.AddToRoleAsync(admin, DomainRoles.TEACHER);
         await userManager.AddToRoleAsync(admin, DomainRoles.ADMIN);
