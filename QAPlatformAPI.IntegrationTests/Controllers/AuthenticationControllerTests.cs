@@ -88,9 +88,9 @@ public class AuthenticationControllerTests : IntegrationTestBase
         {
             // Arrange
             var requestBody = AuthenticationFactory.CreateRegistrationDTO(
-                SeedConstantsTest.USER_USERNAME,
-                SeedConstantsTest.USER_EMAIL,
-                SeedConstantsTest.DEFAULT_PWD
+                SeedDataTest.USER_USERNAME,
+                SeedDataTest.USER_EMAIL,
+                SeedDataTest.DEFAULT_PWD
             );
 
             // Act
@@ -114,9 +114,9 @@ public class AuthenticationControllerTests : IntegrationTestBase
         {
             // Arrange
             var requestBody = AuthenticationFactory.CreateRegistrationDTO(
-                SeedConstantsTest.USER_USERNAME,
-                SeedConstantsTest.USER_EMAIL,
-                SeedConstantsTest.DEFAULT_PWD
+                SeedDataTest.USER_USERNAME,
+                SeedDataTest.USER_EMAIL,
+                SeedDataTest.DEFAULT_PWD
             );
 
             // Act

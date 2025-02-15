@@ -64,13 +64,13 @@ public static class DBSeedProd
 
     private static async Task CreateUsers(
         UserManager<User> userManager,
-        string password = SeedConstantsProd.DEFAULT_PWD
+        string password = SeedDataProd.DEFAULT_PWD
     )
     {
         var admin = new User()
         {
-            UserName = SeedConstantsProd.ADMIN_USERNAME,
-            Email = SeedConstantsProd.ADMIN_EMAIL
+            UserName = SeedDataProd.ADMIN_USERNAME,
+            Email = SeedDataProd.ADMIN_EMAIL
         };
 
         var result = await userManager.CreateAsync(admin, password);

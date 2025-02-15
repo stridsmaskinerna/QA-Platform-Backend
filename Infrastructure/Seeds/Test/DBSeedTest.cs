@@ -53,22 +53,22 @@ public static class DBSeedTest
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = SeedConstant.general;
+            s.Name = SeedData.general;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
 
         var testSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = SeedConstantsTest.A_SEEDED_TEST_SUBJECT;
-            s.SubjectCode = SeedConstantsTest.A_SEEDED_TEST_SUBJECT_CODE;
+            s.Name = SeedDataTest.A_SEEDED_TEST_SUBJECT;
+            s.SubjectCode = SeedDataTest.A_SEEDED_TEST_SUBJECT_CODE;
         });
         subjects.Add(testSubject);
 
         testSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = SeedConstantsTest.A_SECOND_SEEDED_TEST_SUBJECT;
-            s.SubjectCode = SeedConstantsTest.A_SECOND_SEEDED_TEST_SUBJECT_CODE;
+            s.Name = SeedDataTest.A_SECOND_SEEDED_TEST_SUBJECT;
+            s.SubjectCode = SeedDataTest.A_SECOND_SEEDED_TEST_SUBJECT_CODE;
         });
         subjects.Add(testSubject);
 
@@ -77,13 +77,13 @@ public static class DBSeedTest
 
     private static async Task<User> CreateTestAdmin(
         UserManager<User> userManager,
-        string password = SeedConstantsTest.DEFAULT_PWD
+        string password = SeedDataTest.DEFAULT_PWD
     )
     {
         var testAdmin = new User()
         {
-            UserName = SeedConstantsTest.ADMIN_USERNAME,
-            Email = SeedConstantsTest.ADMIN_EMAIL
+            UserName = SeedDataTest.ADMIN_USERNAME,
+            Email = SeedDataTest.ADMIN_EMAIL
         };
 
         var result = await userManager.CreateAsync(testAdmin, password);
@@ -98,14 +98,14 @@ public static class DBSeedTest
     private static async Task<User> CreateTestTeacher(
         List<Subject> subjects,
         UserManager<User> userManager,
-        string password = SeedConstantsTest.DEFAULT_PWD
+        string password = SeedDataTest.DEFAULT_PWD
     )
     {
 
         var testTeacher = new User()
         {
-            UserName = SeedConstantsTest.TEACHER_EMAIL,
-            Email = SeedConstantsTest.TEACHER_EMAIL
+            UserName = SeedDataTest.TEACHER_EMAIL,
+            Email = SeedDataTest.TEACHER_EMAIL
         };
 
         var result = await userManager.CreateAsync(testTeacher, password);
@@ -115,7 +115,7 @@ public static class DBSeedTest
 
         for (int j = 0; j < subjects.Count; j++)
         {
-            if (subjects[j].Name == SeedConstant.general)
+            if (subjects[j].Name == SeedData.general)
             {
                 continue;
             }
@@ -128,13 +128,13 @@ public static class DBSeedTest
 
     private static async Task<User> CreateTestUser(
         UserManager<User> userManager,
-        string password = SeedConstantsTest.DEFAULT_PWD
+        string password = SeedDataTest.DEFAULT_PWD
     )
     {
         var testUser = new User()
         {
-            UserName = SeedConstantsTest.USER_USERNAME,
-            Email = SeedConstantsTest.USER_EMAIL
+            UserName = SeedDataTest.USER_USERNAME,
+            Email = SeedDataTest.USER_EMAIL
         };
 
         var result = await userManager.CreateAsync(testUser, password);

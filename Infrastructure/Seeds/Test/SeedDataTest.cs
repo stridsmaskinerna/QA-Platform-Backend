@@ -1,6 +1,6 @@
 namespace Infrastructure.Seeds.Test;
 
-public static class SeedConstantsTest
+public static class SeedDataTest
 {
     public const string ADMIN_USERNAME = "adminTest";
 

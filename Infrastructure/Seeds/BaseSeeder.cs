@@ -69,7 +69,7 @@ public class BaseSeeder : IBaseSeeder
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = SeedConstant.general;
+            s.Name = SeedData.general;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
@@ -90,7 +90,7 @@ public class BaseSeeder : IBaseSeeder
         List<Subject> subjects,
         int nrOfAdmins = 1,
         int nrOfTeachers = 10,
-        string password = SeedConstantsTest.DEFAULT_PWD
+        string password = SeedDataTest.DEFAULT_PWD
     )
     {
         if (nrOfUsers < nrOfAdmins + nrOfTeachers)
@@ -125,8 +125,8 @@ public class BaseSeeder : IBaseSeeder
         for (int i = 0; i < nrOfAdmins; i++)
         {
             var user = users[i];
-            user.UserName = SeedConstantsTest.ADMIN_USERNAME;
-            user.Email = SeedConstantsTest.ADMIN_EMAIL;
+            user.UserName = SeedDataTest.ADMIN_USERNAME;
+            user.Email = SeedDataTest.ADMIN_EMAIL;
 
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
@@ -147,7 +147,7 @@ public class BaseSeeder : IBaseSeeder
 
             for (int j = 0; j < subjects.Count; j++)
             {
-                if (subjects[j].Name == SeedConstant.general)
+                if (subjects[j].Name == SeedData.general)
                 {
                     continue;
                 }
@@ -277,13 +277,13 @@ public class BaseSeeder : IBaseSeeder
                     rndTags.Add(tags[RandomInt(0, tags.Count)]);
                 }
 
-                var idx = RandomInt(0, Dummydata.StudentQuestions.Length);
+                var idx = RandomInt(0, SeedData.StudentQuestions.Length);
                 var question = new Faker<Question>("en").Rules((f, q) =>
                 {
                     q.TopicId = topic.Id;
                     q.UserId = users[RandomInt(0, users.Count)].Id;
-                    q.Title = Dummydata.StudentQuestions[idx].Title;
-                    q.Description = Dummydata.StudentQuestions[idx].Description;
+                    q.Title = SeedData.StudentQuestions[idx].Title;
+                    q.Description = SeedData.StudentQuestions[idx].Description;
                     q.Created = DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow, new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)), DateTimeKind.Utc);
                     q.IsResolved = RandomBool();
                     q.IsProtected = RandomBool();
