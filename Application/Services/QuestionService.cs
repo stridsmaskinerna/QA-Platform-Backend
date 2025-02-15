@@ -6,6 +6,7 @@ using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic;
 
 namespace Application.Services;
 
@@ -35,18 +36,38 @@ public class QuestionService : BaseService, IQuestionService
     )
     {
         string? userId = null;
-        if (!onlyPublic) userId = _sm.TokenService.GetUserId();
+        List<string>? userRoles = null;
+        if (!onlyPublic)
+        {
+            userId = _sm.TokenService.GetUserId();
+            userRoles = _sm.TokenService.GetUserRoles();
+        }
+        var (Questions, TotalItemCount) = await _rm.QuestionRepository.GetItemsAsync(
+            paginationDTO, searchDTO, onlyPublic, userId, userRoles);
 
-        var questionWithItemCount = await _rm.QuestionRepository.GetItemsAsync(
-            paginationDTO, searchDTO, onlyPublic, userId);
+        var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
+            Questions);
 
-        var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
-            questionWithItemCount.Questions);
+        if (userId is not null && userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
+        {
+            await UpdateQuestionDTOIsHideableField(questionDTOs, userId);
+            //Filter out all question that are hidden and not hideable
+            questionDTOs = questionDTOs.Where(q => !q.IsHidden || q.IsHideable).ToList();
+        }
 
         return (
-            Questions: questionDTOList,
-            TotalItemCount: questionWithItemCount.TotalItemCount
+            Questions: questionDTOs, TotalItemCount
         );
+    }
+
+    private async Task UpdateQuestionDTOIsHideableField(IEnumerable<QuestionDTO> DTOList, string userId)
+    {
+        var teachersSubjectIds = (await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId)).Select(s => s.Id);
+
+        foreach (var dto in DTOList)
+        {
+            dto.IsHideable = teachersSubjectIds.Contains(dto.SubjectId);
+        }
     }
 
     public async Task ManageQuestionVisibilityAsync(Guid id)
@@ -84,6 +105,12 @@ public class QuestionService : BaseService, IQuestionService
         var questionDTOList = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
             questionWithItemCount.Questions);
 
+        foreach (var dto in questionDTOList)
+        {
+            dto.IsHideable = true;
+        }
+
+
         return (
             Questions: questionDTOList,
             TotalItemCount: questionWithItemCount.TotalItemCount
@@ -103,9 +130,31 @@ public class QuestionService : BaseService, IQuestionService
 
         await UpdatingAnsweredByTeacherField(questionDTO);
 
-        UpdatingMyVoteField(question, questionDTO);
+        var userId = _sm.TokenService.GetUserId();
+
+        UpdatingMyVoteField(question, questionDTO, userId);
+        await UpdateQuestionDTOIsHideableField([questionDTO], userId);
+        UpdateAnswerIsHideableField(questionDTO);
+
+        if (questionDTO.IsHidden && !questionDTO.IsHideable)
+        {
+            NotFound(MsgNotFound(id));
+        }
 
         return questionDTO;
+    }
+
+    private void UpdateAnswerIsHideableField(QuestionDetailedDTO questionDTO)
+    {
+        if (!questionDTO.IsHideable)
+        {
+            return;
+        }
+
+        foreach (var answerDTO in questionDTO.Answers ?? [])
+        {
+            answerDTO.IsHideable = true;
+        }
     }
 
     public async Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id)
@@ -114,7 +163,7 @@ public class QuestionService : BaseService, IQuestionService
 
         // If question is protected send NotFound
         // to not provide any information to unauthenticated users.
-        if (question == null || question.IsProtected)
+        if (question == null || question.IsProtected || question.IsHidden)
         {
             NotFound(MsgNotFound(id));
         }
@@ -147,11 +196,10 @@ public class QuestionService : BaseService, IQuestionService
 
     private void UpdatingMyVoteField(
         Question question,
-        QuestionDetailedDTO questionDTO
+        QuestionDetailedDTO questionDTO,
+        string? userId
     )
     {
-        var userId = _sm.TokenService.GetUserId();
-
         var answerVotesDict = (question.Answers ?? Enumerable.Empty<Answer>())
             .SelectMany(a => a.AnswerVotes)
             .Where(v => v.UserId == userId)

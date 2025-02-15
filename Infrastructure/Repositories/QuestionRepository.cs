@@ -103,7 +103,8 @@ public class QuestionRepository : IQuestionRepository
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic,
-        string? userId
+        string? userId,
+        List<string>? userRoles
     )
     {
         var totalItemCount = await _dbContext.Questions.CountAsync();
@@ -119,6 +120,7 @@ public class QuestionRepository : IQuestionRepository
 
         query = query
             .Pipe(q => ApplyPublicFilter(q, onlyPublic))
+            .Pipe(q => ApplyIsHiddenFilter(q, userRoles))
             .Pipe(q => ApplyUserInteractionTypeFilter(q, searchDTO, userId))
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
             .Pipe(q => ApplySubjectFilter(q, searchDTO.SubjectId))
@@ -134,16 +136,24 @@ public class QuestionRepository : IQuestionRepository
     }
 
     private IQueryable<Question> ApplyPublicFilter(
-        IQueryable<Question> queryable,
-        bool onlyPublic
+         IQueryable<Question> queryable,
+         bool onlyPublic
     )
     {
         if (onlyPublic)
         {
             return queryable.Where(q => !q.IsProtected);
         }
-
         return queryable;
+    }
+
+    private IQueryable<Question> ApplyIsHiddenFilter(IQueryable<Question> q, List<string>? userRoles)
+    {
+        if (userRoles is null || !userRoles.Contains(DomainRoles.TEACHER))
+        {
+            return q.Where(q => !q.IsHidden);
+        }
+        return q;
     }
 
     private IQueryable<Question> ApplyUserFilter(
@@ -155,10 +165,10 @@ public class QuestionRepository : IQuestionRepository
     }
 
     private IQueryable<Question> ApplyUserInteractionTypeFilter(
-        IQueryable<Question> queryable,
-        QuestionSearchDTO searchDTO,
-        string? userId
-    )
+         IQueryable<Question> queryable,
+         QuestionSearchDTO searchDTO,
+         string? userId
+     )
     {
         if (userId is not null)
         {

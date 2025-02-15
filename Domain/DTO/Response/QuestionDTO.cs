@@ -17,5 +17,6 @@ public class QuestionDTO
     public bool IsProtected { get; set; }
     public bool IsHidden { get; set; }
     public int AnswerCount { get; set; }
+    public bool IsHideable { get; set; } = false;
     public ICollection<string>? Tags { get; set; }
 }
