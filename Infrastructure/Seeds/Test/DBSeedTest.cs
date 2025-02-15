@@ -61,7 +61,14 @@ public static class DBSeedTest
         var testSubject = new Faker<Subject>().Rules((f, s) =>
         {
             s.Name = SeedConstantsTest.A_SEEDED_TEST_SUBJECT;
-            s.SubjectCode = "TEST_SUBJECT_ID";
+            s.SubjectCode = SeedConstantsTest.A_SEEDED_TEST_SUBJECT_CODE;
+        });
+        subjects.Add(testSubject);
+
+        testSubject = new Faker<Subject>().Rules((f, s) =>
+        {
+            s.Name = SeedConstantsTest.A_SECOND_SEEDED_TEST_SUBJECT;
+            s.SubjectCode = SeedConstantsTest.A_SECOND_SEEDED_TEST_SUBJECT_CODE;
         });
         subjects.Add(testSubject);
 

@@ -17,4 +17,10 @@ public static class SeedConstantsTest
     public const string DEFAULT_PWD = "password";
 
     public const string A_SEEDED_TEST_SUBJECT = "ASeededTestSubject";
+
+    public const string A_SEEDED_TEST_SUBJECT_CODE = "TEST_SUBJECT_CODE_1";
+
+    public const string A_SECOND_SEEDED_TEST_SUBJECT = "ASecondSeededTestSubject";
+
+    public const string A_SECOND_SEEDED_TEST_SUBJECT_CODE = "TEST_SUBJECT_CODE_2";
 }
