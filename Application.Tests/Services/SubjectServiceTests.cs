@@ -1,4 +1,3 @@
-using Application.Contracts;
 using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
@@ -10,10 +9,11 @@ namespace Application.Tests.Services;
 
 
 // TODO!
-// 1) Update SubjectService class methods to check if subject exist before mapping.
-// 2) If not exist call base method not found
+// 1) Update SubjectService class methods to check if subject exist before
+//    mapping to avoid returning null mapping.
+// 2) If not exist call base method NotFound which throws an exception that will
+//    result in a 404 not found response. 
 // 3) If exist map and return.
-// 4) No try and catch should be used in service classes; exception handled by global exception middleware.
 public class SubjectServiceTests : SetupServiceTests
 {
     SubjectService _subjectService;
