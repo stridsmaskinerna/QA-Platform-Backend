@@ -14,7 +14,8 @@ public interface IQuestionRepository
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic,
-        string? userId
+        string? userId,
+        List<string>? userRoles
     );
     Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetTeacherQuestionsAsync(
         PaginationDTO paginationDTO,

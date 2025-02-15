@@ -57,6 +57,8 @@ public class QuestionServiceTests : SetupServiceTests
             var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
                 questionId, _mockTopic.Object.Id);
 
+
+
             _mockQuestionRepository
                 .Setup(q => q.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
@@ -69,10 +71,15 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(t => t.GetUserId())
                 .Returns(_mockUser.Object.Id);
 
+            _mockTokenService
+                .Setup(t => t.GetUserRoles())
+                .Returns([]);
+
             _mockUserRepository
                 .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
                 .ReturnsAsync([]);
 
+            _mockSubjectRepository.Setup(t => t.GetTeachersSubjectsAsync(_mockUser.Object.Id)).ReturnsAsync([]);
             // Act
             var result = await _questionService.GetByIdAsync(questionId);
 
@@ -117,6 +124,8 @@ public class QuestionServiceTests : SetupServiceTests
             var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
                 questionId, _mockTopic.Object.Id);
 
+            questionDTO.IsHideable = true;
+
             questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
             questionEntity.Answers.First(), teacherUser.UserName ?? String.Empty)];
 
@@ -134,6 +143,9 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
                 .ReturnsAsync([teacherUser]);
 
+            _mockTokenService.Setup(t => t.GetUserId()).Returns(teacherUser.Id);
+
+            _mockSubjectRepository.Setup(t => t.GetTeachersSubjectsAsync(teacherUser.Id)).ReturnsAsync([]);
             // Act
             var result = await _questionService.GetByIdAsync(questionId);
 
@@ -196,6 +208,8 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(u => u.GetTeachersBySubjectIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync([]);
 
+            _mockSubjectRepository.Setup(t => t.GetTeachersSubjectsAsync(userId)).ReturnsAsync([]);
+
             // Act
             var result = await _questionService.GetByIdAsync(questionId);
 
@@ -235,6 +249,10 @@ public class QuestionServiceTests : SetupServiceTests
             _mockTokenService
                 .Setup(t => t.GetUserId())
                 .Returns(_mockUser.Object.Id);
+
+            _mockTokenService
+                .Setup(t => t.GetUserRoles())
+                .Returns([]);
 
             _mockUserRepository
                 .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
@@ -297,12 +315,16 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
 
+            _mockTokenService
+            .Setup(t => t.GetUserRoles())
+            .Returns([]);
+
             _mockUserRepository
                 .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
                 .ReturnsAsync([teacherUser]);
 
             // Act
-            var result = await _questionService.GetByIdAsync(questionId);
+            var result = await _questionService.GetPublicQuestionByIdAsync(questionId);
 
             // Assert
             Assert.NotNull(result);

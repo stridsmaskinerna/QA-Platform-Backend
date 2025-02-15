@@ -36,6 +36,20 @@ public class TokenService : BaseService, ITokenService
 
         return userId;
     }
+    public List<string> GetUserRoles()
+    {
+        var userRoles = GetUser().Claims
+        .Where(claim => claim.Type == ClaimTypes.Role)
+        .Select(claim => claim.Value)
+        .ToList();
+
+        if (userRoles.Count == 0)
+        {
+            Unauthorized();
+        }
+
+        return userRoles;
+    }
 
     private ClaimsPrincipal GetUser()
     {
