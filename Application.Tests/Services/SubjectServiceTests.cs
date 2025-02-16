@@ -10,7 +10,8 @@ namespace Application.Tests.Services;
 
 // TODO!
 // 1) Update SubjectService class methods to check if subject exist before
-//    mapping to avoid returning null mapping.
+//    mapping to avoid returning null mapping or 200 OK, better to return
+//    204 No Content or 404 not found.
 // 2) If not exist call base method NotFound which throws an exception that will
 //    result in a 404 not found response. 
 // 3) If exist map and return.
