@@ -89,6 +89,7 @@ public class QuestionRepository : IQuestionRepository
 
         query = query
             .Pipe(q => ApplyUserFilter(q, teacher))
+            .Pipe(q => ApplySubjectFilter(q, subjectId))
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
@@ -96,14 +97,6 @@ public class QuestionRepository : IQuestionRepository
             Questions: await query.ToListAsync(),
             TotalItemCount: totalItemCount
         );
-    }
-
-    private IQueryable<Question> ApplyUserFilter(
-        IQueryable<Question> queryable,
-        User teacher
-    )
-    {
-        return queryable.Where(q => q.Topic.Subject.Teachers.Contains(teacher));
     }
 
     public async Task<(IEnumerable<Question> Questions, int TotalItemCount)> GetItemsAsync(
@@ -130,7 +123,8 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(q => ApplyIsHiddenFilter(q, userRoles))
             .Pipe(q => ApplyUserInteractionTypeFilter(q, searchDTO, userId))
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
-            .Pipe(q => ApplySubjectAndTopiFilter(q, searchDTO))
+            .Pipe(q => ApplySubjectFilter(q, searchDTO.SubjectId))
+            .Pipe(q => ApplyTopicFilter(q, searchDTO.TopicId))
             .Pipe(q => ApplySearchFilter(q, searchDTO))
             .Pipe(q => ApplySorting(q))
             .Pipe(q => ApplyPagination(q, paginationDTO));
@@ -144,7 +138,7 @@ public class QuestionRepository : IQuestionRepository
     private IQueryable<Question> ApplyPublicFilter(
          IQueryable<Question> queryable,
          bool onlyPublic
-     )
+    )
     {
         if (onlyPublic)
         {
@@ -160,6 +154,14 @@ public class QuestionRepository : IQuestionRepository
             return q.Where(q => !q.IsHidden);
         }
         return q;
+    }
+
+    private IQueryable<Question> ApplyUserFilter(
+        IQueryable<Question> queryable,
+        User teacher
+    )
+    {
+        return queryable.Where(q => q.Topic.Subject.Teachers.Contains(teacher));
     }
 
     private IQueryable<Question> ApplyUserInteractionTypeFilter(
@@ -199,19 +201,27 @@ public class QuestionRepository : IQuestionRepository
             : queryable.Where(q => !q.IsResolved);
     }
 
-    private IQueryable<Question> ApplySubjectAndTopiFilter(
+    private IQueryable<Question> ApplySubjectFilter(
         IQueryable<Question> queryable,
-        QuestionSearchDTO searchDTO
+        Guid? subjectId
     )
     {
-        if (searchDTO.SubjectId is not null)
+        if (subjectId is not null)
         {
-            queryable = queryable.Where(q => q.Topic.Subject.Id == searchDTO.SubjectId);
+            queryable = queryable.Where(q => q.Topic.Subject.Id == subjectId);
         }
 
-        if (searchDTO.TopicId is not null)
+        return queryable;
+    }
+
+    private IQueryable<Question> ApplyTopicFilter(
+        IQueryable<Question> queryable,
+        Guid? topicId
+    )
+    {
+        if (topicId is not null)
         {
-            queryable = queryable.Where(q => q.Topic.Id == searchDTO.TopicId);
+            queryable = queryable.Where(q => q.Topic.Id == topicId);
         }
 
         return queryable;

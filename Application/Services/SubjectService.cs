@@ -16,6 +16,7 @@ public class SubjectService : BaseService, ISubjectService
         _rm = rm;
         _sm = sm;
     }
+
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
     {
         Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
@@ -33,6 +34,13 @@ public class SubjectService : BaseService, ISubjectService
 
     public async Task DeleteAsync(Guid id)
     {
+        var subject = await _rm.SubjectRepository.GetByIdAsync(id);
+
+        if (subject == null)
+        {
+            NotFound();
+        }
+
         await _rm.SubjectRepository.DeleteAsync(id);
     }
 

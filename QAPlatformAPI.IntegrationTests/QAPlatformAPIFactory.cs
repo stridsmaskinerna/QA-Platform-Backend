@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Seeds.Base;
 using Infrastructure.Seeds.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -106,6 +107,11 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
                 await dbContext.Database.EnsureDeletedAsync();
                 await dbContext.Database.MigrateAsync();
                 await DBSeedTest.RunAsync(dbContext, userManager, roleManager);
+                break;
+            }
+            catch (SeedException ex)
+            {
+                Console.WriteLine(ex.Message);
                 break;
             }
             catch (Exception ex)

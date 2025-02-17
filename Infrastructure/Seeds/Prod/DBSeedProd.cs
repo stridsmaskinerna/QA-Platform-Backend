@@ -2,12 +2,15 @@ using Bogus;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Seeds.Base;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Prod;
 
 public static class DBSeedProd
 {
+    private static readonly IBaseSeeder _seeder = new BaseSeeder();
+
     public static async Task RunAsync(
         QAPlatformContext context,
         UserManager<User> userManager,
@@ -17,7 +20,7 @@ public static class DBSeedProd
         var subjects = CreateSubjects();
         await context.AddRangeAsync(subjects);
 
-        await CreateUserRoles(roleManager);
+        await _seeder.CreateUserRoles(roleManager);
 
         await CreateUsers(userManager);
 
@@ -33,7 +36,7 @@ public static class DBSeedProd
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = $"General";
+            s.Name = SeedDataProd.generalSubject;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
@@ -41,40 +44,19 @@ public static class DBSeedProd
         return [.. subjects];
     }
 
-    internal static async Task CreateUserRoles(
-        RoleManager<IdentityRole> roleManager
-    )
-    {
-        string[] roles =
-        [
-            DomainRoles.TEACHER,
-            DomainRoles.USER,
-            DomainRoles.ADMIN
-        ];
-
-        foreach (var roleName in roles)
-        {
-            if (await roleManager.RoleExistsAsync(roleName)) continue;
-            var role = new IdentityRole { Name = roleName };
-            var result = await roleManager.CreateAsync(role);
-
-            if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
-        }
-    }
-
     private static async Task CreateUsers(
         UserManager<User> userManager,
-        string password = SeedConstantsProd.DEFAULT_PWD
+        string password = SeedDataProd.DEFAULT_PWD
     )
     {
         var admin = new User()
         {
-            UserName = SeedConstantsProd.ADMIN_USERNAME,
-            Email = SeedConstantsProd.ADMIN_EMAIL
+            UserName = SeedDataProd.ADMIN_USERNAME,
+            Email = SeedDataProd.ADMIN_EMAIL
         };
 
         var result = await userManager.CreateAsync(admin, password);
-        if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+        if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
         await userManager.AddToRoleAsync(admin, DomainRoles.USER);
         await userManager.AddToRoleAsync(admin, DomainRoles.TEACHER);
         await userManager.AddToRoleAsync(admin, DomainRoles.ADMIN);

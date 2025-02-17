@@ -42,6 +42,7 @@ public class SubjectController : ControllerBase
         return Ok(subjects);
     }
 
+    // TODO. FIX BUG: Apply subject filter in repository
     [HttpGet("{id}/questions")]
     [Authorize(Roles = DomainRoles.TEACHER)]
     [ProducesResponseType(StatusCodes.Status200OK)]

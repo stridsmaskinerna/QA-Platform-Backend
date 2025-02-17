@@ -23,24 +23,24 @@ public class IntegrationTestBase : IClassFixture<QAPlatformAPIFactory<Program>>
     protected async Task AuthenticateAsAdminAsync()
     {
         await AuthenticateAsync(
-            SeedConstantsTest.ADMIN_EMAIL,
-            SeedConstantsTest.DEFAULT_PWD,
+            SeedDataTest.ADMIN_EMAIL,
+            SeedDataTest.DEFAULT_PWD,
             DomainRoles.ADMIN);
     }
 
     protected async Task AuthenticateAsTeacherAsync()
     {
         await AuthenticateAsync(
-            SeedConstantsTest.TEACHER_EMAIL,
-            SeedConstantsTest.DEFAULT_PWD,
+            SeedDataTest.TEACHER_EMAIL,
+            SeedDataTest.DEFAULT_PWD,
             DomainRoles.TEACHER);
     }
 
     protected async Task AuthenticateAsUserAsync()
     {
         await AuthenticateAsync(
-            SeedConstantsTest.USER_EMAIL,
-            SeedConstantsTest.DEFAULT_PWD,
+            SeedDataTest.USER_EMAIL,
+            SeedDataTest.DEFAULT_PWD,
             DomainRoles.USER);
     }
 

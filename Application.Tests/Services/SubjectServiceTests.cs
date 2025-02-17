@@ -1,6 +1,8 @@
 using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Domain.Exceptions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
 using TestUtility.Factories;
 
@@ -8,10 +10,12 @@ namespace Application.Tests.Services;
 
 
 // TODO!
-// 1) Update SubjectService class methods to check if subject exist before mapping.
-// 2) If not exist call base method not found
+// 1) Update SubjectService class methods to check if subject exist before
+//    mapping to avoid returning null mapping or 200 OK when not found.
+//    Better to return 404 not found.
+// 2) If not exist call base method NotFound which throws an exception that will
+//    result in a 404 not found response. 
 // 3) If exist map and return.
-// 4) No try and catch should be used in service classes; exception handled by global exception middleware.
 public class SubjectServiceTests : SetupServiceTests
 {
     SubjectService _subjectService;
@@ -188,6 +192,75 @@ public class SubjectServiceTests : SetupServiceTests
             _mockUserRepository.Verify(
                 r => r.GetUserByMailAsync(subjectDto.Teachers.First()),
                 Times.Exactly(teachers.Count));
+        }
+    }
+
+    public class DeleteAsync : SubjectServiceTests
+    {
+        [Fact]
+        public async Task ShouldCallRepositoryDelete_WhenSubjectExist()
+        {
+            // Arrange
+            var subjectId = Guid.NewGuid();
+
+            var subject = SubjectFactory.CreateSubjectEntity(
+                subjectId,
+                "TestSubject",
+                "TestCode");
+
+            _mockSubjectRepository
+                .Setup(r => r.GetByIdAsync(subjectId))
+                .ReturnsAsync(subject);
+
+            _mockSubjectRepository
+                .Setup(r => r.DeleteAsync(subjectId))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await _subjectService.DeleteAsync(subjectId);
+
+            // Assert
+            _mockSubjectRepository.Verify(
+                r => r.DeleteAsync(subjectId),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenSubjectDoesNotExist()
+        {
+            // Arrange
+            var subjectId = Guid.NewGuid();
+
+            _mockSubjectRepository
+                .Setup(r => r.GetByIdAsync(subjectId))
+                .ReturnsAsync(default(Subject));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _subjectService.DeleteAsync(subjectId));
+        }
+
+        [Fact]
+        public async Task ShouldNotCallRepositoryDelete_WhenSubjectDoesNotExist()
+        {
+            // Arrange
+            var subjectId = Guid.NewGuid();
+
+            _mockSubjectRepository
+                .Setup(r => r.GetByIdAsync(subjectId))
+                .ReturnsAsync(default(Subject));
+
+            _mockSubjectRepository
+                .Setup(r => r.DeleteAsync(subjectId))
+                .Returns(Task.CompletedTask);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _subjectService.DeleteAsync(subjectId));
+
+            _mockSubjectRepository.Verify(
+                r => r.DeleteAsync(subjectId),
+                Times.Never);
         }
     }
 }
