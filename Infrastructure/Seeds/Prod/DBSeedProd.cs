@@ -8,6 +8,8 @@ namespace Infrastructure.Seeds.Prod;
 
 public static class DBSeedProd
 {
+    private static readonly IBaseSeeder _seeder = new BaseSeeder();
+
     public static async Task RunAsync(
         QAPlatformContext context,
         UserManager<User> userManager,
@@ -17,7 +19,7 @@ public static class DBSeedProd
         var subjects = CreateSubjects();
         await context.AddRangeAsync(subjects);
 
-        await CreateUserRoles(roleManager);
+        await _seeder.CreateUserRoles(roleManager);
 
         await CreateUsers(userManager);
 
@@ -39,27 +41,6 @@ public static class DBSeedProd
         subjects.Add(generalSubject);
 
         return [.. subjects];
-    }
-
-    private static async Task CreateUserRoles(
-        RoleManager<IdentityRole> roleManager
-    )
-    {
-        string[] roles =
-        [
-            DomainRoles.TEACHER,
-            DomainRoles.USER,
-            DomainRoles.ADMIN
-        ];
-
-        foreach (var roleName in roles)
-        {
-            if (await roleManager.RoleExistsAsync(roleName)) continue;
-            var role = new IdentityRole { Name = roleName };
-            var result = await roleManager.CreateAsync(role);
-
-            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
-        }
     }
 
     private static async Task CreateUsers(

@@ -9,7 +9,7 @@ namespace Infrastructure.Seeds;
 
 public class BaseSeeder : IBaseSeeder
 {
-    public virtual List<Subject> CreateSubjects()
+    public List<Subject> CreateSubjects()
     {
         var subjects = new HashSet<Subject>();
 
@@ -77,14 +77,28 @@ public class BaseSeeder : IBaseSeeder
         return [.. subjects];
     }
 
-    public virtual async Task CreateUserRoles(
+    public async Task CreateUserRoles(
         RoleManager<IdentityRole> roleManager
     )
     {
-        await DBSeedProd.CreateUserRoles(roleManager);
+        string[] roles =
+        [
+            DomainRoles.TEACHER,
+            DomainRoles.USER,
+            DomainRoles.ADMIN
+        ];
+
+        foreach (var roleName in roles)
+        {
+            if (await roleManager.RoleExistsAsync(roleName)) continue;
+            var role = new IdentityRole { Name = roleName };
+            var result = await roleManager.CreateAsync(role);
+
+            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
+        }
     }
 
-    public virtual async Task<List<User>> CreateUsers(
+    public async Task<List<User>> CreateUsers(
         int nrOfUsers,
         UserManager<User> userManager,
         List<Subject> subjects,
@@ -171,7 +185,7 @@ public class BaseSeeder : IBaseSeeder
         return users;
     }
 
-    public virtual List<Topic> CreateTopics(
+    public List<Topic> CreateTopics(
         List<Subject> subjects
     )
     {
@@ -206,7 +220,7 @@ public class BaseSeeder : IBaseSeeder
         return topics;
     }
 
-    public virtual List<Tag> CreateTags()
+    public List<Tag> CreateTags()
     {
         var faker = new Faker();
         var generatedTags = new HashSet<string>();
@@ -254,7 +268,7 @@ public class BaseSeeder : IBaseSeeder
             .ToList();
     }
 
-    public virtual List<Question> CreateQuestions(
+    public List<Question> CreateQuestions(
         int maxQuantityPerTopic,
         List<Topic> topics,
         List<Tag> tags,
@@ -297,7 +311,7 @@ public class BaseSeeder : IBaseSeeder
         return questions;
     }
 
-    public virtual List<Answer> CreateAnswers(
+    public List<Answer> CreateAnswers(
         int maxQuantity,
         List<Question> questions,
         List<User> users
@@ -329,7 +343,7 @@ public class BaseSeeder : IBaseSeeder
         return answers;
     }
 
-    public virtual List<Comment> CreateComments(
+    public List<Comment> CreateComments(
         int maxQuantity,
         List<Answer> answers,
         List<User> users
@@ -355,7 +369,7 @@ public class BaseSeeder : IBaseSeeder
         return comments;
     }
 
-    public virtual List<AnswerVotes> CreateAnswerVotes(
+    public List<AnswerVotes> CreateAnswerVotes(
         List<User> users,
         List<Answer> answers
     )
