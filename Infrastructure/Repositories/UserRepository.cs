@@ -51,4 +51,14 @@ public class UserRepository : IUserRepository
             .Where(user => user.Email == mail)
             .FirstOrDefaultAsync();
     }
+
+    public async Task ChangeUserRoleToTeacher(string Id)
+    {
+        var user = await _userManager.FindByIdAsync(Id);
+        if (user != null)
+        {
+            await _userManager.RemoveFromRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "Teacher");
+        }
+    }
 }

@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
@@ -10,11 +11,13 @@ public class SubjectService : BaseService, ISubjectService
 {
     private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
+    private UserManager<User> _userManager;
 
-    public SubjectService(IRepositoryManager rm, IServiceManager sm)
+    public SubjectService(IRepositoryManager rm, IServiceManager sm, UserManager<User> userManager)
     {
         _rm = rm;
         _sm = sm;
+        _userManager = userManager;
     }
 
     public async Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject)
@@ -25,7 +28,11 @@ public class SubjectService : BaseService, ISubjectService
             //User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
             User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
             if (choosenTeacher != null)
+            {
+                if ((await _userManager.GetRolesAsync(choosenTeacher)).Contains("User"))
+                    await _sm.TeacherService.AssignTeacherRoleToUser(choosenTeacher.Id);
                 sbjObj.Teachers.Add(choosenTeacher);
+            }
         }
         sbjObj.Topics = [];
         return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.AddAsync(sbjObj));
@@ -87,7 +94,11 @@ public class SubjectService : BaseService, ISubjectService
         {
             User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
             if (choosenTeacher != null)
+            {
+                if ((await _userManager.GetRolesAsync(choosenTeacher)).Contains("User"))
+                    await _sm.TeacherService.AssignTeacherRoleToUser(choosenTeacher.Id);
                 sbjObj.Teachers.Add(choosenTeacher);
+            }
         }
 
         await _rm.SubjectRepository.UpdateAsync(sbjObj);

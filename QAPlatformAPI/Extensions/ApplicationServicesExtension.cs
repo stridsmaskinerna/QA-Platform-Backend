@@ -30,6 +30,7 @@ public static class ApplicationServicesExtension
         services.AddAsLazy<ITagService, TagService>();
         services.AddAsLazy<ITokenService, TokenService>();
         services.AddAsLazy<ITopicService, TopicService>();
+        services.AddAsLazy<ITeacherService, TeacherService>();
         services.AddAsLazy<IUtilityService, UtilityService>();
         services.AddAsLazy<IVoteService, VoteService>();
 
