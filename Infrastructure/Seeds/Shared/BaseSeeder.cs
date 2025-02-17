@@ -1,11 +1,10 @@
 using Bogus;
 using Domain.Constants;
 using Domain.Entities;
-using Infrastructure.Seeds.Prod;
 using Infrastructure.Seeds.Test;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Seeds;
+namespace Infrastructure.Seeds.Shared;
 
 public class BaseSeeder : IBaseSeeder
 {
@@ -69,7 +68,7 @@ public class BaseSeeder : IBaseSeeder
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = SeedData.general;
+            s.Name = SeedData.generalSubject;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
@@ -161,7 +160,7 @@ public class BaseSeeder : IBaseSeeder
 
             for (int j = 0; j < subjects.Count; j++)
             {
-                if (subjects[j].Name == SeedData.general)
+                if (subjects[j].Name == SeedData.generalSubject)
                 {
                     continue;
                 }

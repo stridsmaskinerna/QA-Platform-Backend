@@ -2,6 +2,7 @@ using Bogus;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Seeds.Shared;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Prod;
@@ -35,7 +36,7 @@ public static class DBSeedProd
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = $"General";
+            s.Name = SeedDataProd.generalSubject;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);

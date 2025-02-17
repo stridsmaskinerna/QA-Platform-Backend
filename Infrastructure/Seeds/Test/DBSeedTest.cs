@@ -2,6 +2,7 @@ using Bogus;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Seeds.Shared;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Test;
@@ -53,7 +54,7 @@ public static class DBSeedTest
 
         var generalSubject = new Faker<Subject>().Rules((f, s) =>
         {
-            s.Name = SeedData.general;
+            s.Name = SeedData.generalSubject;
             s.SubjectCode = null;
         });
         subjects.Add(generalSubject);
@@ -115,7 +116,7 @@ public static class DBSeedTest
 
         for (int j = 0; j < subjects.Count; j++)
         {
-            if (subjects[j].Name == SeedData.general)
+            if (subjects[j].Name == SeedData.generalSubject)
             {
                 continue;
             }

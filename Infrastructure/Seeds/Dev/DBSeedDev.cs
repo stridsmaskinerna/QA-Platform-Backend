@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Seeds.Shared;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Dev;

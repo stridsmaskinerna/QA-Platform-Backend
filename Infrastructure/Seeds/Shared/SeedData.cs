@@ -1,8 +1,8 @@
-namespace Infrastructure.Seeds;
+namespace Infrastructure.Seeds.Shared;
 
 public static class SeedData
 {
-    public const string general = "General";
+    public const string generalSubject = "General";
 
     public static (string Title, string Description)[] StudentQuestions =
      [
