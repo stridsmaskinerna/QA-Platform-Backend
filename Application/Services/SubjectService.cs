@@ -29,9 +29,9 @@ public class SubjectService : BaseService, ISubjectService
             User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
             if (choosenTeacher != null)
             {
-                if ((await _userManager.GetRolesAsync(choosenTeacher)).Contains("User"))
+                if (choosenTeacher != null && (await _userManager.GetRolesAsync(choosenTeacher))?.Contains("User") == true)
                     await _sm.TeacherService.AssignTeacherRoleToUser(choosenTeacher.Id);
-                sbjObj.Teachers.Add(choosenTeacher);
+                sbjObj.Teachers.Add(choosenTeacher!);
             }
         }
         sbjObj.Topics = [];
