@@ -1,5 +1,17 @@
 # QA-Platform-Backend
 
+## Content
+
+- **[Design](#design)**
+- **[Development requirements](#development-requirements)**
+- **[Docker](#docker)**
+- **[Postgres ADMIN](#postgres-admin)**
+- **[Formatting](#formatting)**
+- **[Testing Strategy](#testing-strategy)**
+  - [Unit Tests](#unit-tests)
+  - [Integration Tests](#integration-tests)
+  - [Acceptance Tests](#acceptance-tests)      
+
 ## Design
 
 - [Database ER diagram](https://lucid.app/lucidchart/ae37e314-f5bd-427d-92c3-6db17f0c7d96/edit?viewport_loc=39%2C-134%2C2908%2C1554%2C0_0&invitationId=inv_407d2aa7-e46e-4486-bd13-9dc5f04f6818)
@@ -51,9 +63,132 @@ After login, you need to register the database server by completing the followin
 - Click `Save`
 
 After `Save`, the database can be found under `Serves`in the left board.
- 
 
 ## Formatting
 
 -   To change formatting rules, go to .editorconfig file in the root folder. To enforce a rule across the whole project, install dotnet format: `dotnet tool install -g dotnet-format` then run `dotnet format`. Be mindful of how this affect others in the project.
 -   **Setup**: In vs code install the extension "EditorConfig for VS Code". For Visual Studio the setting “Enable EditorConfig support” must be turned on (which is the default).
+
+## Testing Strategy
+
+#### Unit Tests
+
+Service classes are unit-tested by mocking all of the dependencies. For example, adding a tag in `TagService.cs`
+
+```csharp
+public class TagServiceTests : SetupServiceTests
+{
+    private readonly TagService _tagService;
+
+    public TagServiceTests()
+    {
+        _tagService = new TagService(
+            _mockRepositoryManager.Object,
+            _mockServiceManager.Object);
+    }
+
+    public class AddAsync : TagServiceTests
+    {
+        [Fact]
+        public async Task ShouldReturnTagDTO_WhenTagIsAdded()
+        {
+            // Arrange
+            var tagEntity = TagFactory.CreateTag(Guid.NewGuid(), "TestTag");
+
+            var tagDTO = TagFactory.CreateTagStandardDTO(tagEntity.Id, tagEntity.Value);
+
+            _mockTagRepository
+                .Setup(r => r.AddAsync(tagEntity))
+                .ReturnsAsync(tagEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<TagStandardDTO>(tagEntity))
+                .Returns(tagDTO);
+
+            // Act
+            var result = await _tagService.AddAsync(tagEntity);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(tagDTO.Id, result.Id);
+            Assert.Equal(tagDTO.Value, result.Value);
+        }
+    }
+}
+```
+
+#### Integration Tests
+
+The backend and the database are tested by using a test database. For example, testing user registration:
+
+```csharp
+public class AuthenticationControllerTests : IntegrationTestBase
+{
+    public AuthenticationControllerTests(QAPlatformAPIFactory<Program> factory) :
+        base(factory)
+    { }
+
+    public class Register : AuthenticationControllerTests
+    {
+        private const string _endpoint = "/api/authentication/register";
+
+        public Register(QAPlatformAPIFactory<Program> factory) :
+            base(factory)
+        { }
+
+        [Theory]
+        [InlineData("12newTestUser", "password")]
+        [InlineData("123newTestUser", "PASSWORD")]
+        [InlineData("1234newTestUser", "12345678")]
+        [InlineData("12335newTestUser", "00000000")]
+        public async Task ShouldReturn_Ok_WhenValidRegistrationData(
+            string userName,
+            string password
+        )
+        {
+            // Arrange
+            var requestBody = AuthenticationFactory.CreateRegistrationDTO(
+                userName,
+                $"{userName}@ltu.se",
+                password
+            );
+
+            // Act
+            var response = await _client.PostAsJsonAsync(_endpoint, requestBody);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+    }
+}
+```
+
+#### Acceptance Tests
+
+Acceptance tests are used to relate tests to *user stories*. Acceptance tests are
+implemented by calling the relevant integration tests. 
+
+For example, an unauthenticated user should be able to register and log in **(User Story: UNAUTH_USER.ESSE.2)**:
+
+```csharp
+public class UnauthenticatedUser : UserStoryTestBase
+{
+    public UnauthenticatedUser(QAPlatformAPIFactory<Program> factory) :
+        base(factory)
+    { }
+
+    public class Essential : UnauthenticatedUser
+    {
+        public Essential(QAPlatformAPIFactory<Program> factory) :
+            base(factory)
+        { }
+
+        [UserStory(Description.UNAUTH_USER_ESSE_2)]
+        public async Task UNAUTH_USER_ESSE_2()
+        {
+            await RunTestsAsync<AuthenticationControllerTests.Register>();
+            await RunTestsAsync<AuthenticationControllerTests.Login>();
+        }
+    }
+}
+```
