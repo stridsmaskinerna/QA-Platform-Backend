@@ -2,6 +2,7 @@ using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.Exceptions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
 using TestUtility.Factories;
 
@@ -201,6 +202,15 @@ public class SubjectServiceTests : SetupServiceTests
         {
             // Arrange
             var subjectId = Guid.NewGuid();
+
+            var subject = SubjectFactory.CreateSubjectEntity(
+                subjectId,
+                "TestSubject",
+                "TestCode");
+
+            _mockSubjectRepository
+                .Setup(r => r.GetByIdAsync(subjectId))
+                .ReturnsAsync(subject);
 
             _mockSubjectRepository
                 .Setup(r => r.DeleteAsync(subjectId))
