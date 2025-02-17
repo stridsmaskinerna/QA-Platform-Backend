@@ -2,7 +2,7 @@ using Bogus;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Contexts;
-using Infrastructure.Seeds.Shared;
+using Infrastructure.Seeds.Base;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Seeds.Test;

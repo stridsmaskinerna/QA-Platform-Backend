@@ -1,6 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Contexts;
-using Infrastructure.Seeds.Shared;
+using Infrastructure.Seeds.Base;
 using Infrastructure.Seeds.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;

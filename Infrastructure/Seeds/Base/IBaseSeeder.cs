@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Seeds.Shared
+namespace Infrastructure.Seeds.Base
 {
     public interface IBaseSeeder
     {

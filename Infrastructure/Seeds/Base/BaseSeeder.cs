@@ -4,7 +4,7 @@ using Domain.Entities;
 using Infrastructure.Seeds.Test;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Seeds.Shared;
+namespace Infrastructure.Seeds.Base;
 
 public class BaseSeeder : IBaseSeeder
 {

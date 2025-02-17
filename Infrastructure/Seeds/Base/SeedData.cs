@@ -1,4 +1,4 @@
-namespace Infrastructure.Seeds.Shared;
+namespace Infrastructure.Seeds.Base;
 
 public static class SeedData
 {
