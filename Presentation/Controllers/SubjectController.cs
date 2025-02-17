@@ -73,7 +73,7 @@ public class SubjectController : ControllerBase
     }
 
     [HttpPost]
-    //[Authorize(Roles = $"{DomainRoles.ADMIN}")]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<SubjectDTO>> CreateNewSubject([FromBody] SubjectForCreationDTO newSubject)

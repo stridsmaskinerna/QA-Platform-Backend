@@ -11,7 +11,7 @@ public class SubjectService : BaseService, ISubjectService
 {
     private readonly IRepositoryManager _rm;
     private readonly IServiceManager _sm;
-    private UserManager<User> _userManager;
+    private readonly UserManager<User> _userManager;
 
     public SubjectService(IRepositoryManager rm, IServiceManager sm, UserManager<User> userManager)
     {
