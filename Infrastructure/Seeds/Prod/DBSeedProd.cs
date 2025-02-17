@@ -41,7 +41,7 @@ public static class DBSeedProd
         return [.. subjects];
     }
 
-    internal static async Task CreateUserRoles(
+    private static async Task CreateUserRoles(
         RoleManager<IdentityRole> roleManager
     )
     {
