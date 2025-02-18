@@ -61,4 +61,17 @@ public class UserRepository : IUserRepository
             await _userManager.AddToRoleAsync(user, "Teacher");
         }
     }
+
+    public async Task<User?> BlocKUserById(string Id)
+    {
+        var user = await _userManager.FindByIdAsync(Id);
+        if (user != null) {
+            user.IsBlocked = !user.IsBlocked;
+            await _dbContext.SaveChangesAsync();
+            return user;
+        }
+        return null;
+
+
+    }
 }

@@ -21,5 +21,10 @@ namespace Application.Services
         {
             await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
         }
+
+        public async Task BlockUserByIdAsync(string Id)
+        {
+            await _rm.UserRepository.BlocKUserById(Id);
+        }
     }
 }

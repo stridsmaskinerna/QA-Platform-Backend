@@ -9,4 +9,6 @@ namespace Application.Contracts;
 public interface ITeacherService
 {
     Task AssignTeacherRoleToUser(string Id);
+
+    Task BlockUserByIdAsync(string Id);
 }
