@@ -42,7 +42,7 @@ namespace Infrastructure.Repositories
                     Name = us.Name,
                     SubjectCode = us.SubjectCode,
                     Teachers = us.Teachers,
-                    Topics = us.Topics.Where(t => t.IsActive).ToList()
+                    Topics = us.Topics
                 }).ToListAsync();
         }
 
