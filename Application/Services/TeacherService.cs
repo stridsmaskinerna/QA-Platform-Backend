@@ -5,30 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Contracts;
 using Domain.Contracts;
+using Domain.DTO.Response;
 using Domain.Entities;
 
-namespace Application.Services
+namespace Application.Services;
+
+public class TeacherService : BaseService, ITeacherService
 {
-    public class TeacherService : BaseService, ITeacherService
+    public readonly IRepositoryManager _rm;
+
+    public TeacherService(IRepositoryManager rm)
     {
-        public readonly IRepositoryManager _rm;
+        _rm = rm;
+    }
 
-        public TeacherService(IRepositoryManager rm)
-        {
-            _rm = rm;
-        }
+    public async Task AssignTeacherRoleToUser(string Id)
+    {
+        await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
+    }
 
-        public async Task AssignTeacherRoleToUser(string Id)
-        {
-            await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
-        }
-
-        public async Task<User?> BlockUserByIdAsync(string Id)
-        {
-            var user = await _rm.UserRepository.BlocKUserById(Id);
-            if (user == null)
-                Forbidden("Action Forbidden. You have not permission to block a teacher");
-            return user;
-        }
+    public async Task<User?> BlockUserByIdAsync(string Id)
+    {
+        var user = await _rm.UserRepository.BlocKUserById(Id);
+        if (user == null)
+            Forbidden("Action Forbidden. You have not permission to block a teacher");
+        return user;
     }
 }

@@ -2,8 +2,6 @@ using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.Exceptions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
 using TestUtility.Factories;
 

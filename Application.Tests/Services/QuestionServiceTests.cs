@@ -14,6 +14,8 @@ public class QuestionServiceTests : SetupServiceTests
     private readonly Mock<Topic> _mockTopic;
     private readonly Mock<User> _mockUser;
     private readonly Mock<ITokenService> _mockTokenService;
+    private readonly Mock<IDTOService> _mockDTOService;
+    private readonly Mock<ITagService> _mockTagService;
     private readonly QuestionService _questionService;
     private readonly Mock<IUtilityService> _mockUtilityService;
 
@@ -21,11 +23,15 @@ public class QuestionServiceTests : SetupServiceTests
     {
         _mockUtilityService = new Mock<IUtilityService>();
 
-        _mockTopic = new Mock<Topic>();
+        _mockTopic = new Mock<Topic>(MockBehavior.Strict);
 
         _mockUser = new Mock<User>();
 
-        _mockTokenService = new Mock<ITokenService>();
+        _mockTokenService = new Mock<ITokenService>(MockBehavior.Strict);
+
+        _mockDTOService = new Mock<IDTOService>(MockBehavior.Strict);
+
+        _mockTagService = new Mock<ITagService>(MockBehavior.Strict);
 
         _questionService = new QuestionService(
             _mockRepositoryManager.Object,
@@ -37,6 +43,14 @@ public class QuestionServiceTests : SetupServiceTests
             .Returns(_mockTokenService.Object);
 
         _mockServiceManager
+            .Setup(sm => sm.DTOService)
+            .Returns(_mockDTOService.Object);
+
+        _mockServiceManager
+            .Setup(sm => sm.TagService)
+            .Returns(_mockTagService.Object);
+
+        _mockServiceManager
             .Setup(sm => sm.UtilityService)
             .Returns(_mockUtilityService.Object);
     }
@@ -44,7 +58,7 @@ public class QuestionServiceTests : SetupServiceTests
     public class GetByIdAsync : QuestionServiceTests
     {
         [Fact]
-        public async Task ShouldReturnDetailedQuestion_WhenExists()
+        public async Task ShouldReturnDetailedQuestion_WhenQuestionExists()
         {
             // Arrange
             var questionId = Guid.NewGuid();
@@ -57,10 +71,8 @@ public class QuestionServiceTests : SetupServiceTests
             var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
                 questionId, _mockTopic.Object.Id);
 
-
-
             _mockQuestionRepository
-                .Setup(q => q.GetByIdAsync(questionId))
+                .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
 
             _mockMapper
@@ -68,18 +80,81 @@ public class QuestionServiceTests : SetupServiceTests
                 .Returns(questionDTO);
 
             _mockTokenService
-                .Setup(t => t.GetUserId())
+                .Setup(s => s.GetUserId())
                 .Returns(_mockUser.Object.Id);
 
+            _mockDTOService
+                .Setup(s => s.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
+
+            _mockDTOService
+                .Setup(s => s.UpdatingMyVoteField(
+                    questionEntity, questionDTO, _mockUser.Object.Id));
+
+            _mockDTOService
+                .Setup(s => s.UpdateQuestionIsHideableField(
+                    questionDTO, _mockUser.Object.Id))
+                .Returns(Task.CompletedTask);
+
+            _mockDTOService
+                .Setup(s => s.UpdateAnswerIsHideableField(questionDTO));
+
+            // Act
+            var result = await _questionService.GetByIdAsync(questionId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(questionEntity.Id, result.Id);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ShouldReturnDetailedQuestion_WhenQuestionDTOIsNotHidden(
+            bool isHideable
+        )
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            var subjectId = Guid.NewGuid();
+            var answerId = Guid.NewGuid();
+
+            var questionEntity = QuestionFactory.CreateQuestionEntity(
+                questionId, _mockTopic.Object, _mockUser.Object);
+
+            var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+                questionId, _mockTopic.Object.Id);
+            questionDTO.IsHidden = false;
+            questionDTO.IsHideable = isHideable;
+
+            _mockQuestionRepository
+                .Setup(r => r.GetByIdAsync(questionId))
+                .ReturnsAsync(questionEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+                .Returns(questionDTO);
+
             _mockTokenService
-                .Setup(t => t.GetUserRoles())
-                .Returns([]);
+                .Setup(s => s.GetUserId())
+                .Returns(_mockUser.Object.Id);
 
-            _mockUserRepository
-                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
-                .ReturnsAsync([]);
+            _mockDTOService
+                .Setup(s => s.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
 
-            _mockSubjectRepository.Setup(t => t.GetTeachersSubjectsAsync(_mockUser.Object.Id)).ReturnsAsync([]);
+            _mockDTOService
+                .Setup(s => s.UpdatingMyVoteField(
+                    questionEntity, questionDTO, _mockUser.Object.Id));
+
+            _mockDTOService
+                .Setup(s => s.UpdateQuestionIsHideableField(
+                    questionDTO, _mockUser.Object.Id))
+                .Returns(Task.CompletedTask);
+
+            _mockDTOService
+                .Setup(s => s.UpdateAnswerIsHideableField(questionDTO));
+
             // Act
             var result = await _questionService.GetByIdAsync(questionId);
 
@@ -89,111 +164,21 @@ public class QuestionServiceTests : SetupServiceTests
         }
 
         [Fact]
-        public async Task ShouldThrowNotFound_WhenQuestionDoesNotExist()
+        public async Task ShouldAccurateCall_UpdatingDTOFieldMethods()
         {
             // Arrange
             var questionId = Guid.NewGuid();
-            _mockQuestionRepository
-                .Setup(q => q.GetByIdAsync(questionId))
-                .ReturnsAsync(default(Question));
-
-            // Act & Assert
-            var exception = await Assert.ThrowsAsync<NotFoundException>(
-                () => _questionService.GetByIdAsync(questionId));
-
-            Assert.Equal(
-                QuestionService.MsgNotFound(questionId),
-                exception.Message);
-        }
-
-        [Fact]
-        public async Task ShouldSetAnsweredByTeacher_WhenTeacherAnswers()
-        {
-            // Arrange
-            var questionId = Guid.NewGuid();
+            var subjectId = Guid.NewGuid();
             var answerId = Guid.NewGuid();
-
-            var teacherUser = UserFactory.CreateUser("teacher123", "teacher-userName");
 
             var questionEntity = QuestionFactory.CreateQuestionEntity(
                 questionId, _mockTopic.Object, _mockUser.Object);
 
-            questionEntity.Answers = [AnswerFactory.CreateAnswerEntity(
-            answerId, questionEntity, teacherUser)];
-
             var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
                 questionId, _mockTopic.Object.Id);
 
-            questionDTO.IsHideable = true;
-
-            questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
-            questionEntity.Answers.First(), teacherUser.UserName ?? String.Empty)];
-
-            questionDTO.SubjectId = Guid.NewGuid();
-
             _mockQuestionRepository
-                .Setup(q => q.GetByIdAsync(questionId))
-                .ReturnsAsync(questionEntity);
-
-            _mockMapper
-                .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
-                .Returns(questionDTO);
-
-            _mockUserRepository
-                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
-                .ReturnsAsync([teacherUser]);
-
-            _mockTokenService.Setup(t => t.GetUserId()).Returns(teacherUser.Id);
-
-            _mockSubjectRepository.Setup(t => t.GetTeachersSubjectsAsync(teacherUser.Id)).ReturnsAsync([]);
-            // Act
-            var result = await _questionService.GetByIdAsync(questionId);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.NotNull(result.Answers);
-
-            Assert.Equal(result.Answers, questionDTO.Answers);
-            Assert.True(result.Answers.First().AnsweredByTeacher);
-        }
-
-        [Theory]
-        [InlineData(VoteType.DISLIKE, false)]
-        [InlineData(VoteType.LIKE, true)]
-        [InlineData(VoteType.NEUTRAL, null)]
-        public async Task ShouldSetMyVoteField_WhenUsersHaveVoted(
-            string expectedVoteValue, bool? voteValueAsBoolean
-        )
-        {
-            // Arrange
-            var questionId = Guid.NewGuid();
-            var userId = "user123";
-            var answerId = Guid.NewGuid();
-
-            var user = UserFactory.CreateUser("user123", "test userName");
-
-            var questionEntity = QuestionFactory.CreateQuestionEntity(
-                questionId, _mockTopic.Object, _mockUser.Object);
-
-            questionEntity.Answers = [AnswerFactory.CreateAnswerEntity(
-            answerId, questionEntity, user)];
-
-            if (voteValueAsBoolean != null)
-            {
-                questionEntity.Answers.First().AnswerVotes = [
-                AnswerVoteFactory.CreateAnswerVoteEntity(
-                answerId, user, questionEntity.Answers.First(), voteValueAsBoolean.Value)
-                ];
-            }
-
-            var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
-                questionId, _mockTopic.Object.Id);
-
-            questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
-            questionEntity.Answers.First(), user.UserName ?? String.Empty)];
-
-            _mockQuestionRepository
-                .Setup(q => q.GetByIdAsync(questionId))
+                .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
 
             _mockMapper
@@ -201,25 +186,167 @@ public class QuestionServiceTests : SetupServiceTests
                 .Returns(questionDTO);
 
             _mockTokenService
-                .Setup(t => t.GetUserId())
-                .Returns(userId);
+                .Setup(s => s.GetUserId())
+                .Returns(_mockUser.Object.Id);
 
-            _mockUserRepository
-                .Setup(u => u.GetTeachersBySubjectIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync([]);
+            _mockDTOService
+                .Setup(s => s.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
 
-            _mockSubjectRepository.Setup(t => t.GetTeachersSubjectsAsync(userId)).ReturnsAsync([]);
+            var sequence = new MockSequence();
+
+            _mockDTOService.InSequence(sequence)
+                .Setup(s => s.UpdatingMyVoteField(
+                    questionEntity, questionDTO, _mockUser.Object.Id));
+
+            _mockDTOService
+                .Setup(s => s.UpdateAnswerIsHideableField(questionDTO));
+
+            _mockDTOService.InSequence(sequence)
+                .Setup(s => s.UpdateQuestionIsHideableField(
+                    questionDTO, _mockUser.Object.Id))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _questionService.GetByIdAsync(questionId);
+
+            // Assert
+            _mockDTOService.Verify(
+                s => s.UpdatingAnsweredByTeacherField(questionDTO),
+                Times.Once);
+
+            _mockDTOService.Verify(
+                s => s.UpdatingMyVoteField(questionEntity, questionDTO, _mockUser.Object.Id),
+                Times.Once);
+
+            _mockDTOService.Verify(
+                s => s.UpdateQuestionIsHideableField(questionDTO, _mockUser.Object.Id),
+                Times.Once);
+
+            _mockDTOService.Verify(
+                s => s.UpdateAnswerIsHideableField(questionDTO),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenQuestionIsNotFound()
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            var answerId = Guid.NewGuid();
+
+
+            _mockQuestionRepository
+                .Setup(q => q.GetByIdAsync(questionId))
+                .ReturnsAsync(default(Question));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _questionService.GetByIdAsync(questionId));
+        }
+
+        [Fact]
+        public async Task ShouldThrowNotFound_WhenQuestionDTOIsHiddenAndNotHideable()
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            var answerId = Guid.NewGuid();
+
+            var questionEntity = QuestionFactory.CreateQuestionEntity(
+                questionId, _mockTopic.Object, _mockUser.Object);
+
+            var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+                questionId, _mockTopic.Object.Id);
+            questionDTO.IsHideable = false;
+            questionDTO.IsHidden = true;
+
+            _mockQuestionRepository
+                .Setup(r => r.GetByIdAsync(questionId))
+                .ReturnsAsync(questionEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+                .Returns(questionDTO);
+
+            _mockTokenService
+                .Setup(s => s.GetUserId())
+                .Returns(_mockUser.Object.Id);
+
+            _mockDTOService
+                .Setup(s => s.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
+
+            var sequence = new MockSequence();
+
+            _mockDTOService.InSequence(sequence)
+                .Setup(s => s.UpdatingMyVoteField(
+                    questionEntity, questionDTO, _mockUser.Object.Id));
+
+            _mockDTOService
+                .Setup(s => s.UpdateAnswerIsHideableField(questionDTO));
+
+            _mockDTOService.InSequence(sequence)
+                .Setup(s => s.UpdateQuestionIsHideableField(
+                    questionDTO, _mockUser.Object.Id))
+                .Returns(Task.CompletedTask);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<NotFoundException>(
+                () => _questionService.GetByIdAsync(questionId));
+        }
+
+        [Fact]
+        public async Task ShouldReturnDetailedQuestion_WhenQuestionDTOIsHiddenAndHideable()
+        {
+            // Arrange
+            var questionId = Guid.NewGuid();
+            var answerId = Guid.NewGuid();
+
+            var questionEntity = QuestionFactory.CreateQuestionEntity(
+                questionId, _mockTopic.Object, _mockUser.Object);
+
+            var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
+                questionId, _mockTopic.Object.Id);
+            questionDTO.IsHideable = true;
+            questionDTO.IsHidden = true;
+
+            _mockQuestionRepository
+                .Setup(r => r.GetByIdAsync(questionId))
+                .ReturnsAsync(questionEntity);
+
+            _mockMapper
+                .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
+                .Returns(questionDTO);
+
+            _mockTokenService
+                .Setup(s => s.GetUserId())
+                .Returns(_mockUser.Object.Id);
+
+            _mockDTOService
+                .Setup(s => s.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
+
+            var sequence = new MockSequence();
+
+            _mockDTOService.InSequence(sequence)
+                .Setup(s => s.UpdatingMyVoteField(
+                    questionEntity, questionDTO, _mockUser.Object.Id));
+
+            _mockDTOService
+                .Setup(s => s.UpdateAnswerIsHideableField(questionDTO));
+
+            _mockDTOService.InSequence(sequence)
+                .Setup(s => s.UpdateQuestionIsHideableField(
+                    questionDTO, _mockUser.Object.Id))
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _questionService.GetByIdAsync(questionId);
 
             // Assert
             Assert.NotNull(result);
-            Assert.NotNull(result.Answers);
-
-            Assert.Equal(expectedVoteValue, result.Answers.First().MyVote);
+            Assert.Equal(questionEntity.Id, result.Id);
         }
-
     }
 
     public class GetPublicQuestionsByIdAsync : QuestionServiceTests
@@ -246,17 +373,9 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
 
-            _mockTokenService
-                .Setup(t => t.GetUserId())
-                .Returns(_mockUser.Object.Id);
-
-            _mockTokenService
-                .Setup(t => t.GetUserRoles())
-                .Returns([]);
-
-            _mockUserRepository
-                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
-                .ReturnsAsync([]);
+            _mockDTOService
+                .Setup(t => t.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _questionService.GetPublicQuestionByIdAsync(questionId);
@@ -285,27 +404,18 @@ public class QuestionServiceTests : SetupServiceTests
         }
 
         [Fact]
-        public async Task ShouldSetAnsweredByTeacher_WhenTeacherAnswers()
+        public async Task ShouldAccurateCall_UpdatingDTOFieldMethods()
         {
             // Arrange
             var questionId = Guid.NewGuid();
+            var subjectId = Guid.NewGuid();
             var answerId = Guid.NewGuid();
-
-            var teacherUser = UserFactory.CreateUser("teacher123", "teacher-userName");
 
             var questionEntity = QuestionFactory.CreateQuestionEntity(
                 questionId, _mockTopic.Object, _mockUser.Object);
 
-            questionEntity.Answers = [AnswerFactory.CreateAnswerEntity(
-            answerId, questionEntity, teacherUser)];
-
             var questionDTO = QuestionFactory.CreateQuestionDetailedDto(
                 questionId, _mockTopic.Object.Id);
-
-            questionDTO.Answers = [AnswerFactory.CreateAnswerDetailedDTO(
-            questionEntity.Answers.First(), teacherUser.UserName ?? String.Empty)];
-
-            questionDTO.SubjectId = Guid.NewGuid();
 
             _mockQuestionRepository
                 .Setup(q => q.GetByIdAsync(questionId))
@@ -315,23 +425,16 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
 
-            _mockTokenService
-            .Setup(t => t.GetUserRoles())
-            .Returns([]);
-
-            _mockUserRepository
-                .Setup(u => u.GetTeachersBySubjectIdAsync(questionDTO.SubjectId))
-                .ReturnsAsync([teacherUser]);
+            _mockDTOService
+                .Setup(t => t.UpdatingAnsweredByTeacherField(questionDTO))
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _questionService.GetPublicQuestionByIdAsync(questionId);
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.NotNull(result.Answers);
-
-            Assert.Equal(result.Answers, questionDTO.Answers);
-            Assert.True(result.Answers.First().AnsweredByTeacher);
+            _mockDTOService.Verify(
+                s => s.UpdatingAnsweredByTeacherField(questionDTO),
+                Times.Once);
         }
     }
 
@@ -424,13 +527,13 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(t => t.GetUserId())
                 .Returns(It.IsAny<string>());
 
+            _mockTagService
+                .Setup(t => t.StoreNewTagsFromQuestion(question, questionDTO.Tags))
+                .Returns(Task.CompletedTask);
+
             _mockTokenService
                 .Setup(t => t.GetUserName())
                 .Returns(It.IsAny<string>());
-
-            _mockTagRepository
-                .Setup(r => r.GetByValueAsync(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<Tag>());
 
             _mockUtilityService.Setup(
                 r => r.NormalizeText(It.IsAny<string>()))
@@ -450,6 +553,10 @@ public class QuestionServiceTests : SetupServiceTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(question.Id, result.Id);
+
+            _mockTagService.Verify(
+                r => r.StoreNewTagsFromQuestion(question, questionDTO.Tags),
+                Times.Once);
         }
 
         [Fact]
@@ -525,20 +632,12 @@ public class QuestionServiceTests : SetupServiceTests
             var question = QuestionFactory.CreateQuestionEntity(
                 questionId, _mockTopic.Object, _mockUser.Object);
 
-            _mockMapper
-                .Setup(m => m.Map<Question>(questionDTO))
-                .Returns(question);
-
             _mockQuestionRepository
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(question);
 
             _mockUtilityService.Setup(r => r.NormalizeText(It.IsAny<string>()))
-                .Returns(It.IsAny<string>());
-
-            _mockQuestionRepository
-                .Setup(r => r.AddAsync(question))
-                .ReturnsAsync(question);
+                .Returns(It.IsAny<string>()); ;
 
             _mockQuestionRepository
                 .Setup(r => r.CompleteAsync())
@@ -546,6 +645,10 @@ public class QuestionServiceTests : SetupServiceTests
 
             _mockTagRepository
                 .Setup(r => r.DeleteUnusedTagsAsync(It.IsAny<IEnumerable<Tag>>()))
+                .Returns(Task.CompletedTask);
+
+            _mockTagService
+                .Setup(s => s.StoreNewTagsFromQuestion(question, questionDTO.Tags))
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -559,6 +662,10 @@ public class QuestionServiceTests : SetupServiceTests
 
             _mockTagRepository.Verify(
                 r => r.DeleteUnusedTagsAsync(It.IsAny<IEnumerable<Tag>>()),
+                Times.Once);
+
+            _mockTagService.Verify(
+                r => r.StoreNewTagsFromQuestion(question, questionDTO.Tags),
                 Times.Once);
         }
 
