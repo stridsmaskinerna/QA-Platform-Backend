@@ -75,7 +75,7 @@ public class QuestionRepository : IQuestionRepository
         User teacher
     )
     {
-        var totalItemCount = await _dbContext.Questions.CountAsync();
+
 
         var query = _dbContext.Questions.AsQueryable();
 
@@ -93,6 +93,8 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
+        var totalItemCount = await query.CountAsync();
+
         return (
             Questions: await query.ToListAsync(),
             TotalItemCount: totalItemCount
@@ -107,7 +109,7 @@ public class QuestionRepository : IQuestionRepository
         List<string>? userRoles
     )
     {
-        var totalItemCount = await _dbContext.Questions.CountAsync();
+
 
         var query = _dbContext.Questions.AsQueryable();
 
@@ -128,6 +130,8 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(q => ApplySearchFilter(q, searchDTO))
             .Pipe(q => ApplySorting(q))
             .Pipe(q => ApplyPagination(q, paginationDTO));
+
+        var totalItemCount = await query.CountAsync();
 
         return (
             Questions: await query.ToListAsync(),
