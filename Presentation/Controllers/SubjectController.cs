@@ -42,14 +42,13 @@ public class SubjectController : ControllerBase
         return Ok(subjects);
     }
 
-    // TODO. FIX BUG: Apply subject filter in repository
     [HttpGet("{id}/questions")]
     [Authorize(Roles = DomainRoles.TEACHER)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
-    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetTeacherSubjectList(
+    public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetTeacherQuestions(
         [FromRoute] Guid id,
         [FromQuery] PaginationDTO paginationDTO
     )

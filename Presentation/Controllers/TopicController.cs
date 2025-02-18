@@ -33,11 +33,10 @@ public class TopicController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<TopicDTO>> CreateTopic(
-    [FromBody] TopicDTO body
-)
+        [FromBody] TopicForCreationDTO body
+    )
     {
         var created = await _sm.TopicService.AddAsync(body);
-
         return Created(string.Empty, created);
     }
 
