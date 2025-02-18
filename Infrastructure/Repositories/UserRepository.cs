@@ -65,7 +65,7 @@ public class UserRepository : IUserRepository
     public async Task<User?> BlocKUserById(string Id)
     {
         var user = await _userManager.FindByIdAsync(Id);
-        if (user != null) {
+        if (user != null && (await _userManager.GetRolesAsync(user))?.Contains("User") == true) {
             user.IsBlocked = !user.IsBlocked;
             await _dbContext.SaveChangesAsync();
             return user;

@@ -29,9 +29,9 @@ public class TeacherController : ControllerBase
     [HttpPut("blockuser")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> BlockUserById([FromQuery] string Id) {
-        await _sm.TeacherService.BlockUserByIdAsync(Id);
-        return Ok();
+        var blockedUSer = await _sm.TeacherService.BlockUserByIdAsync(Id);
+        return Ok(blockedUSer);
     }
 }
