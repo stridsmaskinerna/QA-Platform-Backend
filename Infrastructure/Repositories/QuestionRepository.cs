@@ -89,11 +89,15 @@ public class QuestionRepository : IQuestionRepository
 
         query = query
             .Pipe(q => ApplyUserFilter(q, teacher))
-            .Pipe(q => ApplySubjectFilter(q, subjectId))
+            .Pipe(q => ApplySubjectFilter(q, subjectId));
+
+        var totalItemCount = await query.CountAsync();
+
+        query = query
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
-        var totalItemCount = await query.CountAsync();
+
 
         return (
             Questions: await query.ToListAsync(),
@@ -127,11 +131,14 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
             .Pipe(q => ApplySubjectFilter(q, searchDTO.SubjectId))
             .Pipe(q => ApplyTopicFilter(q, searchDTO.TopicId))
-            .Pipe(q => ApplySearchFilter(q, searchDTO))
+            .Pipe(q => ApplySearchFilter(q, searchDTO));
+
+        var totalItemCount = await query.CountAsync();
+
+        query = query
             .Pipe(q => ApplySorting(q))
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
-        var totalItemCount = await query.CountAsync();
 
         return (
             Questions: await query.ToListAsync(),
