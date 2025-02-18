@@ -2,6 +2,7 @@ using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
 using TestUtility.Factories;
@@ -19,16 +20,17 @@ namespace Application.Tests.Services;
 public class SubjectServiceTests : SetupServiceTests
 {
     SubjectService _subjectService;
-
     public SubjectServiceTests()
     {
+        
         _subjectService = new SubjectService(
             _mockRepositoryManager.Object,
-            _mockServiceManager.Object
+            _mockServiceManager.Object,
+            _mockUserManager.Object
         );
     }
 
-    public class AddAsync : SubjectServiceTests
+    public class AddAsync() : SubjectServiceTests
     {
         [Fact]
         public async Task ShouldReturnNewSubject_WhenSuccessful()
