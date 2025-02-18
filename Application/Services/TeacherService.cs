@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Contracts;
 using Domain.Contracts;
+using Domain.Entities;
 
 namespace Application.Services
 {
@@ -20,6 +21,14 @@ namespace Application.Services
         public async Task AssignTeacherRoleToUser(string Id)
         {
             await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
+        }
+
+        public async Task<User?> BlockUserByIdAsync(string Id)
+        {
+            var user = await _rm.UserRepository.BlocKUserById(Id);
+            if (user == null)
+                Forbidden("Action Forbidden. You have not permission to block a teacher");
+            return user;
         }
     }
 }

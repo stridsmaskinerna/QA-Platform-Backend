@@ -43,9 +43,13 @@ public class AuthenticationService : BaseService, IAuthenticationService
 
         if (user == null)
         {
-            // Throw Unauthorized Exception handled by ExceptionMiddleware.
             Unauthorized();
         }
+        else if (user.IsBlocked)
+        {
+            Unauthorized("Your account has been blocked. Please contact your teacher to request an unblock.");
+        }
+
 
         string? sKey = (_configuration?["secretKey"]) ?? throw new ArgumentNullException("something went wrong");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sKey));

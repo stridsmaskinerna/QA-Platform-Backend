@@ -22,7 +22,7 @@ public class SubjectServiceTests : SetupServiceTests
     SubjectService _subjectService;
     public SubjectServiceTests()
     {
-        
+
         _subjectService = new SubjectService(
             _mockRepositoryManager.Object,
             _mockServiceManager.Object,

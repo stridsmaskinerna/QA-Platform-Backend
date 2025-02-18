@@ -1,3 +1,4 @@
+using Domain.Constants;
 using Domain.Contracts;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -57,8 +58,21 @@ public class UserRepository : IUserRepository
         var user = await _userManager.FindByIdAsync(Id);
         if (user != null)
         {
-            await _userManager.RemoveFromRoleAsync(user, "User");
-            await _userManager.AddToRoleAsync(user, "Teacher");
+            await _userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
         }
+    }
+
+    public async Task<User?> BlocKUserById(string Id)
+    {
+        var user = await _userManager.FindByIdAsync(Id);
+        if (user != null && (await _userManager.GetRolesAsync(user))?.Contains(DomainRoles.TEACHER) == false)
+        {
+            user.IsBlocked = !user.IsBlocked;
+            await _dbContext.SaveChangesAsync();
+            return user;
+        }
+        return null;
+
+
     }
 }
