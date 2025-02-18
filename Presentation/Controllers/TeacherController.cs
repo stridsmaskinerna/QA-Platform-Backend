@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Presentation.Controllers;
 
 [ApiController]
-//[Authorize(Roles = $"{DomainRoles.TEACHER}")]
+[Authorize(Roles = $"{DomainRoles.TEACHER}")]
 [Route("api/teacherconsole")]
 [Produces("application/json")]
 
