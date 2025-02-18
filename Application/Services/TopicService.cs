@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Contracts;
 using Domain.Contracts;
+using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 
@@ -23,7 +24,7 @@ public class TopicService : BaseService, ITopicService
         _rm = rm;
         _sm = sm;
     }
-    public async Task<TopicDTO> AddAsync(TopicDTO topicDTO)
+    public async Task<TopicDTO> AddAsync(TopicForCreationDTO topicDTO)
     {
         var topic = _sm.Mapper.Map<Topic>(topicDTO);
         var addedTopic = await _rm.TopicRepository.AddAsync(topic);
