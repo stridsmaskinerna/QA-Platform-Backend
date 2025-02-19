@@ -16,6 +16,7 @@ public class ServiceManager(
     Lazy<ITopicService> topicService,
     Lazy<ISubjectService> subjectManager,
     Lazy<ITeacherService> teacherService,
+    Lazy<IAdminService> adminService,
     IMapper mapper
 ) : IServiceManager
 {
@@ -32,4 +33,5 @@ public class ServiceManager(
     public ITopicService TopicService => topicService.Value;
     public ISubjectService SubjectService => subjectManager.Value;
     public ITeacherService TeacherService => teacherService.Value;
+    public IAdminService AdminService => adminService.Value;
 }

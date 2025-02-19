@@ -1,4 +1,3 @@
-using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity;

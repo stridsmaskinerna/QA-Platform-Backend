@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Domain.Constants;
 using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
@@ -29,8 +30,8 @@ public class SubjectService : BaseService, ISubjectService
             User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
             if (choosenTeacher != null)
             {
-                if ((await _userManager.GetRolesAsync(choosenTeacher))?.Contains("User") == true)
-                    await _sm.TeacherService.AssignTeacherRoleToUser(choosenTeacher.Id);
+                if ((await _userManager.GetRolesAsync(choosenTeacher))?.Contains(DomainRoles.TEACHER) == false)
+                    await _sm.AdminService.AssignTeacherRoleToUser(choosenTeacher.Id);
                 sbjObj.Teachers.Add(choosenTeacher);
             }
         }
@@ -95,8 +96,8 @@ public class SubjectService : BaseService, ISubjectService
             User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
             if (choosenTeacher != null)
             {
-                if ((await _userManager.GetRolesAsync(choosenTeacher))?.Contains("User") == true)
-                    await _sm.TeacherService.AssignTeacherRoleToUser(choosenTeacher.Id);
+                if ((await _userManager.GetRolesAsync(choosenTeacher))?.Contains(DomainRoles.TEACHER) == false)
+                    await _sm.AdminService.AssignTeacherRoleToUser(choosenTeacher.Id);
                 sbjObj.Teachers.Add(choosenTeacher);
             }
         }

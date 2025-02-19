@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Application.Contracts;
 using Domain.Contracts;
 using Domain.Entities;
@@ -18,10 +13,6 @@ namespace Application.Services
             _rm = rm;
         }
 
-        public async Task AssignTeacherRoleToUser(string Id)
-        {
-            await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
-        }
 
         public async Task<User?> BlockUserByIdAsync(string Id)
         {
