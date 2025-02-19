@@ -9,10 +9,10 @@ namespace Application.Tests.Services;
 
 public class VoteServiceTests : SetupServiceTests
 {
+    private readonly VoteService _voteService;
     private readonly Mock<Question> _mockQuestion;
     private readonly Mock<User> _mockUser;
     private readonly Mock<ITokenService> _mockTokenService;
-    private readonly VoteService _voteService;
 
     public VoteServiceTests()
     {

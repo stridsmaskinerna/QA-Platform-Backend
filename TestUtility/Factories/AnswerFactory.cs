@@ -47,4 +47,19 @@ public static class AnswerFactory
         Value = answer.Value,
         UserName = userName
     };
+
+    public static AnswerDetailedDTO CreateAnswerDetailedDTO(
+        Guid id,
+        string value,
+        string userName,
+        bool isHideable = true,
+        bool answeredByTeacher = true
+    ) => new()
+    {
+        Id = id,
+        Value = value,
+        UserName = userName,
+        IsHideable = isHideable,
+        AnsweredByTeacher = answeredByTeacher
+    };
 }

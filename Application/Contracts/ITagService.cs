@@ -13,4 +13,5 @@ public interface ITagService
     Task UpdateAsync(Tag tag);
     Task DeleteAsync(Guid id);
     Task<bool> IsTagValueTakenAsync(string tagValue);
+    Task StoreNewTagsFromQuestion(Question question, IEnumerable<string> tags);
 }

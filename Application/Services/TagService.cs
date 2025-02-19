@@ -75,4 +75,30 @@ public class TagService : BaseService, ITagService
     {
         await _rm.TagRepository.UpdateAsync(tag);
     }
+
+    public async Task StoreNewTagsFromQuestion(
+        Question question,
+        IEnumerable<string> tags
+    )
+    {
+        var normalizedNewTagValues = tags
+            .Select(_sm.UtilityService.NormalizeText)
+            .ToList();
+
+        foreach (var tagValue in normalizedNewTagValues)
+        {
+            var tag = await _rm.TagRepository.GetByValueAsync(tagValue);
+
+            if (tag == null)
+            {
+                tag = new Tag { Value = tagValue };
+                await _rm.TagRepository.AddAsync(tag);
+            }
+
+            if (!question.Tags.Any(t => t.Value == tagValue))
+            {
+                question.Tags.Add(tag);
+            }
+        }
+    }
 }

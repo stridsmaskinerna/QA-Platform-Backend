@@ -14,6 +14,13 @@ public static class TagFactory
         Value = value
     };
 
+    public static Tag CreateTag(
+        string value = "TestTag"
+    ) => new()
+    {
+        Value = value
+    };
+
     public static TagStandardDTO CreateTagStandardDTO(
         Guid? id,
         string value = "TestTag"

@@ -34,6 +34,22 @@ public class QuestionFactory
         Description = "Test Description"
     };
 
+    public static QuestionDTO CreateQuestionDto(
+        Guid id,
+        Guid topicId,
+        Guid subjectId
+    ) => new()
+    {
+        Id = id,
+        TopicName = "Test TopicName",
+        TopicId = topicId,
+        SubjectId = subjectId,
+        SubjectName = "Test TopicName",
+        UserName = "Test UserName",
+        Title = "Test Title",
+        Description = "Test Description"
+    };
+
     public static QuestionForPutDTO CreateQuestionForPutDto(
         Guid id,
         Guid topicId
