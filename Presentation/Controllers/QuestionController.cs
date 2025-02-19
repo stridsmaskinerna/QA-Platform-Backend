@@ -34,15 +34,14 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var (questions, totalItemCount, ExcludedItems) = await _sm.QuestionService.GetItemsAsync(
+        var (questions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(
             paginationDTO, searchDTO, onlyPublic: false);
 
         var paginationMeta = new PaginationMetaDTO()
         {
             PageNr = paginationDTO.PageNr,
             Limit = paginationDTO.Limit,
-            TotalItemCount = totalItemCount,
-            ExcludedItems = ExcludedItems,
+            TotalItemCount = totalItemCount
         };
 
         Response.Headers.Append(
@@ -62,14 +61,13 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var (publicQuestions, totalItemCount, ExcludedItems) = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
+        var (publicQuestions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
 
         var paginationMeta = new PaginationMetaDTO()
         {
             PageNr = paginationDTO.PageNr,
             Limit = paginationDTO.Limit,
-            TotalItemCount = totalItemCount,
-            ExcludedItems = ExcludedItems
+            TotalItemCount = totalItemCount
         };
 
         Response.Headers.Append(

@@ -126,7 +126,7 @@ public class QuestionRepository : IQuestionRepository
 
         query = query
             .Pipe(q => ApplyPublicFilter(q, onlyPublic))
-            .Pipe(q => ApplyIsHiddenFilter(q, userRoles))
+            .Pipe(q => ApplyIsHiddenFilter(q, userRoles, userId))
             .Pipe(q => ApplyUserInteractionTypeFilter(q, searchDTO, userId))
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
             .Pipe(q => ApplySubjectFilter(q, searchDTO.SubjectId))
@@ -158,13 +158,13 @@ public class QuestionRepository : IQuestionRepository
         return queryable;
     }
 
-    private IQueryable<Question> ApplyIsHiddenFilter(IQueryable<Question> q, List<string>? userRoles)
+    private IQueryable<Question> ApplyIsHiddenFilter(IQueryable<Question> q, List<string>? userRoles, string? userId)
     {
-        if (userRoles is null || !userRoles.Contains(DomainRoles.TEACHER))
+        if (userId != null && userRoles != null && userRoles.Contains(DomainRoles.TEACHER))
         {
-            return q.Where(q => !q.IsHidden);
+            return q.Where(q => !q.IsHidden || q.Topic.Subject.Teachers.Select(t => t.Id).Contains(userId));
         }
-        return q;
+        return q.Where(q => !q.IsHidden);
     }
 
     private IQueryable<Question> ApplyUserFilter(
