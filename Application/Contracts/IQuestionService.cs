@@ -8,7 +8,7 @@ namespace Application.Contracts;
 public interface IQuestionService
 {
     Task<QuestionDetailedDTO> GetByIdAsync(Guid id);
-    Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
+    Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount, int ExcludedItems)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic = true);

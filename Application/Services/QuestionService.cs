@@ -28,7 +28,7 @@ public class QuestionService : BaseService, IQuestionService
 
     public static string MsgBadRequest() => "Invalid question body";
 
-    public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
+    public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount, int ExcludedItems)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO,
         bool onlyPublic = true
@@ -47,15 +47,20 @@ public class QuestionService : BaseService, IQuestionService
         var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
             Questions);
 
+        int ExcludedItems = 0;
         if (userId is not null && userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
         {
             await _sm.DTOService.UpdateQuestionIsHideableField(questionDTOs, userId);
             //Filter out all question that are hidden and not hideable
             questionDTOs = questionDTOs.Where(q => !q.IsHidden || q.IsHideable).ToList();
+            ExcludedItems = Questions.Count() - questionDTOs.Count();
+
         }
 
+
+
         return (
-            Questions: questionDTOs, TotalItemCount
+            Questions: questionDTOs, TotalItemCount, ExcludedItems
         );
     }
 

@@ -8,5 +8,7 @@ public class PaginationMetaDTO
 
     public required int TotalItemCount { get; init; }
 
+    public int ExcludedItems { get; init; } = 0;
+
     public int TotalPageCount => Convert.ToInt32(Math.Ceiling(TotalItemCount / Convert.ToDouble(Limit)));
 }
