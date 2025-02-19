@@ -33,6 +33,12 @@ public static class DBSeedTest
         var questions = _seeder.CreateQuestions(10, topics, tags, users);
         await context.AddRangeAsync(questions);
 
+        var answers = _seeder.CreateAnswers(5, questions, users);
+        await context.AddRangeAsync(answers);
+
+        var comments = _seeder.CreateComments(5, answers, users);
+        await context.AddRangeAsync(comments);
+
         await context.SaveChangesAsync();
     }
 
