@@ -41,7 +41,7 @@ public class QuestionController : ControllerBase
         {
             PageNr = paginationDTO.PageNr,
             Limit = paginationDTO.Limit,
-            TotalItemCount = totalItemCount,
+            TotalItemCount = totalItemCount
         };
 
         Response.Headers.Append(
@@ -67,7 +67,7 @@ public class QuestionController : ControllerBase
         {
             PageNr = paginationDTO.PageNr,
             Limit = paginationDTO.Limit,
-            TotalItemCount = totalItemCount,
+            TotalItemCount = totalItemCount
         };
 
         Response.Headers.Append(

@@ -50,8 +50,6 @@ public class QuestionService : BaseService, IQuestionService
         if (userId is not null && userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
         {
             await _sm.DTOService.UpdateQuestionIsHideableField(questionDTOs, userId);
-            //Filter out all question that are hidden and not hideable
-            questionDTOs = questionDTOs.Where(q => !q.IsHidden || q.IsHideable).ToList();
         }
 
         return (
