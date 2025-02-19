@@ -1,3 +1,5 @@
+using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Bogus;
 using Domain.Constants;
 using Domain.Entities;
@@ -296,7 +298,7 @@ public class BaseSeeder : IBaseSeeder
                     q.TopicId = topic.Id;
                     q.UserId = users[RandomInt(0, users.Count)].Id;
                     q.Title = SeedData.StudentQuestions[idx].Title;
-                    q.Description = SeedData.StudentQuestions[idx].Description;
+                    q.Description = TestToLexicalFormat(SeedData.StudentQuestions[idx].Description);
                     q.Created = DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow, new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)), DateTimeKind.Utc);
                     q.IsResolved = RandomBool();
                     q.IsProtected = RandomBool();
@@ -331,7 +333,7 @@ public class BaseSeeder : IBaseSeeder
                     .Select(u => u.Id)
                     .FirstOrDefault();
 
-                    a.Value = $"{f.Lorem.Sentence(20, 100)}";
+                    a.Value = TestToLexicalFormat($"{f.Lorem.Sentence(20, 100)}");
                     a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddDays(1), question.Created.AddDays(100)), DateTimeKind.Utc);
                     a.IsHidden = RandomInt(0, 11) > 8;
                 });
@@ -412,5 +414,44 @@ public class BaseSeeder : IBaseSeeder
     {
         var random = new Random();
         return random.Next(0, 11) > 2;
+    }
+
+    private static string TestToLexicalFormat(string text)
+    {
+        var json = $$"""
+            {
+                "root": {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "detail": 0,
+                                    "format": 0,
+                                    "mode": "normal",
+                                    "style": "",
+                                    "text": "{{text}}",
+                                    "type": "text",
+                                    "version": 1
+                                }
+                            ],
+                            "direction": "ltr",
+                            "format": "",
+                            "indent": 0,
+                            "type": "paragraph",
+                            "version": 1,
+                            "textFormat": 0,
+                            "textStyle": ""
+                        }
+                    ],
+                    "direction": "ltr",
+                    "format": "",
+                    "indent": 0,
+                    "type": "root",
+                    "version": 1
+                }
+            }
+            
+            """;
+        return Regex.Replace(json, @"\s+", "");
     }
 }
