@@ -418,7 +418,7 @@ public class BaseSeeder : IBaseSeeder
 
     private static string TestToLexicalFormat(string text)
     {
-        var json = $$"""
+        string jsonTemplate = $$"""
             {
                 "root": {
                     "children": [
@@ -429,7 +429,7 @@ public class BaseSeeder : IBaseSeeder
                                     "format": 0,
                                     "mode": "normal",
                                     "style": "",
-                                    "text": "{{text}}",
+                                    "text": "<<<TEXT>>>",
                                     "type": "text",
                                     "version": 1
                                 }
@@ -450,8 +450,10 @@ public class BaseSeeder : IBaseSeeder
                     "version": 1
                 }
             }
-            
             """;
-        return Regex.Replace(json, @"\s+", "");
+
+        string minifiedJson = Regex.Replace(jsonTemplate, @"\s+", "");
+
+        return minifiedJson.Replace("<<<TEXT>>>", text);
     }
 }
