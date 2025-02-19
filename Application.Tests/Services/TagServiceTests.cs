@@ -1,3 +1,4 @@
+using Application.Contracts;
 using Application.Services;
 using Domain.DTO.Response;
 using Domain.Entities;
@@ -10,12 +11,21 @@ namespace Application.Tests.Services;
 public class TagServiceTests : SetupServiceTests
 {
     private readonly TagService _tagService;
+    private readonly Mock<IUtilityService> _mockUtilityService;
+    private readonly Mock<Topic> _mockTopic;
+    private readonly Mock<User> _mockUser;
 
     public TagServiceTests()
     {
         _tagService = new TagService(
             _mockRepositoryManager.Object,
             _mockServiceManager.Object);
+
+        _mockUtilityService = new Mock<IUtilityService>(MockBehavior.Strict);
+        _mockServiceManager.Setup(s => s.UtilityService).Returns(_mockUtilityService.Object);
+
+        _mockTopic = new Mock<Topic>();
+        _mockUser = new Mock<User>();
     }
 
     public class AddAsync : TagServiceTests
@@ -271,6 +281,76 @@ public class TagServiceTests : SetupServiceTests
             // Assert
             _mockTagRepository.Verify(
                 r => r.UpdateAsync(tagEntity),
+                Times.Once);
+        }
+    }
+
+    public class StoreNewTagsFromQuestion : TagServiceTests
+    {
+        [Fact]
+        public async Task ShouldNotCallRepository_WhenNormalizedTagsDoesExist()
+        {
+            // Arrange
+            var tagValue = "testTag";
+
+            var tags = new List<string> { tagValue };
+
+            var storedTag = TagFactory.CreateTag(Guid.NewGuid(), tagValue);
+
+            var question = QuestionFactory.CreateQuestionEntity(
+                Guid.NewGuid(), _mockTopic.Object, _mockUser.Object);
+
+            _mockUtilityService
+                .Setup(s => s.NormalizeText(tagValue))
+                .Returns(tagValue);
+
+            _mockTagRepository
+                .Setup(r => r.GetByValueAsync(tags[0]))
+                .ReturnsAsync(storedTag);
+
+            // Act
+            await _tagService.StoreNewTagsFromQuestion(question, tags);
+
+            // Assert
+            _mockTagRepository.Verify(
+                r => r.AddAsync(storedTag),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task ShouldCallRepository_WhenNormalizedTagsDoesNotExist()
+        {
+            // Arrange
+            var tagValue = "testTag";
+
+            var tags = new List<string> { tagValue };
+
+
+            var storedTag = TagFactory.CreateTag(Guid.NewGuid(), tagValue);
+
+            var newTag = TagFactory.CreateTag(tagValue);
+
+            var question = QuestionFactory.CreateQuestionEntity(
+                Guid.NewGuid(), _mockTopic.Object, _mockUser.Object);
+
+            _mockUtilityService
+                .Setup(s => s.NormalizeText(tagValue))
+                .Returns(tagValue);
+
+            _mockTagRepository
+                .Setup(r => r.GetByValueAsync(tags[0]))
+                .ReturnsAsync(default(Tag));
+
+            _mockTagRepository
+                .Setup(r => r.AddAsync(It.IsAny<Tag>()))
+                .ReturnsAsync(It.IsAny<Tag>());
+
+            // Act
+            await _tagService.StoreNewTagsFromQuestion(question, tags);
+
+            // Assert
+            _mockTagRepository.Verify(
+                r => r.AddAsync(It.IsAny<Tag>()),
                 Times.Once);
         }
     }

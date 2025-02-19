@@ -193,6 +193,8 @@ public class QuestionService : BaseService, IQuestionService
     {
         var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
+        _sm.Mapper.Map(questionDTO, question);
+
         if (question == null)
         {
             NotFound(MsgNotFound(id));
@@ -216,6 +218,8 @@ public class QuestionService : BaseService, IQuestionService
         await _rm.TagRepository.DeleteUnusedTagsAsync(tagsToRemove);
 
         await _sm.TagService.StoreNewTagsFromQuestion(question, questionDTO.Tags);
+
+        await _rm.QuestionRepository.UpdateAsync(question);
     }
 }
 

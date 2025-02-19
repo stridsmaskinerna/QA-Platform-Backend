@@ -1,6 +1,5 @@
 using Application.Contracts;
 using Application.Services;
-using Domain.Constants;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.Exceptions;
@@ -11,12 +10,12 @@ namespace Application.Tests.Services;
 
 public class QuestionServiceTests : SetupServiceTests
 {
+    private readonly QuestionService _questionService;
     private readonly Mock<Topic> _mockTopic;
     private readonly Mock<User> _mockUser;
     private readonly Mock<ITokenService> _mockTokenService;
     private readonly Mock<IDTOService> _mockDTOService;
     private readonly Mock<ITagService> _mockTagService;
-    private readonly QuestionService _questionService;
     private readonly Mock<IUtilityService> _mockUtilityService;
 
     public QuestionServiceTests()
@@ -636,6 +635,10 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(question);
 
+            _mockMapper
+                .Setup(m => m.Map(questionDTO, question))
+                .Returns(question);
+
             _mockUtilityService.Setup(r => r.NormalizeText(It.IsAny<string>()))
                 .Returns(It.IsAny<string>()); ;
 
@@ -649,6 +652,10 @@ public class QuestionServiceTests : SetupServiceTests
 
             _mockTagService
                 .Setup(s => s.StoreNewTagsFromQuestion(question, questionDTO.Tags))
+                .Returns(Task.CompletedTask);
+
+            _mockQuestionRepository
+                .Setup(r => r.UpdateAsync(question))
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -682,6 +689,10 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(default(Question));
 
+            _mockMapper
+                .Setup(m => m.Map(questionDTO, It.IsAny<Question>()))
+                .Returns(It.IsAny<Question>());
+
             // Act & Assert
             var exception = await Assert.ThrowsAsync<NotFoundException>(() =>
                 _questionService.UpdateAsync(questionId, questionDTO));
@@ -703,6 +714,10 @@ public class QuestionServiceTests : SetupServiceTests
             _mockQuestionRepository
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(default(Question));
+
+            _mockMapper
+                .Setup(m => m.Map(questionDTO, It.IsAny<Question>()))
+                .Returns(It.IsAny<Question>());
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<NotFoundException>(() =>

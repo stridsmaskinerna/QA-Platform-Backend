@@ -17,7 +17,8 @@ namespace Application.Tests.Services;
 // 3) If exist map and return.
 public class SubjectServiceTests : SetupServiceTests
 {
-    SubjectService _subjectService;
+    private readonly SubjectService _subjectService;
+
     public SubjectServiceTests()
     {
 

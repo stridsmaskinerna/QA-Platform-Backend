@@ -10,9 +10,9 @@ namespace Application.Tests.Services;
 
 public class CommentServiceTests : SetupServiceTests
 {
+    private readonly CommentService _commentService;
     private readonly Mock<User> _mockUser;
     private readonly Mock<Answer> _mockAnswer;
-    private readonly CommentService _commentService;
     private readonly Mock<ITokenService> _mockTokenService;
 
     public CommentServiceTests()
