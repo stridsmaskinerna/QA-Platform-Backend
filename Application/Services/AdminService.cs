@@ -4,27 +4,22 @@ using Domain.Entities;
 
 namespace Application.Services;
 
-public class TeacherService : BaseService, ITeacherService
+public class AdminService : BaseService, IAdminService
 {
     public readonly IRepositoryManager _rm;
 
-    public TeacherService(IRepositoryManager rm)
-    {
-        _rm = rm;
-    }
+    public AdminService(IRepositoryManager rm) => _rm = rm;
 
     public async Task AssignTeacherRoleToUser(string Id)
     {
         await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
     }
 
-
-
     public async Task<User?> BlockUserByIdAsync(string Id)
     {
-        var user = await _rm.UserRepository.BlocKUserById(Id);
+        var user = await _rm.UserRepository.BlocKUserById(Id, true);
         if (user == null)
-            Forbidden("Action Forbidden. You have not permission to block a teacher");
+            NotFound("The user is not in the database");
         return user;
     }
 }

@@ -22,6 +22,7 @@ public static class ApplicationServicesExtension
 
         // Services
         services.AddAsLazy<IAnswerService, AnswerService>();
+        services.AddAsLazy<IAdminService, AdminService>();
         services.AddAsLazy<IAuthenticationService, AuthenticationService>();
         services.AddAsLazy<IBaseService, BaseService>();
         services.AddAsLazy<ICommentService, CommentService>();

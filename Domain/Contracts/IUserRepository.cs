@@ -8,5 +8,6 @@ public interface IUserRepository
     Task<User?> GetUserByMailAsync(string mail);
     Task<User?> ValidateUserCredential(string? email, string? password);
     Task ChangeUserRoleToTeacher(string Id);
-    Task<User?> BlocKUserById(string Id);
+    Task<User?> BlocKUserById(string Id, bool isAdmin = false);
+
 }

@@ -17,5 +17,6 @@ public interface IServiceManager
     ISubjectService SubjectService { get; }
     IDTOService DTOService { get; }
     ITeacherService TeacherService { get; }
+    IAdminService AdminService { get; }
     IMapper Mapper { get; }
 }

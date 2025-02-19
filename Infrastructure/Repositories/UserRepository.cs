@@ -62,17 +62,20 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<User?> BlocKUserById(string Id)
+
+    public async Task<User?> BlocKUserById(string Id, bool isAdmin = false)
     {
         var user = await _userManager.FindByIdAsync(Id);
-        if (user != null && (await _userManager.GetRolesAsync(user))?.Contains(DomainRoles.TEACHER) == false)
+        if (user == null) return null;
+
+        if (isAdmin || !(await _userManager.GetRolesAsync(user)).Contains(DomainRoles.TEACHER))
         {
             user.IsBlocked = !user.IsBlocked;
             await _dbContext.SaveChangesAsync();
             return user;
         }
-        return null;
 
+        return null;
 
     }
 }

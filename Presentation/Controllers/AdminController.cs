@@ -7,27 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Authorize(Roles = $"{DomainRoles.TEACHER}")]
-[Route("api/teacherconsole")]
+[Authorize(Roles = $"{DomainRoles.ADMIN}")]
+[Route("api/admin")]
 [Produces("application/json")]
 
-public class TeacherController : ControllerBase
+public class AdminController : ControllerBase
 {
-
     private readonly IServiceManager _sm;
+    private bool isAdmin;
 
-    public TeacherController(IServiceManager sM)
-    {
-        _sm = sM;
-    }
+    public AdminController(IServiceManager sm) => _sm = sm;
 
     [HttpPut("blockuser")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> BlockUserById([FromQuery] string Id)
     {
-        var blockedUSer = await _sm.TeacherService.BlockUserByIdAsync(Id);
+        var blockedUSer = await _sm.AdminService.BlockUserByIdAsync(Id);
         return Ok(blockedUSer);
     }
+
 }
