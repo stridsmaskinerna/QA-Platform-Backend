@@ -9,8 +9,8 @@ namespace Application.Tests.Services;
 
 public class TokenServiceTests
 {
-    private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
     private readonly TokenService _tokenService;
+    private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
     private readonly DefaultHttpContext _mockHttpContext;
     private readonly ClaimsPrincipal _claimsPrincipal;
 

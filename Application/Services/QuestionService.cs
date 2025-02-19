@@ -6,7 +6,6 @@ using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.VisualBasic;
 
 namespace Application.Services;
 
@@ -50,7 +49,7 @@ public class QuestionService : BaseService, IQuestionService
 
         if (userId is not null && userRoles is not null && userRoles.Contains(DomainRoles.TEACHER))
         {
-            await UpdateQuestionDTOIsHideableField(questionDTOs, userId);
+            await _sm.DTOService.UpdateQuestionIsHideableField(questionDTOs, userId);
             //Filter out all question that are hidden and not hideable
             questionDTOs = questionDTOs.Where(q => !q.IsHidden || q.IsHideable).ToList();
         }
@@ -58,16 +57,6 @@ public class QuestionService : BaseService, IQuestionService
         return (
             Questions: questionDTOs, TotalItemCount
         );
-    }
-
-    private async Task UpdateQuestionDTOIsHideableField(IEnumerable<QuestionDTO> DTOList, string userId)
-    {
-        var teachersSubjectIds = (await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId)).Select(s => s.Id);
-
-        foreach (var dto in DTOList)
-        {
-            dto.IsHideable = teachersSubjectIds.Contains(dto.SubjectId);
-        }
     }
 
     public async Task ManageQuestionVisibilityAsync(Guid id)
@@ -128,13 +117,15 @@ public class QuestionService : BaseService, IQuestionService
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
 
-        await UpdatingAnsweredByTeacherField(questionDTO);
-
         var userId = _sm.TokenService.GetUserId();
 
-        UpdatingMyVoteField(question, questionDTO, userId);
-        await UpdateQuestionDTOIsHideableField([questionDTO], userId);
-        UpdateAnswerIsHideableField(questionDTO);
+        await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
+
+        _sm.DTOService.UpdatingMyVoteField(question, questionDTO, userId);
+
+        await _sm.DTOService.UpdateQuestionIsHideableField(questionDTO, userId);
+
+        _sm.DTOService.UpdateAnswerIsHideableField(questionDTO);
 
         if (questionDTO.IsHidden && !questionDTO.IsHideable)
         {
@@ -142,19 +133,6 @@ public class QuestionService : BaseService, IQuestionService
         }
 
         return questionDTO;
-    }
-
-    private void UpdateAnswerIsHideableField(QuestionDetailedDTO questionDTO)
-    {
-        if (!questionDTO.IsHideable)
-        {
-            return;
-        }
-
-        foreach (var answerDTO in questionDTO.Answers ?? [])
-        {
-            answerDTO.IsHideable = true;
-        }
     }
 
     public async Task<QuestionDetailedDTO> GetPublicQuestionByIdAsync(Guid id)
@@ -170,56 +148,9 @@ public class QuestionService : BaseService, IQuestionService
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
 
-        await UpdatingAnsweredByTeacherField(questionDTO);
+        await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
 
         return questionDTO;
-    }
-
-    private async Task UpdatingAnsweredByTeacherField(QuestionDetailedDTO questionDTO)
-    {
-        var answersUsernames = questionDTO.Answers?
-            .Select(a => a.UserName)
-            .ToList();
-
-        var teachers = await _rm.UserRepository.GetTeachersBySubjectIdAsync(questionDTO.SubjectId);
-
-        var teachersUsernames = teachers.Select(u => u.UserName).ToList();
-
-        foreach (var answer in questionDTO.Answers ?? [])
-        {
-            if (teachersUsernames.Contains(answer.UserName))
-            {
-                answer.AnsweredByTeacher = true;
-            }
-        }
-    }
-
-    private void UpdatingMyVoteField(
-        Question question,
-        QuestionDetailedDTO questionDTO,
-        string? userId
-    )
-    {
-        var answerVotesDict = (question.Answers ?? Enumerable.Empty<Answer>())
-            .SelectMany(a => a.AnswerVotes)
-            .Where(v => v.UserId == userId)
-            .ToDictionary(v => v.AnswerId, v => v.Vote);
-
-        foreach (var answerDTO in questionDTO.Answers ?? [])
-        {
-            if (answerVotesDict.TryGetValue(answerDTO.Id, out bool vote))
-            {
-                answerDTO.MyVote = vote switch
-                {
-                    true => VoteType.LIKE,
-                    false => VoteType.DISLIKE
-                };
-            }
-            else
-            {
-                answerDTO.MyVote = VoteType.NEUTRAL;
-            }
-        }
     }
 
     public async Task DeleteAsync(Guid id)
@@ -247,7 +178,7 @@ public class QuestionService : BaseService, IQuestionService
 
         question.UserId = _sm.TokenService.GetUserId();
 
-        await AddNewTags(question, questionDTO.Tags);
+        await _sm.TagService.StoreNewTagsFromQuestion(question, questionDTO.Tags);
 
         var createdQuestion = await _rm.QuestionRepository.AddAsync(question);
 
@@ -261,6 +192,8 @@ public class QuestionService : BaseService, IQuestionService
     public async Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO)
     {
         var question = await _rm.QuestionRepository.GetByIdAsync(id);
+
+        _sm.Mapper.Map(questionDTO, question);
 
         if (question == null)
         {
@@ -284,33 +217,9 @@ public class QuestionService : BaseService, IQuestionService
 
         await _rm.TagRepository.DeleteUnusedTagsAsync(tagsToRemove);
 
-        await AddNewTags(question, questionDTO.Tags);
-    }
+        await _sm.TagService.StoreNewTagsFromQuestion(question, questionDTO.Tags);
 
-    private async Task AddNewTags(
-        Question question,
-        IEnumerable<string> tags
-    )
-    {
-        var normalizedNewTagValues = tags
-            .Select(_sm.UtilityService.NormalizeText)
-            .ToList();
-
-        foreach (var tagValue in normalizedNewTagValues)
-        {
-            var tag = await _rm.TagRepository.GetByValueAsync(tagValue);
-
-            if (tag == null)
-            {
-                tag = new Tag { Value = tagValue };
-                await _rm.TagRepository.AddAsync(tag);
-            }
-
-            if (!question.Tags.Any(t => t.Value == tagValue))
-            {
-                question.Tags.Add(tag);
-            }
-        }
+        await _rm.QuestionRepository.UpdateAsync(question);
     }
 }
 

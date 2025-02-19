@@ -1,7 +1,5 @@
-using Application.Contracts;
 using Application.Services;
 using Domain.Constants;
-using Domain.Contracts;
 using Domain.DTO.Request;
 using Domain.Entities;
 using Domain.Exceptions;
@@ -14,9 +12,8 @@ namespace Application.Tests.Services;
 
 public class AuthenticationServiceTests : SetupServiceTests
 {
-    private readonly Mock<IConfiguration> _mockConfiguration;
-
     private readonly AuthenticationService _authenticationService;
+    private readonly Mock<IConfiguration> _mockConfiguration;
 
     public AuthenticationServiceTests()
     {

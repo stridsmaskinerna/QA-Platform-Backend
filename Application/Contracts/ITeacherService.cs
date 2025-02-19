@@ -1,3 +1,4 @@
+
 using Domain.Entities;
 
 namespace Application.Contracts;

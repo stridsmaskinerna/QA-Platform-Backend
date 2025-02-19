@@ -75,7 +75,7 @@ public class QuestionRepository : IQuestionRepository
         User teacher
     )
     {
-        var totalItemCount = await _dbContext.Questions.CountAsync();
+
 
         var query = _dbContext.Questions.AsQueryable();
 
@@ -89,9 +89,15 @@ public class QuestionRepository : IQuestionRepository
 
         query = query
             .Pipe(q => ApplyUserFilter(q, teacher))
-            .Pipe(q => ApplySubjectFilter(q, subjectId))
+            .Pipe(q => ApplySubjectFilter(q, subjectId));
+
+        var totalItemCount = await query.CountAsync();
+
+        query = query
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
+
+
 
         return (
             Questions: await query.ToListAsync(),
@@ -107,7 +113,7 @@ public class QuestionRepository : IQuestionRepository
         List<string>? userRoles
     )
     {
-        var totalItemCount = await _dbContext.Questions.CountAsync();
+
 
         var query = _dbContext.Questions.AsQueryable();
 
@@ -125,9 +131,14 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(q => ApplyResolvedFilter(q, searchDTO))
             .Pipe(q => ApplySubjectFilter(q, searchDTO.SubjectId))
             .Pipe(q => ApplyTopicFilter(q, searchDTO.TopicId))
-            .Pipe(q => ApplySearchFilter(q, searchDTO))
+            .Pipe(q => ApplySearchFilter(q, searchDTO));
+
+        var totalItemCount = await query.CountAsync();
+
+        query = query
             .Pipe(q => ApplySorting(q))
             .Pipe(q => ApplyPagination(q, paginationDTO));
+
 
         return (
             Questions: await query.ToListAsync(),

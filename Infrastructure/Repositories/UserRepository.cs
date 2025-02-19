@@ -62,6 +62,7 @@ public class UserRepository : IUserRepository
         }
     }
 
+
     public async Task<User?> BlocKUserById(string Id, bool isAdmin = false)
     {
         var user = await _userManager.FindByIdAsync(Id);

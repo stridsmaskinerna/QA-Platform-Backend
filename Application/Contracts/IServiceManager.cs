@@ -15,6 +15,7 @@ public interface IServiceManager
     ITagService TagService { get; }
     IVoteService VoteService { get; }
     ISubjectService SubjectService { get; }
+    IDTOService DTOService { get; }
     ITeacherService TeacherService { get; }
     IAdminService AdminService { get; }
     IMapper Mapper { get; }
