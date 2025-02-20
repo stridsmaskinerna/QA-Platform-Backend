@@ -12,4 +12,6 @@ public interface IAnswerRepository
     Task<IEnumerable<Answer>> GetAnswersByUserIdAsync(Guid userId);
     Task<int> GetAnswerCountByQuestionIdAsync(Guid questionId);
     Task CompleteAsync();
+    void FilterOutHiddenAnswers(ICollection<Answer> answers);
+    void FilterOutHiddenAnswers(IEnumerable<Question> questions, IEnumerable<Subject> subjects);
 }

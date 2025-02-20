@@ -30,19 +30,18 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
-        QuestionSearchDTO searchDTO,
-        bool onlyPublic = true
+        QuestionSearchDTO searchDTO
     )
     {
-        string? userId = null;
-        List<string>? userRoles = null;
-        if (!onlyPublic)
-        {
-            userId = _sm.TokenService.GetUserId();
-            userRoles = _sm.TokenService.GetUserRoles();
-        }
+
+        var userId = _sm.TokenService.GetUserId();
+        var userRoles = _sm.TokenService.GetUserRoles();
+        var teachersSubjects = await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId);
+
         var (Questions, TotalItemCount) = await _rm.QuestionRepository.GetItemsAsync(
-            paginationDTO, searchDTO, onlyPublic, userId, userRoles);
+            paginationDTO, searchDTO, onlyPublic: false, userId, userRoles);
+
+        _rm.AnswerRepository.FilterOutHiddenAnswers(Questions, teachersSubjects);
 
         var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
             Questions);
@@ -51,6 +50,24 @@ public class QuestionService : BaseService, IQuestionService
         {
             await _sm.DTOService.UpdateQuestionIsHideableField(questionDTOs, userId);
         }
+
+        return (
+            Questions: questionDTOs, TotalItemCount
+        );
+    }
+
+    public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetPublicItemsAsync(
+        PaginationDTO paginationDTO,
+        QuestionSearchDTO searchDTO
+    )
+    {
+        var (Questions, TotalItemCount) = await _rm.QuestionRepository.GetItemsAsync(
+            paginationDTO, searchDTO, onlyPublic: true, userId: null, userRoles: null);
+
+        _rm.AnswerRepository.FilterOutHiddenAnswers(Questions, []);
+
+        var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
+            Questions);
 
         return (
             Questions: questionDTOs, TotalItemCount
@@ -106,16 +123,23 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
+
         var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
             NotFound(MsgNotFound(id));
         }
+        var userId = _sm.TokenService.GetUserId();
+
+        var teachersSubjects = await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId);
+
+        if (!teachersSubjects.Contains(question.Topic.Subject))
+        {
+            _rm.AnswerRepository.FilterOutHiddenAnswers(question.Answers);
+        }
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
-
-        var userId = _sm.TokenService.GetUserId();
 
         await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
 
@@ -143,6 +167,8 @@ public class QuestionService : BaseService, IQuestionService
         {
             NotFound(MsgNotFound(id));
         }
+
+        _rm.AnswerRepository.FilterOutHiddenAnswers(question.Answers);
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
 
