@@ -1,8 +1,6 @@
 name: QA Platform build and test workflow
 
 on:
-  push:
-    branches: [ "*" ]
   pull_request:
     branches: [ "main", "development" ]
 
