@@ -68,4 +68,15 @@ public class AnswerRepository : IAnswerRepository
             }
         }
     }
+    public void FilterOutHiddenAnswers(IEnumerable<Question> questions, IEnumerable<Subject> teachersSubjects)
+    {
+        foreach (var question in questions)
+        {
+            if (!teachersSubjects.Contains(question.Topic.Subject))
+            {
+                FilterOutHiddenAnswers(question.Answers);
+            }
+        }
+
+    }
 }

@@ -9,8 +9,10 @@ public interface IQuestionService
     Task<QuestionDetailedDTO> GetByIdAsync(Guid id);
     Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
-        QuestionSearchDTO searchDTO,
-        bool onlyPublic = true);
+        QuestionSearchDTO searchDTO);
+    Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetPublicItemsAsync(
+        PaginationDTO paginationDTO,
+        QuestionSearchDTO searchDTO);
     Task<QuestionDTO> AddAsync(QuestionForCreationDTO questionDTO);
     Task UpdateAsync(Guid id, QuestionForPutDTO questionDTO);
     Task DeleteAsync(Guid id);

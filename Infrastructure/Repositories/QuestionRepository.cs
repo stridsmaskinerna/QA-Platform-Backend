@@ -95,8 +95,6 @@ public class QuestionRepository : IQuestionRepository
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
 
-
-
         return (
             Questions: await query.ToListAsync(),
             TotalItemCount: totalItemCount
