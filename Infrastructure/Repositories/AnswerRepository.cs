@@ -57,4 +57,15 @@ public class AnswerRepository : IAnswerRepository
     {
         return await _dbContext.Answers.CountAsync(a => a.QuestionId == questionId);
     }
+
+    public void FilterOutHiddenAnswers(ICollection<Answer> answers)
+    {
+        foreach (var answer in answers)
+        {
+            if (answer.IsHidden)
+            {
+                answers.Remove(answer);
+            }
+        }
+    }
 }

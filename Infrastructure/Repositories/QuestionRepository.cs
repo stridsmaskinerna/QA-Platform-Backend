@@ -20,13 +20,12 @@ public class QuestionRepository : IQuestionRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Question?> GetByIdAsync(Guid id, string? userId = null, List<string>? userRoles = null)
+    public async Task<Question?> GetByIdAsync(Guid id)
     {
-        var question = await _dbContext.Questions
+        return await _dbContext.Questions
             .Where(q => q.Id == id)
             .Include(q => q.Topic)
                 .ThenInclude(t => t.Subject)
-                .ThenInclude(s => s.Teachers)
             .Include(q => q.Tags)
             // Include Users under questions used for DTO mapping
             .Include(q => q.User)
@@ -40,10 +39,6 @@ public class QuestionRepository : IQuestionRepository
             .Include(q => q.Answers)
                 // Include AnswerVotes under answers used for DTO mapping
                 .ThenInclude(a => a.AnswerVotes).FirstOrDefaultAsync();
-
-        ApplyAnswerIsHiddenFilter(question, userRoles, userId);
-
-        return question;
     }
 
     public async Task<Question> AddAsync(Question question)
@@ -170,31 +165,7 @@ public class QuestionRepository : IQuestionRepository
         return q.Where(q => !q.IsHidden);
     }
 
-    private void ApplyAnswerIsHiddenFilter(Question? q, List<string>? userRoles, string? userId)
-    {
-        if (q == null ||
-            (
-            userId != null &&
-            userRoles != null &&
-            userRoles.Contains(DomainRoles.TEACHER) &&
-            //If the user is teacher in the question's course, then dont filter out anything
-            q.Topic.Subject.Teachers.Select(t => t.Id).Contains(userId)
-            )
 
-        )
-        {
-            return;
-        }
-        //If not a teacher in question's course then filter out all hidden answers
-        foreach (var answer in q.Answers)
-        {
-            if (answer.IsHidden)
-            {
-                q.Answers.Remove(answer);
-            }
-        }
-
-    }
 
     private IQueryable<Question> ApplyUserFilter(
         IQueryable<Question> queryable,

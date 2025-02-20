@@ -5,8 +5,7 @@ namespace Domain.Contracts;
 
 public interface IQuestionRepository
 {
-    Task<Question?> GetByIdAsync(Guid id, string? userId = null,
-        List<string>? userRoles = null);
+    Task<Question?> GetByIdAsync(Guid id);
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);
     Task CompleteAsync();

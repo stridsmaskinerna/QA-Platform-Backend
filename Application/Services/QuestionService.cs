@@ -106,16 +106,23 @@ public class QuestionService : BaseService, IQuestionService
 
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
+
         var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
         if (question == null)
         {
             NotFound(MsgNotFound(id));
         }
+        var userId = _sm.TokenService.GetUserId();
+
+        var teachersSubjects = await _rm.SubjectRepository.GetTeachersSubjectsAsync(userId);
+
+        if (!teachersSubjects.Contains(question.Topic.Subject))
+        {
+            _rm.AnswerRepository.FilterOutHiddenAnswers(question.Answers);
+        }
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
-
-        var userId = _sm.TokenService.GetUserId();
 
         await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
 
@@ -143,6 +150,8 @@ public class QuestionService : BaseService, IQuestionService
         {
             NotFound(MsgNotFound(id));
         }
+
+        _rm.AnswerRepository.FilterOutHiddenAnswers(question.Answers);
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
 
