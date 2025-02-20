@@ -23,7 +23,7 @@ public class QuestionProfileMapper : Profile
         CreateMap<Question, QuestionDTO>()
         .ForMember(dest => dest.TopicName, opt => opt.MapFrom(src => src.Topic.Name))
         .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Topic.Subject.Name))
-        .ForMember(dest => dest.AnswerCount, opt => opt.MapFrom(src => src.Answers))
+        .ForMember(dest => dest.AnswerCount, opt => opt.MapFrom(src => src.Answers.Count))
         .ForMember(dest => dest.SubjectCode, opt => opt.MapFrom(src => src.Topic.Subject.SubjectCode))
         .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
         .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.Topic.Subject.Id))

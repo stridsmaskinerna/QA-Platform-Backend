@@ -55,6 +55,7 @@ public class QuestionService : BaseService, IQuestionService
             Questions: questionDTOs, TotalItemCount
         );
     }
+
     public async Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetPublicItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO
@@ -62,6 +63,8 @@ public class QuestionService : BaseService, IQuestionService
     {
         var (Questions, TotalItemCount) = await _rm.QuestionRepository.GetItemsAsync(
             paginationDTO, searchDTO, onlyPublic: true, userId: null, userRoles: null);
+
+        _rm.AnswerRepository.FilterOutHiddenAnswers(Questions, []);
 
         var questionDTOs = _sm.Mapper.Map<IEnumerable<QuestionDTO>>(
             Questions);

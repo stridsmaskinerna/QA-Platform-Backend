@@ -60,7 +60,7 @@ public class AnswerRepository : IAnswerRepository
 
     public void FilterOutHiddenAnswers(ICollection<Answer> answers)
     {
-        foreach (var answer in answers)
+        foreach (var answer in answers.ToList())
         {
             if (answer.IsHidden)
             {
