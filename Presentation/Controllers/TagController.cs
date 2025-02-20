@@ -36,7 +36,7 @@ public class TagController : ControllerBase
     }
 
     [HttpDelete]
-    [Authorize(Roles = $"{DomainRoles.ADMIN}")]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}, {DomainRoles.TEACHER}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
