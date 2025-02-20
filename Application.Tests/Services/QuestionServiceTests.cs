@@ -74,6 +74,13 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
 
+            _mockAnswerRepository
+                .Setup(r => r.FilterOutHiddenAnswers(questionEntity.Answers));
+
+            _mockSubjectRepository
+                .Setup(s => s.GetTeachersSubjectsAsync(_mockUser.Object.Id))
+                .ReturnsAsync([]);
+
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
@@ -130,6 +137,13 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
 
+            _mockAnswerRepository
+                .Setup(r => r.FilterOutHiddenAnswers(questionEntity.Answers));
+
+            _mockSubjectRepository
+                .Setup(s => s.GetTeachersSubjectsAsync(_mockUser.Object.Id))
+                .ReturnsAsync([]);
+
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
@@ -179,6 +193,13 @@ public class QuestionServiceTests : SetupServiceTests
             _mockQuestionRepository
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
+
+            _mockSubjectRepository
+                .Setup(s => s.GetTeachersSubjectsAsync(_mockUser.Object.Id))
+                .ReturnsAsync([]);
+
+            _mockAnswerRepository
+                .Setup(a => a.FilterOutHiddenAnswers(questionEntity.Answers));
 
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
@@ -263,6 +284,13 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
 
+            _mockSubjectRepository
+                .Setup(s => s.GetTeachersSubjectsAsync(_mockUser.Object.Id))
+                .ReturnsAsync([]);
+
+            _mockAnswerRepository
+                .Setup(a => a.FilterOutHiddenAnswers(questionEntity.Answers));
+
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
@@ -312,6 +340,13 @@ public class QuestionServiceTests : SetupServiceTests
             _mockQuestionRepository
                 .Setup(r => r.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
+
+            _mockSubjectRepository
+                .Setup(s => s.GetTeachersSubjectsAsync(_mockUser.Object.Id))
+                .ReturnsAsync([]);
+
+            _mockAnswerRepository
+                .Setup(a => a.FilterOutHiddenAnswers(questionEntity.Answers));
 
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
@@ -368,6 +403,9 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(q => q.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
 
+            _mockAnswerRepository
+                .Setup(a => a.FilterOutHiddenAnswers(questionEntity.Answers));
+
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
                 .Returns(questionDTO);
@@ -419,6 +457,9 @@ public class QuestionServiceTests : SetupServiceTests
             _mockQuestionRepository
                 .Setup(q => q.GetByIdAsync(questionId))
                 .ReturnsAsync(questionEntity);
+
+            _mockAnswerRepository
+                .Setup(a => a.FilterOutHiddenAnswers(questionEntity.Answers));
 
             _mockMapper
                 .Setup(m => m.Map<QuestionDetailedDTO>(questionEntity))
