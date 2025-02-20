@@ -12,12 +12,14 @@ public class AnswerProfileMapper : Profile
         CreateMap<Answer, AnswerDTO>()
         .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments))
         .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
-        .ForMember(dest => dest.VoteCount, opt => opt.MapFrom(src => src.AnswerVotes.Count));
+        .ForMember(dest => dest.VoteCount, opt => opt.MapFrom(src => src.AnswerVotes
+                                                    .Aggregate(0, (acc, current) => acc + (current.Vote ? 1 : -1))));
 
         CreateMap<Answer, AnswerDetailedDTO>()
         .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments))
         .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
-        .ForMember(dest => dest.VoteCount, opt => opt.MapFrom(src => src.AnswerVotes.Count));
+        .ForMember(dest => dest.VoteCount, opt => opt.MapFrom(src => src.AnswerVotes
+                                                    .Aggregate(0, (acc, current) => acc + (current.Vote ? 1 : -1))));
 
         CreateMap<AnswerForCreationDTO, Answer>()
             .AfterMap((s, d) =>

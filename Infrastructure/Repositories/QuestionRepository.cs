@@ -1,4 +1,5 @@
 using System.Data;
+using System.IO.Compression;
 using Domain.Constants;
 using Domain.Contracts;
 using Domain.DTO.Query;
@@ -37,8 +38,7 @@ public class QuestionRepository : IQuestionRepository
                 .ThenInclude(a => a.User)
             .Include(q => q.Answers)
                 // Include AnswerVotes under answers used for DTO mapping
-                .ThenInclude(a => a.AnswerVotes)
-            .FirstOrDefaultAsync();
+                .ThenInclude(a => a.AnswerVotes).FirstOrDefaultAsync();
     }
 
     public async Task<Question> AddAsync(Question question)
@@ -75,8 +75,6 @@ public class QuestionRepository : IQuestionRepository
         User teacher
     )
     {
-
-
         var query = _dbContext.Questions.AsQueryable();
 
         query = query
@@ -96,8 +94,6 @@ public class QuestionRepository : IQuestionRepository
         query = query
             .Pipe(ApplySorting)
             .Pipe(q => ApplyPagination(q, paginationDTO));
-
-
 
         return (
             Questions: await query.ToListAsync(),
@@ -166,6 +162,8 @@ public class QuestionRepository : IQuestionRepository
         }
         return q.Where(q => !q.IsHidden);
     }
+
+
 
     private IQueryable<Question> ApplyUserFilter(
         IQueryable<Question> queryable,

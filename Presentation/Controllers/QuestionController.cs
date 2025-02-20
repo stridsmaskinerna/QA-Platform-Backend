@@ -35,7 +35,7 @@ public class QuestionController : ControllerBase
     )
     {
         var (questions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(
-            paginationDTO, searchDTO, onlyPublic: false);
+            paginationDTO, searchDTO);
 
         var paginationMeta = new PaginationMetaDTO()
         {
@@ -61,7 +61,7 @@ public class QuestionController : ControllerBase
         [FromQuery] QuestionSearchDTO searchDTO
     )
     {
-        var (publicQuestions, totalItemCount) = await _sm.QuestionService.GetItemsAsync(paginationDTO, searchDTO);
+        var (publicQuestions, totalItemCount) = await _sm.QuestionService.GetPublicItemsAsync(paginationDTO, searchDTO);
 
         var paginationMeta = new PaginationMetaDTO()
         {
