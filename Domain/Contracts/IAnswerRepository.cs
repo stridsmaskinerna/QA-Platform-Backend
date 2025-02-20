@@ -14,4 +14,5 @@ public interface IAnswerRepository
     Task CompleteAsync();
     void FilterOutHiddenAnswers(ICollection<Answer> answers);
     void FilterOutHiddenAnswers(IEnumerable<Question> questions, IEnumerable<Subject> subjects);
+    Task<IEnumerable<Comment>> GetAnswerCommentsAsync(Guid id);
 }

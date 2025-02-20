@@ -69,4 +69,15 @@ public class AnswerController : ControllerBase
         await _sm.AnswerService.ManageVisibilityAsync(id);
         return Ok();
     }
+
+    [HttpGet("{id}/comments")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<CommentDTO>>> GetAnswerComments(
+        [FromRoute] Guid id
+    )
+    {
+        IEnumerable<CommentDTO> comments = await _sm.AnswerService.GetAnswerCommentsAsync(id);
+        return Ok(comments);
+    }
 }

@@ -79,4 +79,12 @@ public class AnswerRepository : IAnswerRepository
         }
 
     }
+
+    public async Task<IEnumerable<Comment>> GetAnswerCommentsAsync(Guid id)
+    {
+        return await _dbContext.Comments
+            .Include(c => c.User)
+            .Where(c => c.AnswerId == id)
+            .ToListAsync();
+    }
 }
