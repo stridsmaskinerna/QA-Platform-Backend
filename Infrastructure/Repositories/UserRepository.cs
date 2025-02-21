@@ -1,7 +1,9 @@
 using Domain.Constants;
 using Domain.Contracts;
+using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +13,7 @@ namespace Infrastructure.Repositories;
 /// A repository class that wrap and extend UserManager<User> used
 /// to improve testing.
 /// </summary>
-public class UserRepository : IUserRepository
+public class UserRepository : BaseRepository, IUserRepository
 {
     private UserManager<User> _userManager;
     private readonly QAPlatformContext _dbContext;
@@ -41,7 +43,8 @@ public class UserRepository : IUserRepository
             !await _userManager.CheckPasswordAsync(user, password!))
         {
             return null;
-        };
+        }
+        ;
 
         return user;
     }
@@ -53,7 +56,7 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task ChangeUserRoleToTeacher(string Id)
+    public async Task AddUserRoleTeacher(string Id)
     {
         var user = await _userManager.FindByIdAsync(Id);
         if (user != null)
@@ -77,5 +80,42 @@ public class UserRepository : IUserRepository
 
         return null;
 
+    }
+
+    public async Task<(IEnumerable<User> users, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string searchString)
+    {
+        var query = _dbContext.Users.AsQueryable();
+
+        query = query
+            .Pipe(u => ApplySearchFilter(u, searchString));
+
+        var totalItemCount = await query.CountAsync();
+
+        query = query
+            .Pipe(u => ApplyPagination(u, paginationDTO));
+
+        return (users: await query.ToListAsync(), totalItemCount);
+    }
+
+    private IQueryable<User> ApplySearchFilter(IQueryable<User> queryable, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+        {
+            return queryable;
+        }
+
+        var searchStrings = searchString.Split(
+            //Build error (on Mac) if not explicitly typing the space, i.e new char[] { ' ' } or new string[] { " " },
+            new char[] { ' ' },
+            StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var word in searchStrings)
+        {
+            var query = $"%{word}%";
+            queryable = queryable.Where(u =>
+            (u.UserName != null && EF.Functions.ILike(u.UserName, query))
+            || (u.Email != null && EF.Functions.ILike(u.Email, query)));
+        }
+        return queryable;
     }
 }
