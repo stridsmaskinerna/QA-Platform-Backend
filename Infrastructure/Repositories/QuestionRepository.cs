@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class QuestionRepository : IQuestionRepository
+public class QuestionRepository : BaseRepository, IQuestionRepository
 {
     private readonly QAPlatformContext _dbContext;
 
@@ -281,15 +281,5 @@ public class QuestionRepository : IQuestionRepository
     )
     {
         return queryable.OrderByDescending(q => q.Created);
-    }
-
-    private IQueryable<Question> ApplyPagination(
-        IQueryable<Question> queryable,
-        PaginationDTO paginationDTO
-    )
-    {
-        return queryable
-            .Skip(paginationDTO.Limit * (paginationDTO.PageNr - 1))
-            .Take(paginationDTO.Limit);
     }
 }

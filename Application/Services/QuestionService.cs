@@ -5,7 +5,6 @@ using Domain.DTO.Query;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
 using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
@@ -16,8 +15,7 @@ public class QuestionService : BaseService, IQuestionService
 
     public QuestionService(
         IRepositoryManager rm,
-        IServiceManager sm,
-        UserManager<User> userManager
+        IServiceManager sm
     )
     {
         _rm = rm;

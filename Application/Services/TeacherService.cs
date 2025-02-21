@@ -15,7 +15,7 @@ public class TeacherService : BaseService, ITeacherService
 
     public async Task AssignTeacherRoleToUser(string Id)
     {
-        await _rm.UserRepository.ChangeUserRoleToTeacher(Id);
+        await _rm.UserRepository.AddUserRoleTeacher(Id);
     }
 
 
