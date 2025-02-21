@@ -33,11 +33,13 @@ public class QuestionProfileMapper : Profile
         .ForMember(dest => dest.Tags, opt => opt.Ignore())
         .AfterMap((src, dest, context) =>
         {
-
-            dest.IsProtected = false;
             dest.IsHidden = false;
             dest.Created = DateTime.UtcNow;
         });
+
+        CreateMap<Question, QuestionForEditDTO>()
+        .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.Topic.SubjectId))
+        .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.Select(t => t.Value).ToList()));
 
         CreateMap<QuestionForPutDTO, Question>()
         .ForMember(dest => dest.Tags, opt => opt.Ignore());

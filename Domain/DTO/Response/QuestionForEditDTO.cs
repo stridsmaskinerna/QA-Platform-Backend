@@ -1,6 +1,6 @@
-namespace Domain.DTO.Request;
+namespace Domain.DTO.Response;
 
-public class QuestionForPutDTO
+public class QuestionForEditDTO
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

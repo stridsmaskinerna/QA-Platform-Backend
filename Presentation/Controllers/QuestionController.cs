@@ -89,6 +89,17 @@ public class QuestionController : ControllerBase
         return Ok(question);
     }
 
+    [HttpGet("{id}/edit")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<QuestionForEditDTO>> GetQuestionForEdit(
+        [FromRoute] Guid id
+    )
+    {
+        var question = await _sm.QuestionService.GetByIdForEditAsync(id);
+        return Ok(question);
+    }
+
     [AllowAnonymous]
     [HttpGet("public/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]

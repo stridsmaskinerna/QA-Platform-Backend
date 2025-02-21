@@ -121,6 +121,25 @@ public class QuestionService : BaseService, IQuestionService
         );
     }
 
+    public async Task<QuestionForEditDTO> GetByIdForEditAsync(Guid id)
+    {
+        var question = await _rm.QuestionRepository.GetByIdForEditAsync(id);
+
+        if (question == null)
+        {
+            NotFound(MsgNotFound(id));
+        }
+
+        var userId = _sm.TokenService.GetUserId();
+
+        if (question.UserId != userId)
+        {
+            Forbidden();
+        }
+
+        return _sm.Mapper.Map<QuestionForEditDTO>(question);
+    }
+
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
 

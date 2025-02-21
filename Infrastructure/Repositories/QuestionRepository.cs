@@ -40,6 +40,14 @@ public class QuestionRepository : BaseRepository, IQuestionRepository
                 // Include AnswerVotes under answers used for DTO mapping
                 .ThenInclude(a => a.AnswerVotes).FirstOrDefaultAsync();
     }
+    public async Task<Question?> GetByIdForEditAsync(Guid id)
+    {
+        return await _dbContext.Questions
+            .Where(q => q.Id == id)
+            .Include(q => q.Topic)
+            .Include(q => q.Tags)
+             .FirstOrDefaultAsync();
+    }
 
     public async Task<Question> AddAsync(Question question)
     {
