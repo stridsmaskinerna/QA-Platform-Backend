@@ -76,4 +76,10 @@ public class AnswerService : BaseService, IAnswerService
         answer.IsHidden = !answer.IsHidden;
         await _rm.AnswerRepository.UpdateAsync(answer);
     }
+
+    public async Task<IEnumerable<CommentDTO>> GetAnswerCommentsAsync(Guid id)
+    {
+        var comments = await _rm.AnswerRepository.GetAnswerCommentsAsync(id);
+        return _sm.Mapper.Map<IEnumerable<CommentDTO>>(comments);
+    }
 }
