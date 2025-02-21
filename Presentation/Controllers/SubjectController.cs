@@ -89,8 +89,11 @@ public class SubjectController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSubjectAsync([FromRoute] Guid id)
     {
-        await _sm.SubjectService.DeleteAsync(id);
-        return Ok();
+        var sub = await _sm.SubjectService.DeleteAsync(id);
+
+        if (sub == null) return Forbid();
+
+        return Ok(sub);
     }
 
     [HttpPut("{id}")]

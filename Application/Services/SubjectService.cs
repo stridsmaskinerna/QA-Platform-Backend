@@ -40,7 +40,7 @@ public class SubjectService : BaseService, ISubjectService
     }
 
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<Subject?> DeleteAsync(Guid id)
     {
         var subject = await _rm.SubjectRepository.GetByIdAsync(id);
 
@@ -49,7 +49,7 @@ public class SubjectService : BaseService, ISubjectService
             NotFound();
         }
 
-        await _rm.SubjectRepository.DeleteAsync(id);
+        return await _rm.SubjectRepository.DeleteAsync(id);
     }
 
     public async Task<IEnumerable<SubjectDTO>> GetAllAsync()

@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Domain.Contracts;
 using Domain.Entities;
 using Infrastructure.Contexts;
@@ -74,14 +75,19 @@ namespace Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task<Subject?> DeleteAsync(Guid id)
         {
-            var subject = await _dbContext.Subjects.FindAsync(id);
-            if (subject != null)
-            {
-                _dbContext.Subjects.Remove(subject);
-                await _dbContext.SaveChangesAsync();
-            }
+            var subject = await _dbContext.Subjects
+                                            .Include(s => s.Topics)
+                                            .ThenInclude(t => t.Questions)
+                                            .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (subject == null || subject.Topics.Any(t => t.Questions.Any())) return null;
+           
+            _dbContext.Subjects.Remove(subject);
+            await _dbContext.SaveChangesAsync();
+            return subject;
+            
         }
     }
 }

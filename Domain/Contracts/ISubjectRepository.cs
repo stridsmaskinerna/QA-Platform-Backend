@@ -10,7 +10,7 @@ public interface ISubjectRepository
     Task<Subject?> GetByCodeAsync(string code);
     Task<Subject> AddAsync(Subject subject);
     Task UpdateAsync(Subject subject);
-    Task DeleteAsync(Guid id);
+    Task<Subject?> DeleteAsync(Guid id);
     Task<IEnumerable<Subject>> GetTeachersSubjectsAsync(string teacherId);
 
 }
