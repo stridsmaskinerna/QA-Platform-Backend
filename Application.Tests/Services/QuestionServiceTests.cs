@@ -496,6 +496,10 @@ public class QuestionServiceTests : SetupServiceTests
                 .Setup(r => r.DeleteAsync(questionId))
                 .Returns(Task.CompletedTask);
 
+            _mockTokenService
+                .Setup(t => t.GetUserId())
+                .Returns(_mockUser.Object.Id);
+
             // Act
             await _questionService.DeleteAsync(questionId);
 
@@ -694,6 +698,10 @@ public class QuestionServiceTests : SetupServiceTests
             _mockTagService
                 .Setup(s => s.StoreNewTagsFromQuestion(question, questionDTO.Tags))
                 .Returns(Task.CompletedTask);
+
+            _mockTokenService
+              .Setup(t => t.GetUserId())
+              .Returns(_mockUser.Object.Id);
 
             _mockQuestionRepository
                 .Setup(r => r.UpdateAsync(question))
