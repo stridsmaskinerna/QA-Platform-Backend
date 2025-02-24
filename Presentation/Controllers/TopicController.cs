@@ -2,6 +2,7 @@ using Application.Contracts;
 using Domain.Constants;
 using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +56,11 @@ public class TopicController : ControllerBase
         [FromRoute] Guid id
     )
     {
-        await _sm.TopicService.DeleteAsync(id);
+        var deletedTopic = await _sm.TopicService.DeleteAsync(id);
+        if (deletedTopic == null) return new ForbidResult(new AuthenticationProperties
+        {
+            RedirectUri = "Unable to delete Topic"
+        }); 
         return Ok();
     }
 }
