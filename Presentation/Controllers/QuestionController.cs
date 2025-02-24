@@ -89,6 +89,17 @@ public class QuestionController : ControllerBase
         return Ok(question);
     }
 
+    [HttpGet("{id}/edit")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<QuestionForEditDTO>> GetQuestionForEdit(
+        [FromRoute] Guid id
+    )
+    {
+        var question = await _sm.QuestionService.GetByIdForEditAsync(id);
+        return Ok(question);
+    }
+
     [AllowAnonymous]
     [HttpGet("public/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -116,6 +127,7 @@ public class QuestionController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteQuestion(
         [FromRoute] Guid id
@@ -128,6 +140,7 @@ public class QuestionController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PutQuestion(
         [FromRoute] Guid id,

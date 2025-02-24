@@ -121,6 +121,25 @@ public class QuestionService : BaseService, IQuestionService
         );
     }
 
+    public async Task<QuestionForEditDTO> GetByIdForEditAsync(Guid id)
+    {
+        var question = await _rm.QuestionRepository.GetByIdForEditAsync(id);
+
+        if (question == null)
+        {
+            NotFound(MsgNotFound(id));
+        }
+
+        var userId = _sm.TokenService.GetUserId();
+
+        if (question.UserId != userId)
+        {
+            Forbidden();
+        }
+
+        return _sm.Mapper.Map<QuestionForEditDTO>(question);
+    }
+
     public async Task<QuestionDetailedDTO> GetByIdAsync(Guid id)
     {
 
@@ -186,6 +205,13 @@ public class QuestionService : BaseService, IQuestionService
             NotFound(MsgNotFound(id));
         }
 
+        var userId = _sm.TokenService.GetUserId();
+
+        if (userId != question.User.Id)
+        {
+            Forbidden();
+        }
+
         await _rm.QuestionRepository.DeleteAsync(id);
     }
 
@@ -217,12 +243,19 @@ public class QuestionService : BaseService, IQuestionService
     {
         var question = await _rm.QuestionRepository.GetByIdAsync(id);
 
-        _sm.Mapper.Map(questionDTO, question);
-
         if (question == null)
         {
             NotFound(MsgNotFound(id));
         }
+
+        var userId = _sm.TokenService.GetUserId();
+
+        if (userId != question.User.Id)
+        {
+            Forbidden();
+        }
+
+        _sm.Mapper.Map(questionDTO, question);
 
         var normalizedNewTagValues = questionDTO.Tags
             .Select(_sm.UtilityService.NormalizeText)

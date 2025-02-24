@@ -7,6 +7,7 @@ namespace Application.Contracts;
 public interface IQuestionService
 {
     Task<QuestionDetailedDTO> GetByIdAsync(Guid id);
+    Task<QuestionForEditDTO> GetByIdForEditAsync(Guid id);
     Task<(IEnumerable<QuestionDTO> Questions, int TotalItemCount)> GetItemsAsync(
         PaginationDTO paginationDTO,
         QuestionSearchDTO searchDTO);
