@@ -49,14 +49,17 @@ namespace Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task<Topic?> DeleteAsync(Guid id)
         {
-            var topic = await _dbContext.Topics.FindAsync(id);
-            if (topic != null)
-            {
-                _dbContext.Topics.Remove(topic);
-                await _dbContext.SaveChangesAsync();
-            }
+            var topic = await _dbContext.Topics.Include(t => t.Questions).FirstOrDefaultAsync(t =>t.Id == id);
+
+            if (topic == null || topic.Questions.Count != 0) return null;
+            
+            _dbContext.Topics.Remove(topic);
+            await _dbContext.SaveChangesAsync();
+
+            return topic;
+            
         }
 
         public async Task<bool> IsTopicNameTakenInSubjectAsync(string name, Guid subjectId)

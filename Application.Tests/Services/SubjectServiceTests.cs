@@ -215,7 +215,7 @@ public class SubjectServiceTests : SetupServiceTests
 
             _mockSubjectRepository
                 .Setup(r => r.DeleteAsync(subjectId))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(subject);
 
             // Act
             await _subjectService.DeleteAsync(subjectId);
@@ -253,7 +253,7 @@ public class SubjectServiceTests : SetupServiceTests
 
             _mockSubjectRepository
                 .Setup(r => r.DeleteAsync(subjectId))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(default(Subject));
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<NotFoundException>(

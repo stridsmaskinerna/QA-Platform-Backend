@@ -10,5 +10,5 @@ public interface ITopicRepository
     Task<IEnumerable<Topic>> GetAllAsync();
     Task<Topic> AddAsync(Topic topic);
     Task UpdateAsync(Topic topic);
-    Task DeleteAsync(Guid id);
+    Task<Topic?> DeleteAsync(Guid id);
 }

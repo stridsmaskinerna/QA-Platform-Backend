@@ -40,7 +40,7 @@ public class SubjectService : BaseService, ISubjectService
     }
 
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<Subject> DeleteAsync(Guid id)
     {
         var subject = await _rm.SubjectRepository.GetByIdAsync(id);
 
@@ -49,7 +49,9 @@ public class SubjectService : BaseService, ISubjectService
             NotFound();
         }
 
-        await _rm.SubjectRepository.DeleteAsync(id);
+        var subjectDelete = await _rm.SubjectRepository.DeleteAsync(id);
+        if (subjectDelete == null) Forbidden("Subeject cancellation not allowed: question are connected to the subject");
+        return subjectDelete;
     }
 
     public async Task<IEnumerable<SubjectDTO>> GetAllAsync()
@@ -62,7 +64,7 @@ public class SubjectService : BaseService, ISubjectService
         var teacherId = _sm.TokenService.GetUserId();
 
         return _sm.Mapper.Map<IEnumerable<SubjectDTO>>(
-            await _rm.SubjectRepository.GetTeachersSubjectsAsync(teacherId));
+        await _rm.SubjectRepository.GetTeachersSubjectsAsync(teacherId));
     }
 
     public async Task<SubjectDTO> GetByCodeAsync(string code)

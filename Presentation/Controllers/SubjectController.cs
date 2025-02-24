@@ -86,11 +86,12 @@ public class SubjectController : ControllerBase
     [Authorize(Roles = $"{DomainRoles.ADMIN}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSubjectAsync([FromRoute] Guid id)
     {
-        await _sm.SubjectService.DeleteAsync(id);
-        return Ok();
+        var sub = await _sm.SubjectService.DeleteAsync(id);
+        return Ok(sub);
     }
 
     [HttpPut("{id}")]
