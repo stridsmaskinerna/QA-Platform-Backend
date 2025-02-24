@@ -62,7 +62,7 @@ public class SubjectService : BaseService, ISubjectService
         var teacherId = _sm.TokenService.GetUserId();
 
         return _sm.Mapper.Map<IEnumerable<SubjectDTO>>(
-            await _rm.SubjectRepository.GetTeachersSubjectsAsync(teacherId));
+        await _rm.SubjectRepository.GetTeachersSubjectsAsync(teacherId));
     }
 
     public async Task<SubjectDTO> GetByCodeAsync(string code)

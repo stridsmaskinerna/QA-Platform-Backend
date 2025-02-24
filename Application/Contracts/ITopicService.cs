@@ -1,5 +1,6 @@
 using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Domain.Entities;
 
 namespace Application.Contracts;
 
@@ -9,5 +10,5 @@ public interface ITopicService
     Task<IEnumerable<TopicDTO>> GetAllAsync();
     Task<TopicDTO> AddAsync(TopicForCreationDTO topic);
     Task UpdateAsync(Guid id, TopicDTO topic);
-    Task DeleteAsync(Guid id);
+    Task<Topic?> DeleteAsync(Guid id);
 }
