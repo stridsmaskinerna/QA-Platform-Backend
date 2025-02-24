@@ -57,10 +57,12 @@ public class TopicController : ControllerBase
     )
     {
         var deletedTopic = await _sm.TopicService.DeleteAsync(id);
-        if (deletedTopic == null) return new ForbidResult(new AuthenticationProperties
+        if (deletedTopic == null) return new ContentResult
         {
-            RedirectUri = "Unable to delete Topic"
-        }); 
+            StatusCode = StatusCodes.Status403Forbidden,
+            Content = "Unable to remove the topic",
+            ContentType = "text/plain"
+        };
         return Ok();
     }
 }
