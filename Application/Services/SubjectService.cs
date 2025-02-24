@@ -40,7 +40,7 @@ public class SubjectService : BaseService, ISubjectService
     }
 
 
-    public async Task<Subject?> DeleteAsync(Guid id)
+    public async Task<Subject> DeleteAsync(Guid id)
     {
         var subject = await _rm.SubjectRepository.GetByIdAsync(id);
 
@@ -49,7 +49,9 @@ public class SubjectService : BaseService, ISubjectService
             NotFound();
         }
 
-        return await _rm.SubjectRepository.DeleteAsync(id);
+        var subjectDelete = await _rm.SubjectRepository.DeleteAsync(id);
+        if (subjectDelete == null) Forbidden("Subeject cancellation not allowed: question are connected to the subject");
+        return subjectDelete;
     }
 
     public async Task<IEnumerable<SubjectDTO>> GetAllAsync()

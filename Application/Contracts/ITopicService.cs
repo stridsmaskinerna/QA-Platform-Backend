@@ -10,5 +10,5 @@ public interface ITopicService
     Task<IEnumerable<TopicDTO>> GetAllAsync();
     Task<TopicDTO> AddAsync(TopicForCreationDTO topic);
     Task UpdateAsync(Guid id, TopicDTO topic);
-    Task<Topic?> DeleteAsync(Guid id);
+    Task<Topic> DeleteAsync(Guid id);
 }

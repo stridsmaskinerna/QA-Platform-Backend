@@ -26,10 +26,15 @@ public class TopicService : BaseService, ITopicService
         return _sm.Mapper.Map<TopicDTO>(addedTopic);
     }
 
-    public async Task<Topic?> DeleteAsync(Guid id)
+    public async Task<Topic> DeleteAsync(Guid id)
     {
         var topic = await _rm.TopicRepository.GetByIdAsync(id);
-        return topic == null ? null : await _rm.TopicRepository.DeleteAsync(id);
+        if (topic == null) NotFound("Topic not found in Database");
+
+        var deleteTopic = await _rm.TopicRepository.DeleteAsync(id);
+        if (deleteTopic == null) Forbidden("Topic cancellation not allowed. Questions are connected with the choosen topic");
+
+        return deleteTopic;
     }
 
 
