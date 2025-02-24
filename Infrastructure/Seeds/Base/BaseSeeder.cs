@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Bogus;
 using Domain.Constants;
@@ -91,11 +90,13 @@ public class BaseSeeder : IBaseSeeder
 
         foreach (var roleName in roles)
         {
-            if (await roleManager.RoleExistsAsync(roleName)) continue;
+            if (await roleManager.RoleExistsAsync(roleName))
+                continue;
             var role = new IdentityRole { Name = roleName };
             var result = await roleManager.CreateAsync(role);
 
-            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
+            if (!result.Succeeded)
+                throw new SeedException(string.Join("\n", result.Errors));
         }
     }
 
@@ -144,7 +145,8 @@ public class BaseSeeder : IBaseSeeder
             user.Email = SeedDataTest.ADMIN_EMAIL;
 
             var result = await userManager.CreateAsync(user, password);
-            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
+            if (!result.Succeeded)
+                throw new SeedException(string.Join("\n", result.Errors));
 
             await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
@@ -155,7 +157,8 @@ public class BaseSeeder : IBaseSeeder
         {
             var user = users[i];
             var result = await userManager.CreateAsync(user, password);
-            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
+            if (!result.Succeeded)
+                throw new SeedException(string.Join("\n", result.Errors));
 
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
             await userManager.AddToRoleAsync(user, DomainRoles.TEACHER);
@@ -178,7 +181,8 @@ public class BaseSeeder : IBaseSeeder
         {
             var user = users[i];
             var result = await userManager.CreateAsync(user, password);
-            if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
+            if (!result.Succeeded)
+                throw new SeedException(string.Join("\n", result.Errors));
 
             await userManager.AddToRoleAsync(user, DomainRoles.USER);
         }
@@ -322,6 +326,9 @@ public class BaseSeeder : IBaseSeeder
 
         foreach (var question in questions)
         {
+            var isAccepted = RandomBool();
+            question.IsResolved = isAccepted;
+
             var derivedQuantities = RandomInt(0, maxQuantity);
             for (int i = 0; i < derivedQuantities; i++)
             {
@@ -334,10 +341,15 @@ public class BaseSeeder : IBaseSeeder
                     .FirstOrDefault();
 
                     a.Value = TestToLexicalFormat($"{f.Lorem.Sentence(20, 100)}");
-                    a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddDays(1), question.Created.AddDays(100)), DateTimeKind.Utc);
+                    a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddMinutes(3), DateTime.Now), DateTimeKind.Utc);
                     a.IsHidden = RandomInt(0, 11) > 8;
                 });
                 answers.Add(answer);
+            }
+
+            if (isAccepted && answers.Count > 0)
+            {
+                answers[0].IsAccepted = true;
             }
         }
 

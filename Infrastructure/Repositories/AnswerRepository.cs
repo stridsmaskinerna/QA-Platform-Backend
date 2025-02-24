@@ -100,10 +100,10 @@ public class AnswerRepository : IAnswerRepository
 
         foreach (var questionAnswer in question.Answers)
         {
-            if(questionAnswer.Id == answer.Id)
+            if (questionAnswer.Id == answer.Id)
             {
-                //
                 questionAnswer.IsAccepted = !questionAnswer.IsAccepted;
+                question.IsResolved = questionAnswer.IsAccepted;
             }
             else
             {
