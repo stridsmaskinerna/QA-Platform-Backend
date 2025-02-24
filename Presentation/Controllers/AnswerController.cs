@@ -84,6 +84,7 @@ public class AnswerController : ControllerBase
     [HttpPut("{id}/toggle-accepted")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ToggleAnswerIsAccepted(
         [FromRoute] Guid id

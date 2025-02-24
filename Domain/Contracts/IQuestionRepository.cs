@@ -6,6 +6,7 @@ namespace Domain.Contracts;
 public interface IQuestionRepository
 {
     Task<Question?> GetByIdAsync(Guid id);
+    Task<Question?> GetBasicByIdAsync(Guid id);
     Task<Question?> GetByIdForEditAsync(Guid id);
     Task<Question> AddAsync(Question question);
     Task UpdateAsync(Question question);

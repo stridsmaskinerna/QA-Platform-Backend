@@ -88,8 +88,28 @@ public class AnswerRepository : IAnswerRepository
             .ToListAsync();
     }
 
-    public Task ToggleAccepted(Answer answer)
+    public async Task ToggleAccepted(Answer answer)
     {
-        throw new NotImplementedException();
+        //Get Question.
+        var question = await _dbContext.Questions
+            .Include(q => q.Answers)
+            .Where(q => q.Id == answer.QuestionId)
+            .FirstOrDefaultAsync();
+
+        if (question == null) throw new NullReferenceException();
+
+        foreach (var questionAnswer in question.Answers)
+        {
+            if(questionAnswer.Id == answer.Id)
+            {
+                //
+                questionAnswer.IsAccepted = !questionAnswer.IsAccepted;
+            }
+            else
+            {
+                questionAnswer.IsAccepted = false;
+            }
+        }
+        await _dbContext.SaveChangesAsync();
     }
 }

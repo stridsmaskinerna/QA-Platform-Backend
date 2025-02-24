@@ -90,7 +90,19 @@ public class AnswerService : BaseService, IAnswerService
         {
             NotFound(MsgNotFound(id));
         }
-        await _rm.AnswerRepository.ToggleAccepted(answer);
 
+        var userId = _sm.TokenService.GetUserId();
+        var question = await _rm.QuestionRepository.GetBasicByIdAsync(answer.QuestionId);
+        if (question == null)
+        {
+            NotFound();
+        }
+
+        //If userId is no match
+        if (userId != question.UserId)
+        {
+            Forbidden();
+        }
+        await _rm.AnswerRepository.ToggleAccepted(answer);
     }
 }
