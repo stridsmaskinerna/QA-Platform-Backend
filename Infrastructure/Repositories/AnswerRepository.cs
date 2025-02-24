@@ -87,4 +87,9 @@ public class AnswerRepository : IAnswerRepository
             .Where(c => c.AnswerId == id)
             .ToListAsync();
     }
+
+    public Task ToggleAccepted(Answer answer)
+    {
+        throw new NotImplementedException();
+    }
 }

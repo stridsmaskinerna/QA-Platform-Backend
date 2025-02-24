@@ -15,4 +15,5 @@ public interface IAnswerRepository
     void FilterOutHiddenAnswers(ICollection<Answer> answers);
     void FilterOutHiddenAnswers(IEnumerable<Question> questions, IEnumerable<Subject> subjects);
     Task<IEnumerable<Comment>> GetAnswerCommentsAsync(Guid id);
+    Task ToggleAccepted(Answer answer);
 }

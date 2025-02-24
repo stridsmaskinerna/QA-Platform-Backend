@@ -82,4 +82,15 @@ public class AnswerService : BaseService, IAnswerService
         var comments = await _rm.AnswerRepository.GetAnswerCommentsAsync(id);
         return _sm.Mapper.Map<IEnumerable<CommentDTO>>(comments);
     }
+
+    public async Task ToggleAccepted(Guid id)
+    {
+        var answer = await _rm.AnswerRepository.GetByIdAsync(id);
+        if (answer == null)
+        {
+            NotFound(MsgNotFound(id));
+        }
+        await _rm.AnswerRepository.ToggleAccepted(answer);
+
+    }
 }

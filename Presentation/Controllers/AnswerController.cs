@@ -80,4 +80,16 @@ public class AnswerController : ControllerBase
         IEnumerable<CommentDTO> comments = await _sm.AnswerService.GetAnswerCommentsAsync(id);
         return Ok(comments);
     }
+
+    [HttpPut("{id}/toggle-accepted")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ToggleAnswerIsAccepted(
+        [FromRoute] Guid id
+    )
+    {
+        await _sm.AnswerService.ToggleAccepted(id);
+        return Ok();
+    }
 }
