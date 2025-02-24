@@ -91,7 +91,12 @@ public class SubjectController : ControllerBase
     {
         var sub = await _sm.SubjectService.DeleteAsync(id);
 
-        if (sub == null) return Forbid();
+        if (sub == null) return new ContentResult
+        {
+            StatusCode = StatusCodes.Status403Forbidden,
+            Content = "Unable to remove the Subject",
+            ContentType = "text/plain"
+        };
 
         return Ok(sub);
     }
