@@ -1,3 +1,5 @@
+using Domain.Constants;
+
 namespace Domain.DTO.Query;
 
 public class QuestionSearchDTO

@@ -16,7 +16,7 @@ public class Answer
 
     public bool IsHidden { get; set; }
 
-    public bool IsAccepted { get; set; } = false;
+    public bool IsAccepted { get; set; }
 
     // Navigation
 

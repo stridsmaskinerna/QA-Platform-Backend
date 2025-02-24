@@ -41,8 +41,12 @@ public class QuestionRepository : BaseRepository, IQuestionRepository
                 .ThenInclude(a => a.AnswerVotes).FirstOrDefaultAsync();
     }
 
-    public async Task<Question?> GetBasicByIdAsync(Guid id)
+    public async Task<Question?> GetBasicByIdAsync(Guid id, bool includeAnswers = false)
     {
+        if (includeAnswers)
+        {
+            return await _dbContext.Questions.Where(q => q.Id == id).Include(q => q.Answers).FirstOrDefaultAsync();
+        }
         return await _dbContext.Questions.FindAsync(id);
     }
 

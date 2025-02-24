@@ -88,16 +88,8 @@ public class AnswerRepository : IAnswerRepository
             .ToListAsync();
     }
 
-    public async Task ToggleAccepted(Answer answer)
+    public async Task ToggleAccepted(Answer answer, Question question)
     {
-        //Get Question.
-        var question = await _dbContext.Questions
-            .Include(q => q.Answers)
-            .Where(q => q.Id == answer.QuestionId)
-            .FirstOrDefaultAsync();
-
-        if (question == null) throw new NullReferenceException();
-
         foreach (var questionAnswer in question.Answers)
         {
             if (questionAnswer.Id == answer.Id)

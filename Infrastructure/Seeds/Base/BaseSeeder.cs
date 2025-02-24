@@ -304,7 +304,8 @@ public class BaseSeeder : IBaseSeeder
                     q.Title = SeedData.StudentQuestions[idx].Title;
                     q.Description = TestToLexicalFormat(SeedData.StudentQuestions[idx].Description);
                     q.Created = DateTime.SpecifyKind(f.Date.Between(DateTime.UtcNow, new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)), DateTimeKind.Utc);
-                    q.IsResolved = RandomBool();
+                    //Set IsResolved when creating answers
+                    q.IsResolved = false;
                     q.IsProtected = RandomBool();
                     q.IsHidden = RandomInt(0, 11) > 8;
                     q.Tags = rndTags;
@@ -326,8 +327,7 @@ public class BaseSeeder : IBaseSeeder
 
         foreach (var question in questions)
         {
-            var isAccepted = RandomBool();
-            question.IsResolved = isAccepted;
+
 
             var derivedQuantities = RandomInt(0, maxQuantity);
             for (int i = 0; i < derivedQuantities; i++)
@@ -339,7 +339,7 @@ public class BaseSeeder : IBaseSeeder
                     : users.Where(u => u.Subjects.Any(s => s.Id == question.Topic.SubjectId))
                     .Select(u => u.Id)
                     .FirstOrDefault();
-
+                    a.IsAccepted = false;
                     a.Value = TestToLexicalFormat($"{f.Lorem.Sentence(20, 100)}");
                     a.Created = DateTime.SpecifyKind(f.Date.Between(question.Created.AddMinutes(3), DateTime.Now), DateTimeKind.Utc);
                     a.IsHidden = RandomInt(0, 11) > 8;
@@ -347,9 +347,15 @@ public class BaseSeeder : IBaseSeeder
                 answers.Add(answer);
             }
 
-            if (isAccepted && answers.Count > 0)
+            var hasAcceptedAnswer = RandomBool();
+            if (hasAcceptedAnswer && derivedQuantities > 0)
             {
-                answers[0].IsAccepted = true;
+                var answer = answers.FirstOrDefault(a => a.QuestionId == question.Id);
+                if (answer != null && !answer.IsHidden)
+                {
+                    answer.IsAccepted = true;
+                    question.IsResolved = true;
+                }
             }
         }
 
