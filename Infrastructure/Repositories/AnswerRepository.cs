@@ -87,4 +87,21 @@ public class AnswerRepository : IAnswerRepository
             .Where(c => c.AnswerId == id)
             .ToListAsync();
     }
+
+    public async Task ToggleAccepted(Answer answer, Question question)
+    {
+        foreach (var questionAnswer in question.Answers)
+        {
+            if (questionAnswer.Id == answer.Id)
+            {
+                questionAnswer.IsAccepted = !questionAnswer.IsAccepted;
+                question.IsResolved = questionAnswer.IsAccepted;
+            }
+            else
+            {
+                questionAnswer.IsAccepted = false;
+            }
+        }
+        await _dbContext.SaveChangesAsync();
+    }
 }

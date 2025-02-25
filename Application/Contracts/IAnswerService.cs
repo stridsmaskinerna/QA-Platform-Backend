@@ -10,4 +10,5 @@ public interface IAnswerService
     Task<IEnumerable<CommentDTO>> GetAnswerCommentsAsync(Guid id);
     Task ManageVisibilityAsync(Guid id);
     Task UpdateAsync(Guid id, AnswerForPutDTO answerDTO);
+    Task ToggleAccepted(Guid id);
 }

@@ -16,6 +16,8 @@ public class Answer
 
     public bool IsHidden { get; set; }
 
+    public bool IsAccepted { get; set; }
+
     // Navigation
 
     public ICollection<Comment> Comments { get; set; } = [];

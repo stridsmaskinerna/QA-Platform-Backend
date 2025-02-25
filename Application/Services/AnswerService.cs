@@ -50,7 +50,7 @@ public class AnswerService : BaseService, IAnswerService
             NotFound(MsgNotFound(id));
         }
 
-        var updated = _sm.Mapper.Map(answerDTO, answer);
+        _sm.Mapper.Map(answerDTO, answer);
 
         await _rm.AnswerRepository.CompleteAsync();
     }
@@ -74,6 +74,20 @@ public class AnswerService : BaseService, IAnswerService
             NotFound(MsgNotFound(id));
         }
         answer.IsHidden = !answer.IsHidden;
+
+        if (answer.IsAccepted)
+        {
+            var question = await _rm.QuestionRepository.GetBasicByIdAsync(answer.QuestionId);
+            if (question != null)
+            {
+                //If hiding an accepted answer we set question isResolved to false.
+                //If unhiding an accepted answer we set question isResolved to true.
+                question.IsResolved = answer.IsHidden ? false : true;
+                await _rm.QuestionRepository.UpdateAsync(question);
+            }
+
+        }
+
         await _rm.AnswerRepository.UpdateAsync(answer);
     }
 
@@ -81,5 +95,28 @@ public class AnswerService : BaseService, IAnswerService
     {
         var comments = await _rm.AnswerRepository.GetAnswerCommentsAsync(id);
         return _sm.Mapper.Map<IEnumerable<CommentDTO>>(comments);
+    }
+
+    public async Task ToggleAccepted(Guid id)
+    {
+        var answer = await _rm.AnswerRepository.GetByIdAsync(id);
+        if (answer == null)
+        {
+            NotFound(MsgNotFound(id));
+        }
+
+        var userId = _sm.TokenService.GetUserId();
+        var question = await _rm.QuestionRepository.GetBasicByIdAsync(answer.QuestionId, includeAnswers: true);
+        if (question == null)
+        {
+            NotFound();
+        }
+
+        //If userId is no match
+        if (userId != question.UserId)
+        {
+            Forbidden();
+        }
+        await _rm.AnswerRepository.ToggleAccepted(answer, question);
     }
 }
