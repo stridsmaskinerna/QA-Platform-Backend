@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(QAPlatformContext))]
-    [Migration("20250211220230_Init")]
+    [Migration("20250224161338_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -54,6 +54,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("FilePath")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsAccepted")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsHidden")
                         .HasColumnType("boolean");

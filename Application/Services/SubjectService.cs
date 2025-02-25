@@ -26,7 +26,6 @@ public class SubjectService : BaseService, ISubjectService
         Subject sbjObj = _sm.Mapper.Map<Subject>(subject);
         foreach (string mail in subject.Teachers)
         {
-            //User? choosenTeacher = _dbContext.Users.Where(user => user.Email == mail).FirstOrDefault();
             User? choosenTeacher = await _rm.UserRepository.GetUserByMailAsync(mail);
             if (choosenTeacher != null)
             {
@@ -35,7 +34,15 @@ public class SubjectService : BaseService, ISubjectService
                 sbjObj.Teachers.Add(choosenTeacher);
             }
         }
-        sbjObj.Topics = [];
+        sbjObj.Topics =
+        [
+            new()
+            {
+                Name = $"{(sbjObj.SubjectCode != null ? sbjObj.SubjectCode + " " : "")}{sbjObj.Name}",
+                Subject=sbjObj,
+                IsActive=true
+            }
+        ];
         return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.AddAsync(sbjObj));
     }
 
