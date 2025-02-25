@@ -160,6 +160,12 @@ public class QuestionService : BaseService, IQuestionService
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
 
+        questionDTO.Answers = questionDTO.Answers?
+                                            .OrderByDescending(a => a.VoteCount)
+                                            .ThenByDescending(a => a.Created)
+                                            .ToList();
+
+
         await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
 
         _sm.DTOService.UpdatingMyVoteField(question, questionDTO, userId);
@@ -190,6 +196,10 @@ public class QuestionService : BaseService, IQuestionService
         _rm.AnswerRepository.FilterOutHiddenAnswers(question.Answers);
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
+        questionDTO.Answers = questionDTO.Answers?
+                                            .OrderByDescending(a => a.VoteCount)
+                                            .ThenByDescending(a => a.Created)
+                                            .ToList();
 
         await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
 
