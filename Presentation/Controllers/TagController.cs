@@ -24,6 +24,7 @@ public class TagController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = $"{DomainRoles.ADMIN}, {DomainRoles.TEACHER}, {DomainRoles.USER}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
     public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetFilteredTagListByValue(
@@ -31,32 +32,26 @@ public class TagController : ControllerBase
         [FromQuery] PaginationDTO? paginationDTO
     )
     {
-        if (string.IsNullOrWhiteSpace(subTagValue))
+        var paginationDTODerived = paginationDTO == null
+            ? new PaginationDTO() : paginationDTO;
+
+        var (tags, totalItemCount) = await _sm.TagService.GetAllAsync(
+            paginationDTODerived, subTagValue);
+
+        var paginationMeta = new PaginationMetaDTO()
         {
-            var paginationDTODerived = paginationDTO == null
-                ? new PaginationDTO() : paginationDTO;
+            PageNr = paginationDTODerived.PageNr,
+            Limit = paginationDTODerived.Limit,
+            TotalItemCount = totalItemCount
+        };
 
-            var (allTags, totalItemCount) = await _sm.TagService.GetAllAsync(
-                paginationDTODerived);
-
-            var paginationMeta = new PaginationMetaDTO()
-            {
-                PageNr = paginationDTODerived.PageNr,
-                Limit = paginationDTODerived.Limit,
-                TotalItemCount = totalItemCount
-            };
-
-            Response.Headers.Append(
-                CustomHeaders.Pagination,
-                JsonSerializer.Serialize(paginationMeta)
-            );
-
-            return Ok(allTags);
-        }
-
-        var tags = await _sm.TagService.GetFilteredList(subTagValue);
+        Response.Headers.Append(
+            CustomHeaders.Pagination,
+            JsonSerializer.Serialize(paginationMeta)
+        );
 
         return Ok(tags);
+
     }
 
     [HttpDelete]

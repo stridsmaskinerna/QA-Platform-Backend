@@ -27,26 +27,43 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<(IEnumerable<Tag> Tags, int TotalItemCount)> GetAllAsync(
-            PaginationDTO paginationDTO
+            PaginationDTO paginationDTO, string? searchString
         )
         {
-            var query = _dbContext.Tags;
+            var query = _dbContext.Tags.AsQueryable();
+
+            query = query.Pipe(q => ApplySearchFilter(q, searchString));
+
             var totalItemCount = await query.CountAsync();
 
-            return (
-                Tags: await query.Pipe(q =>
-                    ApplyPagination(q, paginationDTO))
-                    .ToListAsync(),
-                TotalItemCount: totalItemCount
-            );
+
+            query = query.Pipe(q =>
+                    ApplyPagination(q, paginationDTO));
+
+            return (Tags: await query.ToListAsync(), TotalItemCount: totalItemCount);
+
         }
 
-        public async Task<IEnumerable<Tag>> GetFilteredList(string value)
+        private IQueryable<Tag> ApplySearchFilter(IQueryable<Tag> queryable, string? searchString)
         {
-            var test = await _dbContext.Tags
-                                   .Where(t => EF.Functions.ILike(t.Value, $"%{value}%"))
-                                   .ToListAsync();
-            return test;
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                return queryable;
+            }
+
+            var searchStrings = searchString.Split(
+                //Build error (on Mac) if not explicitly typing the space, i.e new char[] { ' ' } or new string[] { " " },
+                new char[] { ' ' },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in searchStrings)
+            {
+                var query = $"%{word}%";
+
+                queryable = queryable.Where(t => EF.Functions.ILike(t.Value, query));
+            }
+
+            return queryable;
         }
 
         public async Task<Tag> AddAsync(Tag tag)
