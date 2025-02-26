@@ -1,9 +1,14 @@
+using System.Text.Json;
 using Application.Contracts;
 using Domain.Constants;
+using Domain.DTO.Header;
+using Domain.DTO.Query;
 using Domain.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Filters;
+using Swashbuckle.AspNetCore.Annotations;
 namespace Presentation.Controllers;
 
 [ApiController]
@@ -20,19 +25,39 @@ public class TagController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperationFilter(typeof(CustomHeadersOperationFilter))]
     public async Task<ActionResult<IEnumerable<TagStandardDTO>>> GetFilteredTagListByValue(
-        [FromQuery] string? subTagValue
+        [FromQuery] string? subTagValue,
+        [FromQuery] PaginationDTO? paginationDTO
     )
     {
         if (string.IsNullOrWhiteSpace(subTagValue))
         {
-            return Ok(await _sm.TagService.GetAllAsync());
+            var paginationDTODerived = paginationDTO == null
+                ? new PaginationDTO() : paginationDTO;
+
+            var (allTags, totalItemCount) = await _sm.TagService.GetAllAsync(
+                paginationDTODerived);
+
+            var paginationMeta = new PaginationMetaDTO()
+            {
+                PageNr = paginationDTODerived.PageNr,
+                Limit = paginationDTODerived.Limit,
+                TotalItemCount = totalItemCount
+            };
+
+            Response.Headers.Append(
+                CustomHeaders.Pagination,
+                JsonSerializer.Serialize(paginationMeta)
+            );
+
+            return Ok(allTags);
         }
 
+        // TODO! Add pagination here if needed.
         var tags = await _sm.TagService.GetFilteredList(subTagValue);
 
         return Ok(tags);
-
     }
 
     [HttpDelete]
