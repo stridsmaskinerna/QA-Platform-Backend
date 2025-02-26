@@ -54,7 +54,6 @@ public class TagController : ControllerBase
             return Ok(allTags);
         }
 
-        // TODO! Add pagination here if needed.
         var tags = await _sm.TagService.GetFilteredList(subTagValue);
 
         return Ok(tags);
