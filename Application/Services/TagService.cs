@@ -43,7 +43,7 @@ public class TagService : BaseService, ITagService
         PaginationDTO paginationDTO
     )
     {
-        var ( tags, totalItemCount ) = await _rm.TagRepository.GetAllAsync(
+        var (tags, totalItemCount) = await _rm.TagRepository.GetAllAsync(
             paginationDTO);
 
         return (

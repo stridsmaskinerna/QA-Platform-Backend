@@ -38,7 +38,7 @@ namespace Infrastructure.Repositories
                     ApplyPagination(q, paginationDTO))
                     .ToListAsync(),
                 TotalItemCount: totalItemCount
-            );  
+            );
         }
 
         public async Task<IEnumerable<Tag>> GetFilteredList(string value)
