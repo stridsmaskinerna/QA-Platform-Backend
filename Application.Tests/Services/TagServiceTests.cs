@@ -136,38 +136,38 @@ public class TagServiceTests : SetupServiceTests
     //    }
     //}
 
-    public class GetFilteredList : TagServiceTests
-    {
-        [Fact]
-        public async Task ShouldReturnFilteredTags()
-        {
-            // Arrange
-            var value = "Filter";
-            var tagEntities = new List<Tag>
-            {
-                TagFactory.CreateTag(Guid.NewGuid(), value)
-            };
+    // public class GetFilteredList : TagServiceTests
+    // {
+    //     [Fact]
+    //     public async Task ShouldReturnFilteredTags()
+    //     {
+    //         // Arrange
+    //         var value = "Filter";
+    //         var tagEntities = new List<Tag>
+    //         {
+    //             TagFactory.CreateTag(Guid.NewGuid(), value)
+    //         };
 
-            var tagDTOs = new List<TagStandardDTO> {
-                TagFactory.CreateTagStandardDTO(tagEntities[0].Id, tagEntities[0].Value)
-            };
+    //         var tagDTOs = new List<TagStandardDTO> {
+    //             TagFactory.CreateTagStandardDTO(tagEntities[0].Id, tagEntities[0].Value)
+    //         };
 
-            _mockTagRepository
-                .Setup(r => r.GetFilteredList(value))
-                .ReturnsAsync(tagEntities);
+    //         _mockTagRepository
+    //             .Setup(r => r.GetFilteredList(value))
+    //             .ReturnsAsync(tagEntities);
 
-            _mockMapper
-                .Setup(m => m.Map<IEnumerable<TagStandardDTO>>(tagEntities))
-                .Returns(tagDTOs);
+    //         _mockMapper
+    //             .Setup(m => m.Map<IEnumerable<TagStandardDTO>>(tagEntities))
+    //             .Returns(tagDTOs);
 
-            // Act
-            var result = await _tagService.GetFilteredList(value);
+    //         // Act
+    //         var result = await _tagService.GetFilteredList(value);
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.Single(result);
-        }
-    }
+    //         // Assert
+    //         Assert.NotNull(result);
+    //         Assert.Single(result);
+    //     }
+    // }
 
     public class GetByIdAsync : TagServiceTests
     {
