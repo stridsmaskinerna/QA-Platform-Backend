@@ -73,6 +73,7 @@ namespace Infrastructure.Repositories
         {
             _dbContext.Subjects.Update(subject);
             await _dbContext.SaveChangesAsync();
+
         }
 
         public async Task<Subject?> DeleteAsync(Guid id)
@@ -83,11 +84,11 @@ namespace Infrastructure.Repositories
                                             .FirstOrDefaultAsync(s => s.Id == id);
 
             if (subject == null || subject.Topics.Any(t => t.Questions.Any())) return null;
-           
+
             _dbContext.Subjects.Remove(subject);
             await _dbContext.SaveChangesAsync();
             return subject;
-            
+
         }
     }
 }

@@ -101,7 +101,7 @@ public class SubjectController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ModifySubject([FromRoute] Guid id, [FromBody] SubjectForCreationDTO body)
     {
-        await _sm.SubjectService.UpdateAsync(id, body);
-        return Ok();
+        var updateSubject = await _sm.SubjectService.UpdateAsync(id, body);
+        return Ok(updateSubject);
     }
 }

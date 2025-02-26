@@ -89,7 +89,7 @@ public class SubjectService : BaseService, ISubjectService
         return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.GetByNameAsync(name));
     }
 
-    public async Task UpdateAsync(Guid Id, SubjectForCreationDTO subject)
+    public async Task<SubjectDTO> UpdateAsync(Guid Id, SubjectForCreationDTO subject)
     {
         var sbjObj = await _rm.SubjectRepository.GetByIdAsync(Id);
 
@@ -112,5 +112,7 @@ public class SubjectService : BaseService, ISubjectService
         }
 
         await _rm.SubjectRepository.UpdateAsync(sbjObj);
+
+        return _sm.Mapper.Map<SubjectDTO>(sbjObj);
     }
 }
