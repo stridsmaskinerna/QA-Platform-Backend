@@ -163,8 +163,8 @@ public class QuestionService : BaseService, IQuestionService
         questionDTO.Answers = questionDTO.Answers?
                                             .OrderByDescending(a => a.IsAccepted)
                                             .ThenByDescending(a => a.AnsweredByTeacher)
-                                            .ThenByDescending(a => a.VoteCount)    
-                                            .ThenByDescending(a => a.Created)      
+                                            .ThenByDescending(a => a.VoteCount)
+                                            .ThenByDescending(a => a.Created)
                                             .ToList();
 
 
@@ -201,8 +201,8 @@ public class QuestionService : BaseService, IQuestionService
         questionDTO.Answers = questionDTO.Answers?
                                         .OrderByDescending(a => a.IsAccepted)
                                         .ThenByDescending(a => a.AnsweredByTeacher)
-                                        .ThenByDescending(a => a.VoteCount)    
-                                        .ThenByDescending(a => a.Created)      
+                                        .ThenByDescending(a => a.VoteCount)
+                                        .ThenByDescending(a => a.Created)
                                         .ToList();
 
 

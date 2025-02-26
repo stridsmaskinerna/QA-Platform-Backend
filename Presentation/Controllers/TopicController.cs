@@ -58,7 +58,7 @@ public class TopicController : ControllerBase
     )
     {
         var deletedTopic = await _sm.TopicService.DeleteAsync(id);
-        
+
         return Ok();
     }
 }

@@ -1,5 +1,6 @@
 using Application.Contracts;
 using Domain.Contracts;
+using Domain.DTO.Query;
 using Domain.DTO.Response;
 using Domain.Entities;
 
@@ -38,10 +39,17 @@ public class TagService : BaseService, ITagService
         await _rm.TagRepository.DeleteAsync(id);
     }
 
-    public async Task<IEnumerable<TagStandardDTO>> GetAllAsync()
+    public async Task<(IEnumerable<TagStandardDTO> Tags, int TotalItemCount)> GetAllAsync(
+        PaginationDTO paginationDTO
+    )
     {
-        return _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(
-            await _rm.TagRepository.GetAllAsync());
+        var (tags, totalItemCount) = await _rm.TagRepository.GetAllAsync(
+            paginationDTO);
+
+        return (
+            Tags: _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(tags),
+            TotalItemCount: totalItemCount
+        );
     }
 
     public async Task<IEnumerable<TagStandardDTO>> GetFilteredList(string value)

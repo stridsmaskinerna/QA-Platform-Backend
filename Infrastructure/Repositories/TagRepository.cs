@@ -1,11 +1,13 @@
 using Domain.Contracts;
+using Domain.DTO.Query;
 using Domain.Entities;
 using Infrastructure.Contexts;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class TagRepository : ITagRepository
+    public class TagRepository : BaseRepository, ITagRepository
     {
         private readonly QAPlatformContext _dbContext;
 
@@ -24,9 +26,19 @@ namespace Infrastructure.Repositories
             return await _dbContext.Tags.FirstOrDefaultAsync(t => t.Value == value);
         }
 
-        public async Task<IEnumerable<Tag>> GetAllAsync()
+        public async Task<(IEnumerable<Tag> Tags, int TotalItemCount)> GetAllAsync(
+            PaginationDTO paginationDTO
+        )
         {
-            return await _dbContext.Tags.ToListAsync();
+            var query = _dbContext.Tags;
+            var totalItemCount = await query.CountAsync();
+
+            return (
+                Tags: await query.Pipe(q =>
+                    ApplyPagination(q, paginationDTO))
+                    .ToListAsync(),
+                TotalItemCount: totalItemCount
+            );
         }
 
         public async Task<IEnumerable<Tag>> GetFilteredList(string value)

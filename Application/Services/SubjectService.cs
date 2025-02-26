@@ -39,8 +39,8 @@ public class SubjectService : BaseService, ISubjectService
             new()
             {
                 Name = $"{(sbjObj.SubjectCode != null ? sbjObj.SubjectCode + " " : "")}{sbjObj.Name}",
-                Subject=sbjObj,
-                IsActive=true
+                Subject = sbjObj,
+                IsActive = true
             }
         ];
         return _sm.Mapper.Map<SubjectDTO>(await _rm.SubjectRepository.AddAsync(sbjObj));
