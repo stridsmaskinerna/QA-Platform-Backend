@@ -161,8 +161,10 @@ public class QuestionService : BaseService, IQuestionService
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
 
         questionDTO.Answers = questionDTO.Answers?
-                                            .OrderByDescending(a => a.VoteCount)
-                                            .ThenByDescending(a => a.Created)
+                                            .OrderByDescending(a => a.IsAccepted)
+                                            .ThenByDescending(a => a.AnsweredByTeacher)
+                                            .ThenByDescending(a => a.VoteCount)    
+                                            .ThenByDescending(a => a.Created)      
                                             .ToList();
 
 
@@ -197,9 +199,12 @@ public class QuestionService : BaseService, IQuestionService
 
         var questionDTO = _sm.Mapper.Map<QuestionDetailedDTO>(question);
         questionDTO.Answers = questionDTO.Answers?
-                                            .OrderByDescending(a => a.VoteCount)
-                                            .ThenByDescending(a => a.Created)
-                                            .ToList();
+                                        .OrderByDescending(a => a.IsAccepted)
+                                        .ThenByDescending(a => a.AnsweredByTeacher)
+                                        .ThenByDescending(a => a.VoteCount)    
+                                        .ThenByDescending(a => a.Created)      
+                                        .ToList();
+
 
         await _sm.DTOService.UpdatingAnsweredByTeacherField(questionDTO);
 

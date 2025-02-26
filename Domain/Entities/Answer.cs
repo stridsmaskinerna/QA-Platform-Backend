@@ -8,7 +8,7 @@ public class Answer
 
     public string? UserId { get; set; }
 
-    public string Value { get; set; } = String.Empty;
+    public string Value { get; set; } = string.Empty;
 
     public string? FilePath { get; set; }
 
