@@ -9,8 +9,7 @@ public interface ITagService
     Task<TagStandardDTO> GetByIdAsync(Guid id);
     Task<TagStandardDTO> GetByValueAsync(string value);
     Task<(IEnumerable<TagStandardDTO> Tags, int TotalItemCount)> GetAllAsync(
-        PaginationDTO paginationDTO);
-    Task<IEnumerable<TagStandardDTO>> GetFilteredList(string value);
+        PaginationDTO paginationDTO, string? searchString);
     Task<TagStandardDTO> AddAsync(Tag tag);
     Task UpdateAsync(Tag tag);
     Task DeleteAsync(Guid id);

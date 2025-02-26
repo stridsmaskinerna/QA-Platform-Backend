@@ -40,24 +40,17 @@ public class TagService : BaseService, ITagService
     }
 
     public async Task<(IEnumerable<TagStandardDTO> Tags, int TotalItemCount)> GetAllAsync(
-        PaginationDTO paginationDTO
+        PaginationDTO paginationDTO, string? searchString
     )
     {
         var (tags, totalItemCount) = await _rm.TagRepository.GetAllAsync(
-            paginationDTO);
+            paginationDTO, searchString);
 
         return (
             Tags: _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(tags),
             TotalItemCount: totalItemCount
         );
     }
-
-    public async Task<IEnumerable<TagStandardDTO>> GetFilteredList(string value)
-    {
-        return _sm.Mapper.Map<IEnumerable<TagStandardDTO>>(
-            await _rm.TagRepository.GetFilteredList(value));
-    }
-
     public async Task<TagStandardDTO> GetByIdAsync(Guid id)
     {
         var tag = await _rm.TagRepository.GetByIdAsync(id);
