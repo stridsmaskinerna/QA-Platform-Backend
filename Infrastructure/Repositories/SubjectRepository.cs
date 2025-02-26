@@ -73,6 +73,7 @@ namespace Infrastructure.Repositories
         {
             _dbContext.Subjects.Update(subject);
             await _dbContext.SaveChangesAsync();
+
         }
 
         public async Task<Subject?> DeleteAsync(Guid id)

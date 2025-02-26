@@ -11,7 +11,7 @@ namespace Application.Contracts
         Task<SubjectDTO> GetByNameAsync(string name);
         Task<SubjectDTO> GetByCodeAsync(string code);
         Task<SubjectDTO> AddAsync(SubjectForCreationDTO subject);
-        Task UpdateAsync(Guid Id, SubjectForCreationDTO subject);
+        Task<SubjectDTO> UpdateAsync(Guid Id, SubjectForCreationDTO subject);
         Task<Subject> DeleteAsync(Guid id);
         Task<IEnumerable<SubjectDTO>> GetTeacherSubjectsAsync();
     }
