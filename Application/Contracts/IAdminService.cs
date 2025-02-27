@@ -8,5 +8,5 @@ public interface IAdminService
 {
     Task AssignTeacherRoleToUser(string Id);
     Task<User?> BlockUserByIdAsync(string Id);
-    Task<(IEnumerable<UserDetailsDTO> usersDTO, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string searchString);
+    Task<(IEnumerable<UserDetailsDTO> usersDTO, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string? searchString);
 }

@@ -82,7 +82,7 @@ public class UserRepository : BaseRepository, IUserRepository
 
     }
 
-    public async Task<(IEnumerable<User> users, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string searchString)
+    public async Task<(IEnumerable<User> users, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string? searchString)
     {
         var query = _dbContext.Users.AsQueryable();
 
@@ -97,7 +97,7 @@ public class UserRepository : BaseRepository, IUserRepository
         return (users: await query.ToListAsync(), totalItemCount);
     }
 
-    private IQueryable<User> ApplySearchFilter(IQueryable<User> queryable, string searchString)
+    private IQueryable<User> ApplySearchFilter(IQueryable<User> queryable, string? searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
         {

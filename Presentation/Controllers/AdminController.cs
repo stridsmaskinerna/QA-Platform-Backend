@@ -38,7 +38,7 @@ public class AdminController : ControllerBase
     public async Task<ActionResult<IEnumerable<UserDetailsDTO>>> GetUsers
     (
         [FromQuery] PaginationDTO paginationDTO,
-        [FromQuery] string searchString)
+        [FromQuery] string? searchString)
     {
         var (usersDTO, totalItemCount) = await _sm.AdminService.GetUsersAsync(paginationDTO, searchString);
 

@@ -10,6 +10,6 @@ public interface IUserRepository
     Task<User?> ValidateUserCredential(string? email, string? password);
     Task AddUserRoleTeacher(string Id);
     Task<User?> BlocKUserById(string Id, bool isAdmin = false);
-    Task<(IEnumerable<User> users, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string searchString);
+    Task<(IEnumerable<User> users, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string? searchString);
 
 }
