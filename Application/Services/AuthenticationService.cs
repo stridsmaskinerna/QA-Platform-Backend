@@ -47,7 +47,7 @@ public class AuthenticationService : BaseService, IAuthenticationService
         }
         else if (user.IsBlocked)
         {
-            Unauthorized("Your account has been blocked. Please contact your teacher to request an unblock.");
+            Forbidden("Your account has been blocked. Please contact your teacher to request an unblock.");
         }
 
 
