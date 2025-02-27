@@ -31,7 +31,7 @@ public class AdminService : BaseService, IAdminService
         return user;
     }
 
-    public async Task<(IEnumerable<UserDetailsDTO> usersDTO, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string searchString)
+    public async Task<(IEnumerable<UserDetailsDTO> usersDTO, int totalItemCount)> GetUsersAsync(PaginationDTO paginationDTO, string? searchString)
     {
         var (users, totalItemCount) = await _rm.UserRepository.GetUsersAsync(paginationDTO, searchString);
         var usersDTO = _sm.Mapper.Map<IEnumerable<UserDetailsDTO>>(users);
