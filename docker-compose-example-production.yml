@@ -1,17 +1,17 @@
 services:
   client:
-    image: registry.gitlab.com/martelleur1/qa-platform-deployment/qa-client:latest
+    image: ghcr.io/stridsmaskinerna/qa-platform-client:<VERSION_TAG>
     restart: always
     ports:
-      - "3030:80"
+      - "3031:80"
     networks:
       - qa-platform-network-prod
 
   qa-platform-api:
-    image: registry.gitlab.com/martelleur1/qa-platform-deployment/qa-api:latest
+    image: ghcr.io/stridsmaskinerna/qa-platform-api:<VERSION_TAG>
     restart: always
     ports:
-      - "5050:8080"
+      - "5051:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
     depends_on:
@@ -23,8 +23,8 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: admin-qa-platform
-      POSTGRES_PASSWORD: iyDQpkdFv26vcfWtrvsFuy4VXs6tgDbpfVUv5E
+      POSTGRES_USER: adminusername
+      POSTGRES_PASSWORD: strongpasswordshouldbeused
       POSTGRES_DB: qa-platform-db
     volumes:
       - qa-platform-volume-prod:/var/lib/postgresql/data
