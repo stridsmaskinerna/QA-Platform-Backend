@@ -1,4 +1,5 @@
 using Domain.Constants;
+using Microsoft.Extensions.Configuration;
 
 namespace QAPlatformAPI.Extensions;
 
@@ -16,12 +17,17 @@ public static class CORSExtension
         var allowedOrigins = configuration.GetSection("CORS:AllowedOrigins")
             .Get<string[]>() ?? Array.Empty<string>();
 
+        Console.WriteLine($"Allowed origins [TEST_3]: {string.Join(", ", allowedOrigins)}");
+
+        Console.WriteLine($"Allowed origins [TEST_2]: {allowedOrigins}");
+
         services.AddCors(config =>
         {
             config.AddPolicy(CORS_DEV_POLICY, p => p
                 .WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
                 .AllowAnyHeader() // Allows `Authorization` header
+                .AllowCredentials()
                 .WithExposedHeaders([
                     CustomHeaders.Pagination
                 ])
@@ -31,6 +37,7 @@ public static class CORSExtension
                 .WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
                 .AllowAnyHeader() // Allows `Authorization` header
+                .AllowCredentials()
                 .WithExposedHeaders([
                     CustomHeaders.Pagination
                 ])

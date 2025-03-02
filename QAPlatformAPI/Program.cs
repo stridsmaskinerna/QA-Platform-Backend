@@ -14,6 +14,10 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        Console.WriteLine($"ENVIRONMENT: {builder.Environment.EnvironmentName}");
+
+        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
+
         builder.Services.AddDatabaseExtension(builder.Configuration, builder.Environment);
 
         builder.Services.AddControllerExtension();
