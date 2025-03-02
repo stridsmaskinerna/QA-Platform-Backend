@@ -57,13 +57,14 @@ jobs:
 
       - name: Inject Secrets into appsettings.json
         run: |
+          cd QAPlatformAPI  # Change to the correct working directory
           cp appsettings.Production.template.json appsettings.Production.json
-          sed -i "s|\${POSTGRES_CONN}|${{ secrets.POSTGRES_CONN }}|g" appsettings.json
-          sed -i "s|\${JWT_ISSUER}|${{ secrets.JWT_ISSUER }}|g" appsettings.json
-          sed -i "s|\${JWT_AUDIENCE}|${{ secrets.JWT_AUDIENCE }}|g" appsettings.json
-          sed -i "s|\${SECRET_KEY}|${{ secrets.SECRET_KEY }}|g" appsettings.json
-          sed -i "s|\${SEED_ADMIN_MAIL}|${{ secrets.SEED_ADMIN_MAIL }}|g" appsettings.json
-          sed -i "s|\${SEED_ADMIN_PASSWORD}|${{ secrets.SEED_ADMIN_PASSWORD }}|g" appsettings.json
+          sed -i "s|\${POSTGRES_CONN}|${{ secrets.POSTGRES_CONN }}|g" appsettings.Production.json
+          sed -i "s|\${JWT_ISSUER}|${{ secrets.JWT_ISSUER }}|g" appsettings.Production.json
+          sed -i "s|\${JWT_AUDIENCE}|${{ secrets.JWT_AUDIENCE }}|g" appsettings.Production.json
+          sed -i "s|\${SECRET_KEY}|${{ secrets.SECRET_KEY }}|g" appsettings.Production.json
+          sed -i "s|\${SEED_ADMIN_MAIL}|${{ secrets.SEED_ADMIN_MAIL }}|g" appsettings.Production.json
+          sed -i "s|\${SEED_ADMIN_PASSWORD}|${{ secrets.SEED_ADMIN_PASSWORD }}|g" appsettings.Production.json
 
       - name: Determine Image Tag
         run: echo "IMAGE_TAG=pr-${{ github.event.pull_request.number || github.sha }}" >> $GITHUB_ENV
