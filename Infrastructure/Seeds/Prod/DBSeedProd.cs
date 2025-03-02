@@ -14,7 +14,9 @@ public static class DBSeedProd
     public static async Task RunAsync(
         QAPlatformContext context,
         UserManager<User> userManager,
-        RoleManager<IdentityRole> roleManager
+        RoleManager<IdentityRole> roleManager,
+        string? adminMail,
+        string? adminPassword
     )
     {
         var subjects = CreateSubjects();
@@ -22,7 +24,10 @@ public static class DBSeedProd
 
         await _seeder.CreateUserRoles(roleManager);
 
-        await CreateUsers(userManager);
+        await CreateUsers(
+            userManager,
+            adminMail ?? SeedDataProd.ADMIN_EMAIL,
+            adminPassword ?? SeedDataProd.DEFAULT_PWD);
 
         var topics = CreateTopics(subjects);
         await context.AddRangeAsync(topics);
@@ -46,16 +51,19 @@ public static class DBSeedProd
 
     private static async Task CreateUsers(
         UserManager<User> userManager,
-        string password = SeedDataProd.DEFAULT_PWD
+        string adminMail,
+        string adminPassword
     )
     {
+        Console.WriteLine($"Admin pwd: {adminPassword}");
+
         var admin = new User()
         {
             UserName = SeedDataProd.ADMIN_USERNAME,
-            Email = SeedDataProd.ADMIN_EMAIL
+            Email = adminMail
         };
 
-        var result = await userManager.CreateAsync(admin, password);
+        var result = await userManager.CreateAsync(admin, adminPassword);
         if (!result.Succeeded) throw new SeedException(string.Join("\n", result.Errors));
         await userManager.AddToRoleAsync(admin, DomainRoles.USER);
         await userManager.AddToRoleAsync(admin, DomainRoles.TEACHER);

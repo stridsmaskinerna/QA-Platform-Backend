@@ -16,7 +16,7 @@ public class Program
 
         Console.WriteLine($"ENVIRONMENT: {builder.Environment.EnvironmentName}");
 
-        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
+        // var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
 
         builder.Services.AddDatabaseExtension(builder.Configuration, builder.Environment);
 

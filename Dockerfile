@@ -33,11 +33,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Copy configuration files explicitly
-# COPY ["QAPlatformAPI/appsettings.json", "appsettings.json"]
-# COPY ["QAPlatformAPI/appsettings.Production.json", "appsettings.Production.json"]
-
 # Ensure the environment is set to Production
 ENV DOTNET_ENVIRONMENT=Production
 
+# Image entry point
 ENTRYPOINT ["dotnet", "QAPlatformAPI.dll"]

@@ -27,7 +27,6 @@ public static class CORSExtension
                 .WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
                 .AllowAnyHeader() // Allows `Authorization` header
-                .AllowCredentials()
                 .WithExposedHeaders([
                     CustomHeaders.Pagination
                 ])
@@ -37,7 +36,6 @@ public static class CORSExtension
                 .WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
                 .AllowAnyHeader() // Allows `Authorization` header
-                .AllowCredentials()
                 .WithExposedHeaders([
                     CustomHeaders.Pagination
                 ])
