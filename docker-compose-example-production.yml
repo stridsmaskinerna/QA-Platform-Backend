@@ -3,7 +3,7 @@ services:
     image: ghcr.io/stridsmaskinerna/qa-platform-client:<VERSION_TAG>
     restart: always
     ports:
-      - "3031:80"
+      - "3333:80"
     networks:
       - qa-platform-network-prod
 
@@ -23,9 +23,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: adminusername
-      POSTGRES_PASSWORD: strongpasswordshouldbeused
-      POSTGRES_DB: qa-platform-db
+      POSTGRES_USER: <Same username value as in 'PostgreSQLConnection'>
+      POSTGRES_PASSWORD: <Same password value as in 'PostgreSQLConnection'>
+      POSTGRES_DB: <Same db name as in 'PostgreSQLConnection'>
     volumes:
       - qa-platform-volume-prod:/var/lib/postgresql/data
     networks:
