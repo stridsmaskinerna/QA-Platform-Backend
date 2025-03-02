@@ -22,7 +22,7 @@ public class Program
 
         builder.Services.AddControllerExtension();
 
-        builder.Services.AddCORSConfigurationExtension(builder.Configuration);
+        builder.Services.AddCORSConfigurationExtension(builder.Configuration, builder.Environment);
 
         builder.Services.AddJWTSecurityExtension(builder.Configuration);
 

@@ -11,7 +11,8 @@ public static class CORSExtension
 
     public static void AddCORSConfigurationExtension(
         this IServiceCollection services,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IWebHostEnvironment environment
     )
     {
         var allowedOrigins = configuration.GetSection("CORS:AllowedOrigins")
@@ -21,26 +22,35 @@ public static class CORSExtension
 
         Console.WriteLine($"Allowed origins [TEST_2]: {allowedOrigins}");
 
-        services.AddCors(config =>
+        if (environment.IsProduction())
         {
-            config.AddPolicy(CORS_DEV_POLICY, p => p
-                .WithOrigins(allowedOrigins)
-                .AllowAnyMethod()
-                .AllowAnyHeader() // Allows `Authorization` header
-                .WithExposedHeaders([
-                    CustomHeaders.Pagination
-                ])
-            );
-
-            config.AddPolicy(CORS_PROD_POLICY, p => p
-                .WithOrigins(allowedOrigins)
-                .AllowAnyMethod()
-                .AllowAnyHeader() // Allows `Authorization` header
-                .WithExposedHeaders([
-                    CustomHeaders.Pagination
-                ])
-            );
-        });
+            services.AddCors(config =>
+            {
+                config.AddPolicy(CORS_PROD_POLICY, p => p
+                    .WithOrigins(allowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader() // Allows `Authorization` header
+                    .AllowCredentials()
+                    .WithExposedHeaders([
+                        CustomHeaders.Pagination
+                    ])
+                );
+            });
+        }
+        else
+        {
+            services.AddCors(config =>
+            {
+                config.AddPolicy(CORS_DEV_POLICY, p => p
+                    .WithOrigins(allowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader() // Allows `Authorization` header
+                    .WithExposedHeaders([
+                        CustomHeaders.Pagination
+                    ])
+                );
+            });
+        }
     }
 
     public static void UseCORSDevelopmentPolicyExtension(this WebApplication app)

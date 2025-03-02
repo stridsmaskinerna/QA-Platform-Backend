@@ -58,15 +58,12 @@ public static class DatabaseExtension
         var adminMail = configuration["SeedData:AdminMail"];
         var adminPassword = configuration["SeedData:AdminPassword"];
         var context = serviceProvider.GetRequiredService<QAPlatformContext>();
-        var logger = serviceProvider.GetRequiredService<ILogger>();
         await context.Database.MigrateAsync();
         if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
         {
             return;
         }
         Console.WriteLine("Seeding data...");
-        logger.LogInformation($"[SEEDING] Admin Password: {adminMail}");
-        logger.LogInformation($"[SEEDING] Admin mail: {adminMail}");
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         await DBSeedProd.RunAsync(
