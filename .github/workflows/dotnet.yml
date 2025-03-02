@@ -57,7 +57,7 @@ jobs:
 
       - name: Inject Secrets into appsettings.json
         run: |
-          cd QAPlatformAPI  # Change to the correct working directory
+          cd QAPlatformAPI
           cp appsettings.Production.template.json appsettings.Production.json
           sed -i "s|\${POSTGRES_CONN}|${{ secrets.POSTGRES_CONN }}|g" appsettings.Production.json
           sed -i "s|\${JWT_ISSUER}|${{ secrets.JWT_ISSUER }}|g" appsettings.Production.json
