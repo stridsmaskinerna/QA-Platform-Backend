@@ -363,7 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # App settings
-appsettings.Production.json
+# appsettings.Production.json
 /.idea/.idea.QAPlatformAPI/.idea
 
 # Docker
