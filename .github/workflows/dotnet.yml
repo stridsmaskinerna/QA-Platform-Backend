@@ -1,6 +1,9 @@
 name: QA Platform build and test workflow
 
 on:
+  push:
+    branches:
+      - spike-deployment
   pull_request:
     branches: [ "main", "development" ]
 
@@ -39,3 +42,24 @@ jobs:
 
     - name: Stop and clean up containers
       run: docker compose -f docker-compose-test.yml down
+
+  build-and-push:
+    needs: [run-tests]  # Run only after tests pass
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write  # Needed to push images to GitHub Container Registry
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/qa-platform-api:pr-${{ github.event.pull_request.number }} .
+
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/qa-platform-api:pr-${{ github.event.pull_request.number }}
+
