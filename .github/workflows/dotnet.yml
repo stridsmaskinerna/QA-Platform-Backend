@@ -44,7 +44,7 @@ jobs:
       run: docker compose -f docker-compose-test.yml down
 
   build-and-push:
-    needs: [run-tests]  # Run only after tests pass
+    needs: [run-tests]
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -54,6 +54,16 @@ jobs:
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Inject Secrets into appsettings.json
+        run: |
+          cp appsettings.Production.template.json appsettings.Production.json
+          sed -i "s|\${POSTGRES_CONN}|${{ secrets.POSTGRES_CONN }}|g" appsettings.json
+          sed -i "s|\${JWT_ISSUER}|${{ secrets.JWT_ISSUER }}|g" appsettings.json
+          sed -i "s|\${JWT_AUDIENCE}|${{ secrets.JWT_AUDIENCE }}|g" appsettings.json
+          sed -i "s|\${SECRET_KEY}|${{ secrets.SECRET_KEY }}|g" appsettings.json
+          sed -i "s|\${SEED_ADMIN_MAIL}|${{ secrets.SEED_ADMIN_MAIL }}|g" appsettings.json
+          sed -i "s|\${SEED_ADMIN_PASSWORD}|${{ secrets.SEED_ADMIN_PASSWORD }}|g" appsettings.json
 
       - name: Determine Image Tag
         run: echo "IMAGE_TAG=pr-${{ github.event.pull_request.number || github.sha }}" >> $GITHUB_ENV
