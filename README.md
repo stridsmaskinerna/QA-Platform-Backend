@@ -2,7 +2,7 @@
 
 ## External Doc
 
-- **[Recommended Deployment Strategy for QA Platform](doc/DEPLOYMENT.md)** 🔗
+- **[Recommended Deployment Strategy for QA Platform](Doc/DEPLOYMENT.md)** 🔗
 
 ## Content
 
