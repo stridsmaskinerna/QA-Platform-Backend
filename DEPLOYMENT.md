@@ -9,7 +9,7 @@ This document outlines the recommended deployment process for the **QA Platform*
 - **Docker & Docker Compose** for containerized deployment
 
 This setup is designed for a **staging environment** that can be extended for production use
-and have been tested on [Debian Bookworm](https://www.debian.org/releases/bookworm/).
+and have been tested on **[Debian Bookworm](https://www.debian.org/releases/bookworm/)**.
 
 ---
 
@@ -26,13 +26,13 @@ Cloudflare enhances security and performance through **DNS management and tunnel
 ## Deployment Instructions
 
 ### **1. Prerequisites**
-Ensure you have the following installed on your server:
+Ensure you have the following prerequisites:
 - **A registered domain or sub-domain for the front-end (e.g., `qa.stridsmaskinerna.online`)** 
 - **A registered domain or sub-domain for the back-end (e.g., `qa-api.stridsmaskinerna.online`)** 
 - **Docker** & **Docker Compose**
 - **NGINX**
 - **Cloudflare Account**
-- **A GitHub personal access token (GAT)** 
+- **A GitHub personal access token [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)** 
 - **A Linux environment like `Debian Bookworm`**
 
 ---
@@ -65,7 +65,7 @@ Ensure the correct environment variables are set in
 - `[SEED_ADMIN_MAIL]: A Default Admin mail`
 - `[JWT_AUDIENCE]: A Default Admin password`
 
-**OBS!** The values of `GitHub Secrets` will not be displayed after updating or setting these values.
+**OBS!** `GitHub Secrets` values will not be displayed after updating or setting these values.
 
 **OBS!** Use your `GitHub Secrets` values later in your `docker-compose.yml` file for deployment.
 
@@ -81,7 +81,7 @@ later be used for deployment, e.g.:
 
 #### **3.3. Update docker compose**
 
-Use [docker-compose-example-production.yml](docker-compose-example-production.yml) as a example file to create a `docker-compose.yml` for deployment.
+Use [docker-compose-example-production.yml](Doc/docker-compose-example-production.yml) as a example file to create a `docker-compose.yml` for deployment.
 
 - Set container tags; needs to be the same tags as the built images in `GitHub Packages`.
 
@@ -90,8 +90,16 @@ Use [docker-compose-example-production.yml](docker-compose-example-production.ym
 #### **3.4. Deploy Services**
 Run the following commands to start the deployment:
 
-- `docker login ghcr.io -u <your-github-username>`, then enter your GitHub personal access token.
-- `docker compose -f docker-compose.yml up -d`
+```sh
+docker login ghcr.io -u <your-github-username>
+```
+
+then enter your GitHub personal access token (PAT).
+
+
+```sh
+docker compose -f docker-compose.yml up -d
+```
 
 This will:
 - Pull the **React frontend** and **ASP.NET backend** images from `GitHub Packages`.
@@ -152,18 +160,23 @@ server {
 
 After configuring NGINX, link configuration files:
 
-- `sudo ln -s /etc/nginx/sites-available/<YOUR_FRONTEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_FRONTEND_DOMAIN>.conf`
-
-- `sudo ln -s /etc/nginx/sites-available/<YOUR_BACKEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_BACKEND_DOMAIN>.conf`
+```sh
+sudo ln -s /etc/nginx/sites-available/<YOUR_FRONTEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_FRONTEND_DOMAIN>.conf
+sudo ln -s /etc/nginx/sites-available/<YOUR_BACKEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_BACKEND_DOMAIN>.conf
+```
 
 
 #### **4.4. Start Nginx**
 
 After linking configuration files, restart the service:
-`sudo systemctl restart nginx`
+```sh
+sudo systemctl restart nginx
+```
 
 Ensure NGINX is running:
-`sudo systemctl status nginx`
+```sh
+sudo systemctl status nginx
+```
 
 ---
 
