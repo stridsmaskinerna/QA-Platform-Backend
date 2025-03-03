@@ -9,7 +9,7 @@ This document outlines the recommended deployment process for the **QA Platform*
 - **Docker & Docker Compose** for containerized deployment
 
 This setup is designed for a **staging environment** that can be extended for production use
-and have been tested on [Debian Bookworm](https://www.debian.org/releases/bookworm/).
+and is currently tested on [Debian Bookworm](https://www.debian.org/releases/bookworm/) see [https://qa.stridsmaskinerna.online/](https://qa.stridsmaskinerna.online/).
 
 ---
 
