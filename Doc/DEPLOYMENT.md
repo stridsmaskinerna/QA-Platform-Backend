@@ -32,7 +32,7 @@ Ensure you have the following installed on your server:
 - **Docker** & **Docker Compose**
 - **NGINX**
 - **Cloudflare Account**
-- **A GitHub personal access token [GAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)** 
+- **A GitHub personal access token [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)** 
 - **A Linux environment like `Debian Bookworm`**
 
 ---
