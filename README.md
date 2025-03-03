@@ -1,5 +1,9 @@
 # QA-Platform-Backend
 
+## External Doc
+
+- **[Recommended Deployment Strategy for QA Platform](doc/DEPLOYMENT.md)** 🔗
+
 ## Content
 
 - **[Design](#design)**
