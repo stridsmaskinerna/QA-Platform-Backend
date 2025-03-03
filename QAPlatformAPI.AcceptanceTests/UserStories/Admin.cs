@@ -4,6 +4,7 @@ using QAPlatformAPI.IntegrationTests.Controllers;
 
 namespace QAPlatformAPI.AcceptanceTests.UserStories;
 
+[Collection("Sequential")]
 public class Admin : UserStoryTestBase
 {
     public Admin(QAPlatformAPIFactory<Program> factory) :

@@ -33,4 +33,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+# Ensure the environment is set to Production
+ENV DOTNET_ENVIRONMENT=Production
+
+# Image entry point
 ENTRYPOINT ["dotnet", "QAPlatformAPI.dll"]

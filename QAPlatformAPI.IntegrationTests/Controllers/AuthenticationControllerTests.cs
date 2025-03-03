@@ -5,6 +5,7 @@ using TestUtility.Factories;
 
 namespace QAPlatformAPI.IntegrationTests.Controllers;
 
+[Collection("Sequential")]
 public class AuthenticationControllerTests : IntegrationTestBase
 {
     public AuthenticationControllerTests(QAPlatformAPIFactory<Program> factory) :
@@ -132,7 +133,7 @@ public class AuthenticationControllerTests : IntegrationTestBase
             // Arrange
             var requestBody = AuthenticationFactory.CreateRegistrationDTO(
                 "UnknownnewUser",
-                "UnknownTestUser@mail.com",
+                "UnknownTestUser@ltu.se",
                 "password"
             );
 

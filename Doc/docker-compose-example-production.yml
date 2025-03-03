@@ -1,0 +1,39 @@
+services:
+  client:
+    image: ghcr.io/stridsmaskinerna/qa-platform-client:<VERSION_TAG>
+    restart: always
+    ports:
+      - "3333:80"
+    networks:
+      - qa-platform-network-prod
+
+  qa-platform-api:
+    image: ghcr.io/stridsmaskinerna/qa-platform-api:<VERSION_TAG>
+    restart: always
+    ports:
+      - "5051:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      - qa-platform-db
+    networks:
+      - qa-platform-network-prod
+
+  qa-platform-db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: <Same username value as in 'PostgreSQLConnection'>
+      POSTGRES_PASSWORD: <Same password value as in 'PostgreSQLConnection'>
+      POSTGRES_DB: <Same db name as in 'PostgreSQLConnection'>
+    volumes:
+      - qa-platform-volume-prod:/var/lib/postgresql/data
+    networks:
+      - qa-platform-network-prod
+
+volumes:
+  qa-platform-volume-prod:
+
+networks:
+  qa-platform-network-prod:
+    driver: bridge

@@ -1,9 +1,11 @@
+using System.Runtime.ConstrainedExecution;
 using Domain.Entities;
 using Infrastructure.Contexts;
 using Infrastructure.Seeds.Dev;
 using Infrastructure.Seeds.Prod;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace QAPlatformAPI.Extensions;
 
@@ -52,6 +54,9 @@ public static class DatabaseExtension
     {
         using var scope = app.ApplicationServices.CreateScope();
         var serviceProvider = scope.ServiceProvider;
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var adminMail = configuration["SeedData:AdminMail"];
+        var adminPassword = configuration["SeedData:AdminPassword"];
         var context = serviceProvider.GetRequiredService<QAPlatformContext>();
         await context.Database.MigrateAsync();
         if (await context.Subjects.AnyAsync() || await context.Users.AnyAsync())
@@ -61,6 +66,7 @@ public static class DatabaseExtension
         Console.WriteLine("Seeding data...");
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await DBSeedProd.RunAsync(context, userManager, roleManager);
+        await DBSeedProd.RunAsync(
+            context, userManager, roleManager, adminMail, adminPassword);
     }
 }

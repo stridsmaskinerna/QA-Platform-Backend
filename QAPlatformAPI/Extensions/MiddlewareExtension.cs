@@ -7,5 +7,6 @@ public static class MiddlewareExtension
     public static void UseMiddlewareExtension(this WebApplication app)
     {
         app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddleware<RequestSizeLimitMiddleware>();
     }
 }

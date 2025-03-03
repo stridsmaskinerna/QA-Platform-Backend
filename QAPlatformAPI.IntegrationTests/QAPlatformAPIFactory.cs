@@ -66,7 +66,7 @@ public class QAPlatformAPIFactory<TStartup> : WebApplicationFactory<TStartup> wh
                 options.UseNpgsql(connectionString));
 
             services.AddControllerExtension();
-            services.AddCORSConfigurationExtension(context.Configuration);
+            services.AddCORSConfigurationExtension(context.Configuration, context.HostingEnvironment);
             services.AddIdentityCoreExtension();
             services.AddJSONSerializerOptionsExtension();
             services.AddApplicationServicesExtension();

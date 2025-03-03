@@ -4,6 +4,7 @@ using QAPlatformAPI.IntegrationTests.Controllers;
 
 namespace QAPlatformAPI.AcceptanceTests.UserStories;
 
+[Collection("Sequential")]
 public class UnauthenticatedUser : UserStoryTestBase
 {
     public UnauthenticatedUser(QAPlatformAPIFactory<Program> factory) :

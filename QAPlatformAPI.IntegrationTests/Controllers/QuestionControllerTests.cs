@@ -4,7 +4,7 @@ using TestUtility.Factories;
 
 namespace QAPlatformAPI.IntegrationTests.Controllers;
 
-
+[Collection("Sequential")]
 public class QuestionControllerTests : IntegrationTestBase
 {
     public QuestionControllerTests(QAPlatformAPIFactory<Program> factory) :
