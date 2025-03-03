@@ -32,7 +32,7 @@ Ensure you have the following installed on your server:
 - **Docker** & **Docker Compose**
 - **NGINX**
 - **Cloudflare Account**
-- **A GitHub personal access token (GAT)** 
+- **A GitHub personal access token [GAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)** 
 - **A Linux environment like `Debian Bookworm`**
 
 ---
@@ -90,8 +90,15 @@ Use back-end `QAPlatformAPI/docker-compose-example-production.yml` as a example 
 #### **3.4. Deploy Services**
 Run the following commands to start the deployment:
 
-- `docker login ghcr.io -u <your-github-username>`, then enter your GitHub personal access token.
-- `docker compose -f docker-compose.yml up -d`
+```sh
+docker login ghcr.io -u <your-github-username>
+```
+
+then enter your GitHub personal access token (PAT).
+
+```sh
+docker compose -f docker-compose.yml up -d
+```
 
 This will:
 - Pull the **React frontend** and **ASP.NET backend** images from `GitHub Packages`.
@@ -152,18 +159,23 @@ server {
 
 After configuring NGINX, link configuration files:
 
-- `sudo ln -s /etc/nginx/sites-available/<YOUR_FRONTEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_FRONTEND_DOMAIN>.conf`
-
-- `sudo ln -s /etc/nginx/sites-available/<YOUR_BACKEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_BACKEND_DOMAIN>.conf`
+```sh
+sudo ln -s /etc/nginx/sites-available/<YOUR_FRONTEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_FRONTEND_DOMAIN>.conf
+sudo ln -s /etc/nginx/sites-available/<YOUR_BACKEND_DOMAIN>.conf /etc/nginx/sites-enabled/<YOUR_BACKEND_DOMAIN>.conf
+```
 
 
 #### **4.4. Start Nginx**
 
 After linking configuration files, restart the service:
-`sudo systemctl restart nginx`
+```sh
+sudo systemctl restart nginx
+```
 
 Ensure NGINX is running:
-`sudo systemctl status nginx`
+```sh
+sudo systemctl status nginx
+```
 
 ---
 
