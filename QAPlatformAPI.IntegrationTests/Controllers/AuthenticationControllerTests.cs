@@ -5,6 +5,7 @@ using TestUtility.Factories;
 
 namespace QAPlatformAPI.IntegrationTests.Controllers;
 
+[Collection("Sequential")]
 public class AuthenticationControllerTests : IntegrationTestBase
 {
     public AuthenticationControllerTests(QAPlatformAPIFactory<Program> factory) :
@@ -109,7 +110,7 @@ public class AuthenticationControllerTests : IntegrationTestBase
             base(factory)
         { }
 
-        [Fact(Skip = "Unknown failure after refactoring")]
+        [Fact]
         public async Task ShouldReturn_Ok_WhenValidRegistrationData()
         {
             // Arrange
@@ -126,7 +127,7 @@ public class AuthenticationControllerTests : IntegrationTestBase
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        [Fact(Skip = "Unknown failure after refactoring")]
+        [Fact]
         public async Task ShouldReturn_Unauthorized_WhenInvalidRegistrationData()
         {
             // Arrange

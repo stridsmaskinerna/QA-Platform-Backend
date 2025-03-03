@@ -4,6 +4,7 @@ using QAPlatformAPI.IntegrationTests.Controllers;
 
 namespace QAPlatformAPI.AcceptanceTests.UserStories;
 
+[Collection("Sequential")]
 public class Admin : UserStoryTestBase
 {
     public Admin(QAPlatformAPIFactory<Program> factory) :
@@ -16,7 +17,7 @@ public class Admin : UserStoryTestBase
             base(factory)
         { }
 
-        [UserStory(Description.ADMIN_ESSE_1, Skip = "Unknown failure after reafactorin")]
+        [UserStory(Description.ADMIN_ESSE_1)]
         public async Task ADMIN_ESSE_1()
         {
             await RunTestsAsync<QuestionControllerTests.CreateSubject>();

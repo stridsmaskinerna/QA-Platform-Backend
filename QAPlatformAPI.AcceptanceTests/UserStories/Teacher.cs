@@ -3,6 +3,7 @@ using QAPlatformAPI.IntegrationTests;
 
 namespace QAPlatformAPI.AcceptanceTests.UserStories;
 
+[Collection("Sequential")]
 public class Teacher : UserStoryTestBase
 {
     public Teacher(QAPlatformAPIFactory<Program> factory) :

@@ -3,6 +3,7 @@ using QAPlatformAPI.IntegrationTests;
 
 namespace QAPlatformAPI.AcceptanceTests.UserStories;
 
+[Collection("Sequential")]
 public class User : UserStoryTestBase
 {
     public User(QAPlatformAPIFactory<Program> factory) :
